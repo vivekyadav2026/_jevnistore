@@ -5,12 +5,14 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 $host = 'localhost';
-$user = 'root';
-$password = '';
-$dbname = 'clothproject_db';
-// $user = 'u478569362_jevni_Store';
-// $password = 'jevni_Store2@';
-// $dbname = 'u478569362_jevni';
+
+// $user = 'root';
+// $password = '';
+// $dbname = 'clothproject_db';
+
+$user = 'u798623491_jevni';
+$password = 'Jevni2026@$%';
+$dbname = 'u798623491_jevnidb';
 
 $conn = new mysqli($host, $user, $password, $dbname);
 
