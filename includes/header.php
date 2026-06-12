@@ -263,7 +263,7 @@ require_once __DIR__ . '/functions.php';
             
             <div class="logo-wrapper" style="justify-self: center;">
                 <a href="<?php echo BASE_URL; ?>/index.php" class="logo">
-                    <img src="<?php echo BASE_URL; ?>/assets/logo.png" alt="Jevani Store" style="height: 40px; width: auto;" onerror="this.src='<?php echo BASE_URL; ?>/assets/logoOD.png';">
+                    <img src="<?php echo BASE_URL; ?>/assets/logo.png" alt="Jevani Store" style="height: 60px; width: auto;" onerror="this.src='<?php echo BASE_URL; ?>/assets/logoOD.png';">
                 </a>
             </div>
             
