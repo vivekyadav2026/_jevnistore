@@ -1,73 +1,229 @@
-    <!-- Footer -->
-    <footer class="footer" style="padding: 4rem 24px 3rem !important; background: #000; border-top: 1px solid rgba(255, 255, 255, 0.05); font-family: var(--font);">
-        <div style="max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; align-items: flex-start; gap: 1.5rem;">
+    <!-- Footer CSS -->
+    <style>
+        .footer-premium {
+            background-color: #000;
+            color: #fff;
+            padding: 80px 40px 40px;
+            font-family: 'Inter', sans-serif;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .footer-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+        .footer-brand p {
+            color: #a1a1aa;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            margin-top: 20px;
+            max-width: 300px;
+        }
+        .footer-col-title {
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: #fff;
+        }
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .footer-links a {
+            color: #a1a1aa;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: color 0.3s ease;
+        }
+        .footer-links a:hover {
+            color: #fff;
+        }
+        .footer-newsletter input {
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid #444;
+            color: #fff;
+            padding: 10px 0;
+            width: 100%;
+            font-size: 0.85rem;
+            outline: none;
+            transition: border-color 0.3s;
+            margin-bottom: 15px;
+        }
+        .footer-newsletter input:focus {
+            border-bottom-color: #fff;
+        }
+        .footer-newsletter button {
+            background: #fff;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .footer-newsletter button:hover {
+            background: #e4e4e7;
+        }
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .footer-social {
+            display: flex;
+            gap: 20px;
+        }
+        .footer-social a {
+            color: #a1a1aa;
+            transition: color 0.3s ease;
+        }
+        .footer-social a:hover {
+            color: #fff;
+        }
+        .footer-meta {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 0.8rem;
+            color: #71717a;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .footer-country {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #a1a1aa;
+        }
+        @media (max-width: 900px) {
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .footer-brand {
+                grid-column: span 2;
+            }
+        }
+        @media (max-width: 600px) {
+            .footer-premium {
+                padding: 60px 20px 30px;
+            }
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+            .footer-brand {
+                grid-column: span 1;
+            }
+            .footer-bottom {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            .footer-meta {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+
+    <!-- Footer HTML -->
+    <footer class="footer-premium">
+        <div class="footer-grid">
             
-            <!-- Left-aligned Logo -->
-            <a href="<?php echo BASE_URL; ?>/index.php" style="display: block; margin-bottom: 0.5rem;">
-                <img src="<?php echo BASE_URL; ?>/assets/logo_gothic.png" alt="GENRAGE Store" style="height: 60px; width: auto; object-fit: contain;">
-            </a>
-
-            <!-- Section Title -->
-            <div style="font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; color: #fff; font-weight: 500; margin-bottom: 0.5rem;">
-                FOOTER
-            </div>
-
-            <!-- Vertical Links Stack -->
-            <div style="display: flex; flex-direction: column; gap: 16px; font-size: 0.95rem; letter-spacing: 0.5px;">
-                <a href="<?php echo BASE_URL; ?>/customer/index.php" style="color: #a1a1aa; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">TRACK MY ORDER</a>
-                <!--<a href="<?php echo BASE_URL; ?>/exchange_portal.php" style="color: #a1a1aa; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">EXCHANGE PORTAL</a>-->
-                <a href="<?php echo BASE_URL; ?>/reviews.php" style="color: #a1a1aa; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">JEVANI Reviews</a>
-                <a href="<?php echo BASE_URL; ?>/exchange_policy.php" style="color: #a1a1aa; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">Exchange Policy</a>
-                <a href="<?php echo BASE_URL; ?>/policies.php" style="color: #a1a1aa; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">Policies</a>
-                <a href="<?php echo BASE_URL; ?>/about.php" style="color: #a1a1aa; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">About us</a>
-                <a href="<?php echo BASE_URL; ?>/terms_of_service.php" style="color: #a1a1aa; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">Terms of Service</a>
-                <a href="<?php echo BASE_URL; ?>/partner_with_us.php" style="color: #a1a1aa; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">PARTNER WITH US</a>
-                <a href="<?php echo BASE_URL; ?>/lookbook.php" style="color: #a1a1aa; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">Blogs</a>
-            </div>
-
-            <!-- Tagline & Copyright Info -->
-            <div style="margin-top: 1.5rem; display: flex; flex-direction: column; gap: 16px;">
-                <div style="font-size: 0.85rem; letter-spacing: 1.5px; text-transform: uppercase; color: #e4e4e7; font-weight: 500;">
-                    PROUDLY HOMEGROWN IN INDIA
+            <!-- Column 1: Brand & Newsletter -->
+            <div class="footer-brand">
+                <a href="<?php echo BASE_URL; ?>/index.php" style="display: inline-block;">
+                    <img src="<?php echo BASE_URL; ?>/assets/logo_gothic.png" alt="JEVANI" style="height: 70px; width: auto; object-fit: contain;">
+                </a>
+                <p>Every stitch carries purpose. Jevani is a premium streetwear accessories brand redefining everyday carry for the modern urbanite. Proudly homegrown in India.</p>
+                
+                <div class="footer-newsletter" style="margin-top: 30px;">
+                    <div class="footer-col-title" style="margin-bottom: 15px;">Join The Inner Circle</div>
+                    <form onsubmit="event.preventDefault(); alert('Subscribed successfully!');">
+                        <input type="email" placeholder="ENTER YOUR EMAIL ADDRESS" required>
+                        <button type="submit">Subscribe</button>
+                    </form>
                 </div>
-                <!-- <div style="font-size: 0.85rem; color: #a1a1aa;">
-                    &copy; GENRAGE
-                </div> -->
             </div>
 
-            <!-- Social Outlined Icons -->
-            <div style="display: flex; gap: 24px; margin-top: 1rem; align-items: center;">
-                <a href="<?php echo htmlspecialchars(getSetting('social_instagram', '#')); ?>" target="_blank" style="color: #a1a1aa; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px; height: 20px;"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-                </a>
-                <a href="#" target="_blank" style="color: #a1a1aa; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">
-                    <svg style="width: 20px; height: 20px;" viewBox="0 0 24 24" fill="currentColor"><path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.401.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.951-7.252 4.168 0 7.41 2.967 7.41 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.354-.629-2.758-1.379l-.749 2.848c-.269 1.045-1.004 2.352-1.498 3.146 1.123.345 2.306.535 3.55.535 6.607 0 11.985-5.365 11.985-11.987C23.97 5.367 18.592 0 12.017 0z"/></svg>
-                </a>
-                <a href="#" target="_blank" style="color: #a1a1aa; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px; height: 20px;"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+            <!-- Column 2: Shop -->
+            <div>
+                <div class="footer-col-title">Shop</div>
+                <div class="footer-links">
+                    <a href="<?php echo BASE_URL; ?>/shop.php">All Products</a>
+                    <a href="<?php echo BASE_URL; ?>/shop.php?category=totes">Signature Totes</a>
+                    <a href="<?php echo BASE_URL; ?>/shop.php?category=crossbody">Crossbody Bags</a>
+                    <a href="<?php echo BASE_URL; ?>/shop.php?category=accessories">Accessories</a>
+                    <a href="<?php echo BASE_URL; ?>/lookbook.php">The Lookbook</a>
+                </div>
+            </div>
+
+            <!-- Column 3: Support -->
+            <div>
+                <div class="footer-col-title">Support</div>
+                <div class="footer-links">
+                    <a href="<?php echo BASE_URL; ?>/customer/index.php">Track My Order</a>
+                    <a href="<?php echo BASE_URL; ?>/exchange_policy.php">Returns & Exchanges</a>
+                    <a href="<?php echo BASE_URL; ?>/policies.php">Shipping Policy</a>
+                    <a href="<?php echo BASE_URL; ?>/contact.php">Contact Us</a>
+                </div>
+            </div>
+
+            <!-- Column 4: Company -->
+            <div>
+                <div class="footer-col-title">Company</div>
+                <div class="footer-links">
+                    <a href="<?php echo BASE_URL; ?>/about.php">About Jevani</a>
+                    <a href="<?php echo BASE_URL; ?>/reviews.php">Customer Reviews</a>
+                    <a href="<?php echo BASE_URL; ?>/partner_with_us.php">Partner With Us</a>
+                    <a href="<?php echo BASE_URL; ?>/terms_of_service.php">Terms of Service</a>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer Bottom -->
+        <div class="footer-bottom">
+            <!-- Social Icons -->
+            <div class="footer-social">
+                <a href="<?php echo htmlspecialchars(getSetting('social_instagram', '#')); ?>" target="_blank" aria-label="Instagram">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width: 20px; height: 20px;"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
                 </a>
                 <?php 
                     $wa_number = getSetting('contact_whatsapp', ''); 
                     $wa_clean = preg_replace('/[^0-9]/', '', $wa_number);
                     $wa_link = $wa_clean ? 'https://wa.me/' . $wa_clean : '#';
                 ?>
-                <a href="<?php echo htmlspecialchars($wa_link); ?>" target="_blank" style="color: #a1a1aa; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px; height: 20px;"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                <a href="<?php echo htmlspecialchars($wa_link); ?>" target="_blank" aria-label="WhatsApp">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width: 20px; height: 20px;"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                </a>
+                <a href="#" target="_blank" aria-label="TikTok">
+                    <svg viewBox="0 0 24 24" fill="currentColor" style="width: 18px; height: 18px;"><path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.401.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.951-7.252 4.168 0 7.41 2.967 7.41 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.354-.629-2.758-1.379l-.749 2.848c-.269 1.045-1.004 2.352-1.498 3.146 1.123.345 2.306.535 3.55.535 6.607 0 11.985-5.365 11.985-11.987C23.97 5.367 18.592 0 12.017 0z"/></svg>
                 </a>
             </div>
-
-        </div>
-
-        <div style="display: flex; flex-direction: column; align-items: center; margin-top: 4rem; gap: 1rem;">
-            <!-- Flag Country Selector -->
-            <div style="display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.8rem; letter-spacing: 1px; color: #a1a1aa; text-transform: uppercase;">
-                <img src="https://flagcdn.com/w20/in.png" alt="India" style="height: 12px; width: auto; border-radius: 2px;">
-                INDIA (INR ₹) <i data-lucide="chevron-down" style="width: 14px; height: 14px;"></i>
-            </div>
-
-            <!-- Footer Small Bottom Copyright -->
-            <div style="font-size: 0.75rem; color: #71717a; text-transform: uppercase; letter-spacing: 1.5px;">
-                &copy; <?php echo date('Y'); ?>
+            
+            <div class="footer-meta">
+                <div class="footer-country">
+                    <img src="https://flagcdn.com/w20/in.png" alt="India" style="height: 12px; border-radius: 2px;">
+                    INDIA (INR ₹) <i data-lucide="chevron-up" style="width: 14px; height: 14px;"></i>
+                </div>
+                <div>
+                    &copy; <?php echo date('Y'); ?> JEVANI STUDIOS. ALL RIGHTS RESERVED.
+                </div>
             </div>
         </div>
     </footer>

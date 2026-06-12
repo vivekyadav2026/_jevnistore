@@ -71,7 +71,8 @@ h1, h2, h3, h4, h5, h6 { font-weight: 500; letter-spacing: -0.01em; }
 }
 .header {
     position: absolute; left: 0; width: 100%; z-index: 100;
-    height: var(--header-height); display: flex; align-items: center;
+    /* height: var(--header-height); */
+     display: flex; align-items: center;
     background: transparent; transition: background var(--transition-smooth);
     border-bottom: 1px solid transparent;
 }

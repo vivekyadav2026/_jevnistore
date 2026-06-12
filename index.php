@@ -1,538 +1,701 @@
 <?php require_once 'includes/header.php'; ?>
 
-    <!-- 1. Hero Banner -->
-    <section class="hero" style="min-height: 85vh;">
-        <picture>
-            <source media="(max-width: 768px)" srcset="<?php echo BASE_URL; ?>/assets/hero_mobile.jpg">
-            <img src="<?php echo BASE_URL; ?>/assets/hero_banner_model.png" alt="Premium Gen-Z Bag Campaign" class="hero-img">
-        </picture>
-        <div class="hero-overlay" style="background: linear-gradient(to top, rgba(9, 9, 11, 0.95) 0%, rgba(9, 9, 11, 0.3) 50%, rgba(9, 9, 11, 0.6) 100%);"></div>
-        <div class="container hero-content" style="align-self: flex-end; margin-bottom: 15vh; z-index: 2; display: flex; justify-content: center; align-items: center;">
-            <div class="hero-actions" style="width: 100%; display: flex; justify-content: center;">
-                <a href="<?php echo BASE_URL; ?>/shop.php" style="color: #ffffff; text-transform: uppercase; font-size: clamp(0.9rem, 2.5vw, 1.2rem); letter-spacing: 6px; text-decoration: underline; text-underline-offset: 8px; text-decoration-thickness: 1px; font-weight: 500; font-family: var(--font); transition: opacity 0.3s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">JUST DROPPED</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- New Arrivals Section -->
-    <section class="new-arrivals-section">
-
-        
-        <div class="container">
-            <div class="new-arrivals-header" style="margin-bottom: 3rem;">
-                <h2 class="new-arrivals-title" style="font-size: clamp(1.2rem, 3vw, 1.8rem); letter-spacing: 5px; font-weight: 400; color: var(--text-primary); text-transform: uppercase;">DROPPED TODAY</h2>
-            </div>
-            
-            <div class="new-arrivals-grid">
-                <?php
-                $na_stmt = $conn->prepare("SELECT * FROM products ORDER BY created_at DESC LIMIT 12");
-                $na_stmt->execute();
-                $na_result = $na_stmt->get_result();
-                $index = 0;
-                while ($product = $na_result->fetch_assoc()) {
-                    $image = $product['image'] ? BASE_URL . '/assets/' . htmlspecialchars($product['image']) : BASE_URL . '/assets/bag_shoulder.png';
-                    $hover_image = !empty($product['image2']) ? BASE_URL . '/assets/' . htmlspecialchars($product['image2']) : '';
-                    
-                    $discount_pct = 0;
-                    if (!empty($product['compare_at_price']) && $product['compare_at_price'] > $product['price']) {
-                        $discount_pct = round((($product['compare_at_price'] - $product['price']) / $product['compare_at_price']) * 100);
-                    }
-                    
-                    $in_wish = isset($_SESSION['wishlist']) && in_array($product['id'], $_SESSION['wishlist']);
-                    $heart_fill = $in_wish ? '#ef4444' : 'none';
-                    $heart_color = $in_wish ? '#ef4444' : '#ffffff';
-                    $wish_class = $in_wish ? 'in-wishlist' : '';
-                    ?>
-                    <div class="y2k-card y2k-fade-in" style="transition-delay: <?php echo ($index % 4) * 0.1; ?>s;">
-                        <div class="y2k-img-wrapper">
-                            <!-- Badges -->
-                            <div class="y2k-badges">
-                                <?php if ($product['stock'] <= 0): ?>
-                                    <span class="y2k-badge sold-out">SOLD OUT</span>
-                                <?php endif; ?>
-                                <?php if ($discount_pct > 0): ?>
-                                    <span class="y2k-badge sale">SAVE <?php echo $discount_pct; ?>%</span>
-                                <?php endif; ?>
-                            </div>
-                            
-                            <!-- Wishlist Toggle -->
-                            <button type="button" class="y2k-wishlist-btn <?php echo $wish_class; ?>" onclick="toggleWishlist(<?php echo $product['id']; ?>, this)" aria-label="Add to Wishlist">
-                                <i data-lucide="heart" fill="<?php echo $heart_fill; ?>" style="width: 18px; height: 18px; color: <?php echo $heart_color; ?>;"></i>
-                            </button>
-                            
-                            <!-- Product Image -->
-                            <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $product['id']; ?>">
-                                <img src="<?php echo $image; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" class="y2k-img">
-                                <?php if ($hover_image): ?>
-                                    <img src="<?php echo $hover_image; ?>" alt="<?php echo htmlspecialchars($product['name']); ?> hover" class="y2k-img-hover">
-                                <?php endif; ?>
-                            </a>
-                            
-                            <!-- Quick View Trigger -->
-                            <button type="button" class="y2k-quickview-btn" onclick="openQuickView(<?php echo $product['id']; ?>)">Quick View</button>
-                        </div>
-                        
-                        <!-- Details -->
-                        <div class="y2k-info">
-                            <div>
-                                <span class="y2k-brand">JEVANI STORE</span>
-                                <h3 class="y2k-title">
-                                    <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $product['id']; ?>">
-                                        <?php echo htmlspecialchars($product['name']); ?>
-                                    </a>
-                                </h3>
-                            </div>
-                            
-                            <div class="y2k-price-row">
-                                <span class="y2k-price-sale">₹<?php echo number_format($product['price']); ?></span>
-                                <?php if (!empty($product['compare_at_price']) && $product['compare_at_price'] > $product['price']): ?>
-                                    <span class="y2k-price-compare">₹<?php echo number_format($product['compare_at_price']); ?></span>
-                                    <span class="y2k-discount-badge">(<?php echo $discount_pct; ?>% OFF)</span>
-                                <?php endif; ?>
-                            </div>
-                            
-                            <!-- AJAX Add to Cart form -->
-                            <form action="<?php echo BASE_URL; ?>/cart_action.php" method="POST" class="ajax-cart-form">
-                                <input type="hidden" name="action" value="add">
-                                <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
-                                <input type="hidden" name="quantity" value="1">
-                                <input type="hidden" name="size" value="Silver">
-                                <button type="submit" class="y2k-add-btn">
-                                    <i data-lucide="shopping-bag"></i>
-                                    Add to Bag
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                    <?php
-                    $index++;
-                }
-                ?>
-            </div>
-        </div>
-    </section>
-
-    <script>
-        // Scroll Intersection Observer for animations
-        document.addEventListener('DOMContentLoaded', () => {
-            const fadeElements = document.querySelectorAll('.y2k-fade-in');
-            
-            const observerOptions = {
-                root: null,
-                rootMargin: '0px',
-                threshold: 0.1
-            };
-            
-            const observer = new IntersectionObserver((entries, observer) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('animated');
-                        observer.unobserve(entry.target);
-                    }
-                });
-            }, observerOptions);
-            
-            fadeElements.forEach(el => observer.observe(el));
-        });
-    </script>
-
-    <!-- Video Campaign Section -->
-    <section class="video-campaign-section" style="background: #000; border-top: 1px solid #1a1a1a; border-bottom: 1px solid #1a1a1a; padding: 0; line-height: 0;">
-        <div style="width: 100%; position: relative; overflow: hidden; height: auto;">
-            <video id="campaign-video" autoplay loop muted playsinline style="width: 100%; height: auto; display: block; object-fit: cover; max-height: 80vh;">
-                <source src="<?php echo BASE_URL; ?>/assets/campaign.mp4" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
-        </div>
-    </section>
-
-    <!-- Genrage Bags Showcase -->
-    <section class="bags-showcase" style="background-color: #cfcfcf; padding: 4rem 20px; font-family: var(--font); overflow: hidden;">
-        <div class="container" style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; align-items: flex-start;">
-            
-            <!-- Showcase Composition -->
-            <div style="width: 100%; max-width: 600px; position: relative; margin-bottom: 3rem; padding-right: 20%; align-self: center;">
-                
-                <!-- Video Container (Replaces the Man) -->
-                <div style="width: 100%; background-color: #1a1a1a; position: relative; z-index: 1;">
-                    <video autoplay loop muted playsinline style="width: 100%; height: auto; display: block; object-fit: cover; aspect-ratio: 4/5;">
-                        <source src="<?php echo BASE_URL; ?>/assets/y2k_video.mp4" type="video/mp4">
-                    </video>
-                </div>
-
-                <!-- Bag Image Overlapping (Replaces the Pants) -->
-                <div style="position: absolute; right: 0; top: 50%; transform: translateY(-50%); z-index: 2; width: 45%;">
-                    <img src="<?php echo BASE_URL; ?>/assets/streetwear_bag.png" alt="Genrage Bag" style="width: 100%; height: auto; object-fit: contain; filter: drop-shadow(-10px 15px 25px rgba(0,0,0,0.3));">
-                </div>
-            </div>
-
-            <!-- Text Content -->
-            <div style="width: 100%; max-width: 600px; margin: 0 auto; text-align: left;">
-                <h2 style="font-size: 1.4rem; font-weight: 500; letter-spacing: 2px; color: #1a1a1a; margin-bottom: 1.5rem; text-transform: uppercase; border-bottom: 1px solid #1a1a1a; display: inline-block; padding-bottom: 4px;">
-                    JEVANI BAGS
-                </h2>
-                
-                <p style="font-size: 1rem; line-height: 1.8; color: #222; font-weight: 400; margin-bottom: 0;">
-                   Crafted for the modern muse, JEVANI redefines everyday luxury through bold design and timeless attitude.
-Each bag is thoughtfully created with premium materials, refined details, and a distinctive Y2K-inspired aesthetic, delivering the perfect balance of fashion and function.
-Designed to elevate every outfit and every occasion, JEVANI is more than an accessory—it's a statement of confidence, individuality, and style.
-Luxury with attitude. Designed for the unforgettable. ✦
-                </p>
-            </div>
-            
-        </div>
-    </section>
-
-    
-
-
-    <section class="section" style="padding: 0; background: #000; position: relative;">
-        <div style="width: 100%; height: 80vh; min-height: 600px; overflow: hidden; position: relative; display: flex; justify-content: center; align-items: center;">
-            <img src="<?php echo BASE_URL; ?>/assets/campaign_lifestyle.jpg" alt="Lifestyle Campaign" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.5;">
-            <!-- <div style="position: absolute; text-align: center; color: #fff; z-index: 2; width: 100%; padding: 0 20px;">
-                <h2 class="font-serif" style="font-size: clamp(3rem, 8vw, 6rem); font-style: italic; font-weight: 400; margin-bottom: 30px; line-height: 1;">ARCHITECTURAL<br>ELEGANCE</h2>
-                <a href="<?php echo BASE_URL; ?>/shop.php" class="btn" style="padding: 18px 40px; letter-spacing: 2px;">DISCOVER THE COLLECTION</a>
-            </div> -->
-        </div>
-    </section>
-
-    <!-- 8. About Us -->
-    <section class="section" style="background: var(--bg-primary); padding: 8rem 0; border-top: 1px solid rgba(255, 255, 255, 0.05);">
-        <div class="container" style="max-width: 800px; text-align: center;">
-            <h2 style="font-family: var(--font); font-size: 0.9rem; letter-spacing: 4px; color: var(--accent); margin-bottom: 2.5rem; font-weight: 600; text-transform: uppercase;">ABOUT US</h2>
-            <p style="font-family: var(--font); font-size: clamp(1.1rem, 2.5vw, 1.4rem); line-height: 1.8; color: var(--text-primary); font-weight: 300; letter-spacing: 0.5px; margin-bottom: 3rem;">
-                Jevani is a modern Y2K-inspired fashion brand focused on creating stylish, trend-driven bags and accessories for fashion-conscious women. The brand blends nostalgic early-2000s aesthetics with contemporary luxury, offering statement pieces that are both fashionable and functional.
-            </p>
-            <a href="<?php echo BASE_URL; ?>/about.php" style="font-family: var(--font); text-decoration: underline; text-underline-offset: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 2.5px; color: var(--text-primary); font-size: 0.85rem; transition: color 0.3s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-primary)'">Learn More</a>
-        </div>
-    </section>
-
-    <!-- 9. Customer Reviews Section -->
-    <section class="reviews-section" style="background: var(--bg-secondary); color: var(--text-primary); padding: 6rem 0; font-family: var(--font); text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.05); border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
-        <div class="container" style="max-width: 600px; padding: 0 20px; position: relative;">
-            
-            <h2 style="font-size: 1.8rem; font-weight: 600; margin-bottom: 8px; color: #fff; font-family: var(--font); letter-spacing: 1.5px; text-transform: uppercase;">Let JEVANIS' speak for us</h2>
-            
-            <!-- Global Rating -->
-            <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; margin-bottom: 2.5rem;">
-                <div style="color: var(--accent); font-size: 1.2rem; letter-spacing: 2px;">★★★★★</div>
-                <div style="font-size: 0.85rem; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px;">
-                    from 1,420 reviews 
-                    <span style="display: inline-flex; align-items: center; justify-content: center; background: #009688; color: #fff; width: 14px; height: 14px; border-radius: 50%; font-size: 8px; font-weight: 700;">✓</span>
-                </div>
-            </div>
-
-            <!-- Review Card Container (Slider) -->
-            <div class="review-slider" style="position: relative; min-height: 250px;">
-                
-                <?php
-                $reviews_list = [
-                    [
-                        'stars' => '★★★★★',
-                        'title' => 'This Is for the Looks',
-                        'body' => 'The quality is amazing and exactly what I was looking for.',
-                        'author' => 'Ankit Sharma',
-                        'image' => 'assets/bag_mini.png'
-                    ],
-                    [
-                        'stars' => '★★★★★',
-                        'title' => 'Obsessed with the hardware',
-                        'body' => 'Super heavy, robust hardware. Perfect for daily streetwear styling.',
-                        'author' => 'Rohan Sen',
-                        'image' => 'assets/bag_shoulder.png'
-                    ],
-                    [
-                        'stars' => '★★★★★',
-                        'title' => 'Instantly elevated my fits',
-                        'body' => 'This Y2K baguette bag is exactly what my closet was missing. Love it!',
-                        'author' => 'Priya S.',
-                        'image' => 'assets/bag_tote.png'
-                    ]
-                ];
-                foreach ($reviews_list as $idx => $rev):
-                ?>
-                <div class="review-slide" id="review-slide-<?php echo $idx; ?>" style="display: <?php echo $idx === 0 ? 'block' : 'none'; ?>; transition: opacity 0.4s ease;">
-                    <div style="color: var(--accent); font-size: 1.1rem; letter-spacing: 2px; margin-bottom: 8px;">★★★★★</div>
-                    <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; color: #fff; font-family: var(--font); text-transform: uppercase; letter-spacing: 1px;"><?php echo htmlspecialchars($rev['title']); ?></h3>
-                    <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-secondary); max-width: 450px; margin: 0 auto 1.5rem; font-weight: 350; font-family: var(--font);"><?php echo htmlspecialchars($rev['body']); ?></p>
-                    <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.2rem; font-weight: 500; font-family: var(--font); text-transform: uppercase; letter-spacing: 1px;"><?php echo htmlspecialchars($rev['author']); ?></div>
-                    
-                    <!-- Product Image Link -->
-                    <div style="display: inline-block; margin-bottom: 1.5rem;">
-                        <img src="<?php echo BASE_URL . '/' . $rev['image']; ?>" alt="Product" style="height: 60px; width: auto; object-fit: contain; background: rgba(255,255,255,0.02); padding: 5px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08);">
-                    </div>
-                </div>
-                <?php endforeach; ?>
-
-                <!-- Navigation Arrows -->
-                <div style="display: flex; justify-content: center; gap: 24px; align-items: center; margin-top: 1rem;">
-                    <button onclick="prevReview()" style="background: none; border: none; font-size: 2.5rem; color: var(--text-secondary); cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-secondary)'">‹</button>
-                    <button onclick="nextReview()" style="background: none; border: none; font-size: 2.5rem; color: var(--text-secondary); cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-secondary)'">›</button>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <script>
-        let currentReviewIdx = 0;
-        const totalReviews = <?php echo count($reviews_list); ?>;
-        
-        function showReview(idx) {
-            for (let i = 0; i < totalReviews; i++) {
-                document.getElementById('review-slide-' + i).style.display = 'none';
-            }
-            document.getElementById('review-slide-' + idx).style.display = 'block';
-        }
-        
-        function nextReview() {
-            currentReviewIdx = (currentReviewIdx + 1) % totalReviews;
-            showReview(currentReviewIdx);
-        }
-        
-        function prevReview() {
-            currentReviewIdx = (currentReviewIdx - 1 + totalReviews) % totalReviews;
-            showReview(currentReviewIdx);
-        }
-    </script>
-
-
-    <style>
-    /* ═══════════════════════════════════════════
-       INSTAGRAM / COMMUNITY SECTION
-    ═══════════════════════════════════════════ */
-    .ig-section {
-        background: linear-gradient(160deg, #0a0a0a 0%, #111 60%, #1a1010 100%);
-        padding: 5rem 0 0;
-        overflow: hidden;
+<style>
+    :root {
+        --bg-tan: #d6d3d1; /* For the drop section and general background */
+        --text-dark: #1a1a1a;
     }
 
-    /* Header */
-    .ig-header {
-        text-align: center;
-        padding: 0 20px 3.5rem;
-    }
-    .ig-handle-wrap {
-        display: inline-flex;
-        align-items: baseline;
-        gap: 4px;
-        margin-bottom: 1rem;
-    }
-    .ig-at {
-        font-size: clamp(1.2rem, 4vw, 2rem);
-        font-weight: 700;
-        background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
-    .ig-handle {
-        font-size: clamp(1.6rem, 5vw, 3rem);
-        font-weight: 800;
-        letter-spacing: 3px;
-        color: #fff;
-        font-family: var(--font-serif);
-        font-style: italic;
-    }
-    .ig-tagline {
-        color: rgba(255,255,255,0.55);
-        font-size: 1rem;
-        line-height: 1.7;
-        letter-spacing: 0.5px;
-        margin-bottom: 2.5rem;
+    body {
+        background-color: var(--text-dark); /* Page is generally dark or sections define it */
+        color: var(--text-dark);
+        font-family: 'Inter', -apple-system, sans-serif;
     }
 
-    /* Stats */
-    .ig-stats {
-        display: inline-flex;
+    /* 1. Hero Full Width Image */
+    .hero-main {
+        width: 100%;
+        background-color: #000;
+        display: flex;
+    }
+    .hero-main img {
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+    }
+
+    /* 2. Products Row Section (THE DROP +) */
+    .products-row-section {
+        background-color: var(--bg-tan);
+        padding: 40px 20px;
+    }
+    .products-header {
+        display: flex;
+        justify-content: space-between;
         align-items: center;
-        gap: 0;
-        background: rgba(255,255,255,0.05);
-        border: 1px solid rgba(255,255,255,0.1);
-        border-radius: 60px;
-        padding: 16px 32px;
-        backdrop-filter: blur(10px);
-    }
-    .ig-stat { text-align: center; padding: 0 24px; }
-    .ig-stat-num {
-        display: block;
-        font-size: 1.4rem;
-        font-weight: 800;
-        color: #fff;
-        line-height: 1;
-        margin-bottom: 4px;
-    }
-    .ig-stat-label {
-        font-size: 0.65rem;
+        margin-bottom: 30px;
+        font-size: 0.75rem;
+        font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 2px;
-        color: rgba(255,255,255,0.4);
+        letter-spacing: 1px;
+        max-width: 1400px;
+        margin-left: auto;
+        margin-right: auto;
     }
-    .ig-stat-divider {
-        width: 1px;
-        height: 36px;
-        background: rgba(255,255,255,0.12);
-        flex-shrink: 0;
+    .products-header a {
+        text-decoration: none;
+        color: var(--text-dark);
+        border-bottom: 1px solid var(--text-dark);
+        padding-bottom: 2px;
     }
-
-    /* Mosaic Grid */
-    .ig-mosaic {
+    .products-grid {
         display: grid;
-        grid-template-columns: 1.8fr 1fr 1fr;
-        gap: 6px;
-        padding: 0 6px;
-        max-height: 560px;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 15px;
+        max-width: 1400px;
+        margin: 0 auto;
     }
-    .ig-tile-col {
+    .product-card-min {
         display: flex;
         flex-direction: column;
-        gap: 6px;
+        align-items: center;
+        text-align: center;
     }
-    .ig-tile {
+    .product-img-box {
+        background: #fff;
+        width: 100%;
+        aspect-ratio: 1/1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 15px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    .product-img-box img {
+        width: 80%;
+        height: 80%;
+        object-fit: contain;
+    }
+    .product-min-title {
+        font-size: 0.6rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+        letter-spacing: 0.5px;
+    }
+    .product-min-price {
+        font-size: 0.6rem;
+        font-weight: 600;
+        margin-bottom: 12px;
+    }
+    .add-btn-small {
+        width: 28px;
+        height: 28px;
+        border: 1px solid var(--text-dark);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    .add-btn-small:hover {
+        background: var(--text-dark);
+        color: #fff;
+    }
+    .add-btn-small svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    /* 3. Alleyway Girl Section */
+    .alleyway-section {
+        width: 100%;
+        background-color: #000;
+    }
+    .alleyway-section img {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+
+    /* 4. Icon Infographic Section */
+    .icon-infographic {
+        background-color: #e3ded7;
+        width: 100%;
+        padding: 60px 20px;
         position: relative;
         overflow: hidden;
-        display: block;
-        cursor: pointer;
-        background: #1a1a1a;
+        color: #1a1a1a;
+        font-family: 'Inter', sans-serif;
     }
-    .ig-tile--large {
-        grid-row: span 1;
+    .info-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 30px;
+        position: relative;
     }
-    .ig-tile,
-    .ig-tile-col .ig-tile {
-        flex: 1;
-        min-height: 0;
+    .info-handwriting {
+        font-family: 'Caveat', cursive;
+        font-size: 1.8rem;
+        color: #333;
+        transform: rotate(-3deg);
     }
-    .ig-mosaic > .ig-tile--large {
-        height: 100%;
+    .info-header {
+        grid-column: 1 / 2;
     }
-    .ig-tile-img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-        display: block;
-        transition: transform 0.7s cubic-bezier(0.16,1,0.3,1);
-        background: #141414;
-        mix-blend-mode: lighten;
-        padding: 10px;
+    .info-title {
+        font-family: 'Impact', 'Inter', sans-serif;
+        font-size: 4rem;
+        line-height: 0.9;
+        text-transform: uppercase;
+        margin-bottom: 20px;
+        color: #111;
     }
-    .ig-tile:hover .ig-tile-img {
-        transform: scale(1.07);
+    .info-subtitle {
+        font-family: monospace;
+        font-size: 0.8rem;
+        line-height: 1.6;
+        color: #444;
+        max-width: 280px;
     }
-    .ig-tile-overlay {
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(135deg, rgba(240,148,51,0.6), rgba(188,24,136,0.6));
+    .info-center-bag {
+        grid-column: 2 / 3;
+        grid-row: 1 / 3;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 10px;
-        opacity: 0;
-        transition: opacity 0.4s ease;
-        color: #fff;
+        position: relative;
     }
-    .ig-tile-overlay svg { width: 32px; height: 32px; }
-    .ig-tile-overlay span {
-        font-size: 0.75rem;
-        letter-spacing: 2px;
+    .info-bag-img {
+        width: 100%;
+        max-width: 450px;
+        filter: drop-shadow(0 20px 30px rgba(0,0,0,0.3));
+    }
+    .info-measurements {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        max-width: 380px;
+        font-size: 0.7rem;
+        color: #666;
+        border-top: 1px dashed #999;
+        padding-top: 5px;
+        margin-top: 10px;
+    }
+    .info-made-for {
+        grid-column: 3 / 4;
+        padding-left: 20px;
+    }
+    .info-made-for h4 {
+        font-size: 0.9rem;
+        font-weight: 800;
+        margin-bottom: 15px;
+        text-transform: uppercase;
+    }
+    .info-made-for ul {
+        list-style: none;
+        padding: 0;
+    }
+    .info-made-for li {
+        font-size: 0.8rem;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
         text-transform: uppercase;
         font-weight: 600;
     }
-    .ig-tile:hover .ig-tile-overlay { opacity: 1; }
-
-    /* CTA */
-    .ig-cta-wrap {
-        text-align: center;
-        padding: 3rem 20px;
+    .info-made-for li i {
+        color: #666;
     }
-    .ig-cta-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    
+    .polaroid {
+        background: #fff;
+        padding: 10px 10px 35px 10px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        position: absolute;
+        width: 180px;
+        transform: rotate(4deg);
+        z-index: 10;
+    }
+    .polaroid img {
+        width: 100%;
+        aspect-ratio: 4/5;
+        object-fit: cover;
+    }
+    .polaroid.p-left {
+        left: -40px;
+        top: 250px;
+        transform: rotate(-6deg);
+    }
+    .polaroid.p-right {
+        right: 0px;
+        top: 80px;
+        transform: rotate(3deg);
+    }
+    
+    .info-bottom-row {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 20px;
+        margin-top: 40px;
+    }
+    .info-box {
+        border: 1.5px solid #1a1a1a;
+        padding: 20px;
+        background: transparent;
+        position: relative;
+    }
+    .info-box-label {
+        position: absolute;
+        top: -12px;
+        left: 20px;
+        background: #1a1a1a;
         color: #fff;
-        text-decoration: none;
-        padding: 16px 40px;
-        border-radius: 60px;
+        font-size: 0.6rem;
+        padding: 4px 8px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .fits-icons {
+        display: flex;
+        justify-content: space-around;
+        align-items: flex-end;
+        padding-top: 15px;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    .fit-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+    }
+    .fit-item i {
+        width: 32px;
+        height: 32px;
+        color: #333;
+    }
+    .fit-item span {
+        font-size: 0.55rem;
+        text-transform: uppercase;
+        font-weight: 700;
+        text-align: center;
+    }
+    
+    .info-details-row {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+        margin-top: 20px;
+    }
+    .detail-card {
+        border: 1px solid #1a1a1a;
+        position: relative;
+    }
+    .detail-card img {
+        width: 100%;
+        aspect-ratio: 1/1;
+        object-fit: cover;
+        display: block;
+    }
+    .detail-label {
+        position: absolute;
+        top: 0;
+        left: 0;
+        background: #1a1a1a;
+        color: #fff;
+        font-size: 0.5rem;
+        padding: 4px 6px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    @media(max-width: 900px) {
+        .info-container { grid-template-columns: 1fr; }
+        .info-header { grid-column: 1 / -1; text-align: center; }
+        .info-subtitle { margin: 0 auto; }
+        .info-center-bag { grid-column: 1 / -1; grid-row: auto; }
+        .info-made-for { grid-column: 1 / -1; padding-left: 0; display: flex; flex-direction: column; align-items: center; }
+        .polaroid { display: none; }
+        .info-bottom-row { grid-template-columns: 1fr; }
+        .info-details-row { grid-template-columns: repeat(2, 1fr); }
+    }
+
+
+
+    /* 5. Lookbook Section (Signature Bag) */
+    .lookbook-section {
+        background: linear-gradient(135deg, #d3ccc5 0%, #c1b9b1 100%);
+        padding: 60px 20px 40px 20px;
+    }
+    .lookbook-container {
+        max-width: 800px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .lookbook-images {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 20px;
+        width: 100%;
+        margin-bottom: 40px; 
+    }
+    .lookbook-main-img {
+        width: 65%;
+        aspect-ratio: 3/4;
+        display: block;
+        object-fit: cover;
+        object-position: top center;
+    }
+    .lookbook-sub-img {
+        width: 30%;
+        height: auto;
+        display: block;
+        filter: drop-shadow(-10px 15px 20px rgba(0,0,0,0.15));
+    }
+    .lookbook-sub-img:hover {
+        transform: scale(1.05);
+    }
+    .lookbook-text-area {
+        width: 65%; /* Matches the width of the main image perfectly */
+        text-align: left;
+    }
+    .lookbook-title {
+        font-family: 'Inter', sans-serif;
+        font-size: 1.5rem;
+        font-weight: 400;
+        letter-spacing: 5px;
+        color: #222;
+        text-transform: uppercase;
+        border-bottom: 1px solid #444;
+        display: block; /* Make it a block so border goes across or fits content */
+        padding-bottom: 5px;
+        margin-bottom: 15px;
+        width: max-content; /* Border only under text */
+    }
+    .lookbook-desc {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.75rem;
+        line-height: 1.8;
+        color: #333;
+        font-weight: 500;
+        margin: 0;
+    }
+    .lookbook-divider {
+        position: relative;
+        width: 100%;
+        margin: 40px 0 10px 0;
+        border-top: 1px solid rgba(0,0,0,0.15);
+    }
+    .lookbook-divider::after {
+        content: "▼";
+        position: absolute;
+        top: -9px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 10px;
+        color: #111;
+        background-color: transparent; /* No need to mask since we have a gradient now, but let's use a soft mask */
+        text-shadow: 0 0 10px #c1b9b1, 0 0 10px #c1b9b1; /* Pseudo-mask for gradient */
+        padding: 0 8px;
+    }
+
+    /* Details That Inspire CSS Removed */
+
+    /* 7. Ragers Video Section */
+    .ragers-section {
+        position: relative;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    .ragers-video-container {
+        width: 100%;
+        height: 60vh;
+        overflow: hidden;
+    }
+    .ragers-video-container video, .ragers-video-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .ragers-content {
+        background: var(--bg-tan);
+        padding: 60px 20px;
+        text-align: center;
+        width: 100%;
+    }
+    .ragers-title {
+        font-size: 1.6rem;
+        font-weight: 600;
+        margin-bottom: 20px;
+    }
+    .ragers-stars {
+        color: #22c55e;
+        font-size: 1.4rem;
+        letter-spacing: 4px;
+        margin-bottom: 5px;
+    }
+    .ragers-count {
+        font-size: 0.85rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        margin-bottom: 40px;
+    }
+    .ragers-count svg {
+        width: 16px;
+        height: 16px;
+        color: #0ea5e9;
+    }
+    .ragers-review-title {
         font-size: 0.9rem;
         font-weight: 700;
-        letter-spacing: 1.5px;
-        text-transform: uppercase;
-        transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
-        box-shadow: 0 8px 30px rgba(220,39,67,0.35);
+        margin-bottom: 15px;
     }
-    .ig-cta-btn:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 16px 45px rgba(220,39,67,0.5);
-        opacity: 0.92;
-    }
-    .ig-cta-btn svg { width: 20px; height: 20px; }
-
-    /* Hashtag Marquee */
-    .ig-marquee-wrap {
-        background: rgba(255,255,255,0.04);
-        border-top: 1px solid rgba(255,255,255,0.08);
-        padding: 18px 0;
-        overflow: hidden;
-        white-space: nowrap;
-    }
-    .ig-marquee {
-        display: inline-block;
-        animation: igMarquee 22s linear infinite;
-        font-size: 0.75rem;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        color: rgba(255,255,255,0.35);
+    .ragers-review-text {
+        font-size: 0.85rem;
+        line-height: 1.8;
+        color: #333;
+        max-width: 600px;
+        margin: 0 auto 20px;
         font-weight: 500;
     }
-    @keyframes igMarquee {
-        0%   { transform: translateX(0); }
-        100% { transform: translateX(-50%); }
+    .ragers-author {
+        font-size: 0.85rem;
+        color: #666;
+        margin-bottom: 30px;
+    }
+    .ragers-prod-img {
+        width: 60px;
+        height: 60px;
+        object-fit: contain;
+        margin: 0 auto;
+        display: block;
     }
 
-    /* ── Responsive ── */
+    @media (max-width: 1024px) {
+        .products-grid { grid-template-columns: repeat(3, 1fr); }
+    }
     @media (max-width: 768px) {
-        .ig-section { padding: 3.5rem 0 0; }
-        .ig-mosaic {
-            grid-template-columns: 1fr 1fr;
-            max-height: none;
-            gap: 5px;
-            padding: 0 5px;
-        }
-        /* Hide the large tile spanning behaviour, show all as equal */
-        .ig-tile--large { grid-column: span 2; height: 220px; }
-        .ig-tile-col { gap: 5px; }
-        .ig-stats { padding: 14px 20px; }
-        .ig-stat { padding: 0 16px; }
-        .ig-stat-num { font-size: 1.1rem; }
-        .ig-tagline { font-size: 0.9rem; }
+        .products-grid { grid-template-columns: repeat(2, 1fr); }
+        .lookbook-images { display: flex; align-items: center; justify-content: flex-start; gap: 10px; width: 100%; margin: 0 auto 25px auto; }
+        .lookbook-main-img { width: 65%; margin-bottom: 0px; }
+        .lookbook-sub-img { width: 35%; margin-bottom: 0px; position: static; }
+        .lookbook-text-area { width: 100%; margin: 0; text-align: left; }
+        .lookbook-title { margin: 0 0 15px 0; display: inline-block; width: max-content; }
+        .lookbook-desc { text-align: left; }
+        .lookbook-divider { margin-left: 0; margin-right: 0; }
     }
-    @media (max-width: 480px) {
-        .ig-header { padding: 0 16px 2.5rem; }
-        .ig-mosaic {
-            grid-template-columns: 1fr 1fr;
-            gap: 4px;
-            padding: 0 4px;
-        }
-        .ig-tile--large { height: 180px; }
-        .ig-tile-col .ig-tile { height: 130px; }
-        .ig-stats {
-            flex-wrap: wrap;
-            border-radius: 16px;
-            padding: 16px;
-            gap: 0;
-        }
-        .ig-stat { padding: 8px 12px; }
-        .ig-stat-divider { display: none; }
-        .ig-cta-btn { padding: 14px 28px; font-size: 0.8rem; }
-        .ig-tile-overlay span { display: none; }
-    }
-    @media (max-width: 375px) {
-        .ig-tile--large { height: 150px; }
-        .ig-tile-col .ig-tile { height: 110px; }
-    }
-    </style>
+</style>
 
+<!-- 1. Hero Main Banner -->
+<section class="hero-main">
+    <picture style="width: 100%;">
+        <source media="(max-width: 768px)" srcset="<?php echo BASE_URL; ?>/assets/hero_mobile.jpg">
+        <source media="(min-width: 769px)" srcset="<?php echo BASE_URL; ?>/assets/hero_banner_model.png">
+        <img src="<?php echo BASE_URL; ?>/assets/hero_banner_model.png" alt="JEVANI Campaign" style="width: 100%; height: auto; object-fit: cover;">
+    </picture>
+</section>
 
+<!-- 2. Products Row (THE DROP +) -->
+<section class="products-row-section">
+    <div class="products-header">
+        <div>THE DROP +</div>
+        <a href="<?php echo BASE_URL; ?>/shop.php">VIEW ALL <i data-lucide="arrow-right" style="width:12px; height:12px; margin-left:4px;"></i></a>
+    </div>
+    
+    <div class="products-grid">
+        <?php
+        // Fetch 6 products to match the screenshot
+        $na_stmt = $conn->prepare("SELECT * FROM products ORDER BY id DESC LIMIT 6");
+        $na_stmt->execute();
+        $na_result = $na_stmt->get_result();
+        while ($product = $na_result->fetch_assoc()) {
+            $image = $product['image'] ? BASE_URL . '/assets/' . htmlspecialchars($product['image']) : BASE_URL . '/assets/bag_shoulder.png';
+            ?>
+            <div class="product-card-min">
+                <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $product['id']; ?>" class="product-img-box">
+                    <img src="<?php echo $image; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
+                </a>
+                <div class="product-min-title"><?php echo htmlspecialchars($product['name']); ?></div>
+                <div class="product-min-price">₹<?php echo number_format($product['price']); ?></div>
+                <form action="<?php echo BASE_URL; ?>/cart_action.php" method="POST" class="ajax-cart-form">
+                    <input type="hidden" name="action" value="add">
+                    <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
+                    <input type="hidden" name="quantity" value="1">
+                    <button type="submit" class="add-btn-small" aria-label="Add to Bag">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5v14"/></svg>
+                    </button>
+                </form>
+            </div>
+            <?php
+        }
+        ?>
+    </div>
+</section>
+
+<!-- 3. Alleyway Girl Section -->
+<section class="alleyway-section">
+    <img src="<?php echo BASE_URL; ?>/assets/alleyway_model.png" alt="Editorial Look">
+</section>
+
+<!-- 4. Icon Infographic Section -->
+<section class="icon-infographic">
+    <div class="info-container">
+        <!-- Decorative Text -->
+        <div style="position: absolute; top: 10px; right: 28%; z-index: 20;" class="info-handwriting">
+            <div style="border: 1px solid #333; border-radius: 50%; padding: 25px 35px; text-align: center; background: rgba(255,255,255,0.2);">
+                The best Y2K<br>shoulder bag for<br>laptops & other<br>essentials
+            </div>
+        </div>
+
+        <div class="info-header">
+            <h2 class="info-title">THE ICON.<br>YOUR EVERYDAY.</h2>
+            <p class="info-subtitle">
+                The ultimate Y2K shoulder bag designed to carry your world. Laptop, essentials, and attitude.
+            </p>
+        </div>
+
+        <div class="info-center-bag">
+            <img src="<?php echo BASE_URL; ?>/assets/bag_shoulder.png" alt="The Icon Bag" class="info-bag-img">
+            <div class="info-measurements">
+                <span>← 42CM →</span>
+                <span>↑ 28CM ↓</span>
+                <span>↗ 15CM ↙</span>
+            </div>
+        </div>
+
+        <div class="info-made-for">
+            <h4>Made For:</h4>
+            <ul>
+                <li><i data-lucide="check-circle-2" style="width:16px; height:16px;"></i> Laptops up to 15"</li>
+                <li><i data-lucide="check-circle-2" style="width:16px; height:16px;"></i> Daily essentials</li>
+                <li><i data-lucide="check-circle-2" style="width:16px; height:16px;"></i> Books & Notebooks</li>
+                <li><i data-lucide="check-circle-2" style="width:16px; height:16px;"></i> Wallets & Pouches</li>
+                <li><i data-lucide="check-circle-2" style="width:16px; height:16px;"></i> Gym Gear & More</li>
+            </ul>
+        </div>
+
+        <!-- Polaroids -->
+        <div class="polaroid p-left">
+            <img src="<?php echo BASE_URL; ?>/assets/campaign_lifestyle.jpg" alt="Model">
+            <div class="info-handwriting" style="text-align:center; font-size:1.4rem; margin-top:10px; color:#555;">chaotic life<br>iconic bag</div>
+        </div>
+        <div class="polaroid p-right">
+            <img src="<?php echo BASE_URL; ?>/assets/lookbook_edit_2.png" alt="Model">
+            <div class="info-handwriting" style="text-align:center; font-size:1.4rem; margin-top:10px; color:#555;">your go to<br>every damn day</div>
+        </div>
+
+        <div class="info-bottom-row">
+            <div class="info-box">
+                <div class="info-box-label">FITS YOUR WORLD</div>
+                <div class="fits-icons">
+                    <div class="fit-item"><i data-lucide="laptop"></i><span>Laptop<br>up to 15"</span></div>
+                    <div class="fit-item"><i data-lucide="cup-soda"></i><span>Water<br>Bottle</span></div>
+                    <div class="fit-item"><i data-lucide="book"></i><span>Notebooks</span></div>
+                    <div class="fit-item"><i data-lucide="headphones"></i><span>Headphones</span></div>
+                    <div class="fit-item"><i data-lucide="briefcase"></i><span>Makeup<br>Pouch</span></div>
+                    <div class="fit-item"><i data-lucide="wallet"></i><span>Wallet</span></div>
+                    <div class="fit-item"><i data-lucide="smartphone"></i><span>Phone</span></div>
+                    <div class="fit-item"><i data-lucide="glasses"></i><span>Sunglasses</span></div>
+                </div>
+            </div>
+            <div class="info-box">
+                <div class="info-box-label">SPACIOUS & FUNCTIONAL</div>
+                <img src="<?php echo BASE_URL; ?>/assets/hero_banner_bags.png" style="width:100%; height:80px; object-fit:cover; margin-bottom:10px; filter:grayscale(30%);" alt="Inside Bag">
+                <p style="font-size:0.7rem; color:#444; margin:0; font-family:monospace;">Everything has its place.<br>You have everything you need.</p>
+            </div>
+        </div>
+
+        <div class="info-details-row">
+            <div class="detail-card">
+                <div class="detail-label">PREMIUM SUEDE FINISH</div>
+                <img src="<?php echo BASE_URL; ?>/assets/craft_machine.jpg" alt="Suede">
+            </div>
+            <div class="detail-card">
+                <div class="detail-label">SIGNATURE HARDWARE</div>
+                <img src="<?php echo BASE_URL; ?>/assets/bags/acc_2.jpeg" alt="Hardware">
+            </div>
+            <div class="detail-card">
+                <div class="detail-label">SECURE ZIP CLOSURE</div>
+                <img src="<?php echo BASE_URL; ?>/assets/craft_workshop.jpg" alt="Zip">
+            </div>
+            <div class="detail-card">
+                <div class="detail-label">STRONG SHOULDER STRAPS</div>
+                <img src="<?php echo BASE_URL; ?>/assets/lookbook_hero.png" alt="Straps">
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- 5. Lookbook Section (Signature Bag) -->
+<section class="lookbook-section">
+    <div class="lookbook-container">
+        <div class="lookbook-images">
+            <img src="<?php echo BASE_URL; ?>/assets/model_with_bag.png" alt="Model with Bag" class="lookbook-main-img" onerror="this.src='<?php echo BASE_URL; ?>/assets/hero_mobile.jpg';">
+            <img src="<?php echo BASE_URL; ?>/assets/bag_tote.png" alt="Signature Bag" class="lookbook-sub-img">
+        </div>
+        <div class="lookbook-text-area">
+            <h2 class="lookbook-title">SIGNATURE BAG</h2>
+            <p class="lookbook-desc">
+                Every stitch carries purpose, every detail reflects power,<br>
+                every wear defines endurance.<br>
+                Subtle confidence meets precision design, offering lasting<br>
+                comfort, movement, and presence in every moment you<br>
+                choose to carry it.
+            </p>
+        </div>
+        <div class="lookbook-divider"></div>
+    </div>
+</section>
+
+<!-- 7. Let Ragers Speak -->
+<section class="ragers-section">
+    <div class="ragers-video-container">
+        <!-- Assuming y2k_video.mp4 is the background video -->
+        <video autoplay loop muted playsinline>
+            <source src="<?php echo BASE_URL; ?>/assets/y2k_video.mp4" type="video/mp4">
+        </video>
+    </div>
+    
+    <div class="ragers-content">
+        <h2 class="ragers-title">Let RAGERS' speak for us</h2>
+        
+        <div class="ragers-stars">★★★★★</div>
+        <div class="ragers-count">
+            from 3649 reviews 
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+        
+        <div class="ragers-stars" style="font-size: 1.2rem; margin-bottom: 15px;">★★★★★</div>
+        <div class="ragers-review-title">slay check passed with full marks</div>
+        <div class="ragers-review-text">
+            bindass hai yaar, fabric se pata chalta hai premium hai design looks even better in person than the product photos corduroy texture is so tactile and premium feeling will be a loyal customer from her...
+        </div>
+        <div class="ragers-author">Lavanya Gupta</div>
+        
+        <img src="<?php echo BASE_URL; ?>/assets/product_tshirt.png" alt="Purchased Product" class="ragers-prod-img" onerror="this.src='<?php echo BASE_URL; ?>/assets/bag_mini.png';">
+        
+        <div style="display: flex; justify-content: center; gap: 25px; margin-top: 25px;">
+            <i data-lucide="chevron-left" style="width: 24px; height: 24px; color: #888; cursor: pointer;"></i>
+            <i data-lucide="chevron-right" style="width: 24px; height: 24px; color: #888; cursor: pointer;"></i>
+        </div>
+    </div>
+</section>
 
 <?php require_once 'includes/footer.php'; ?>

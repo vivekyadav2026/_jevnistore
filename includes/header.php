@@ -12,6 +12,9 @@ require_once __DIR__ . '/functions.php';
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/styles.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/responsive.css?v=<?php echo time(); ?>">
     <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&display=swap" rel="stylesheet">
     <!-- Lucide Icons for minimal elegant icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -199,123 +202,82 @@ require_once __DIR__ . '/functions.php';
     </script>
 
     <!-- Header -->
-    <div class="announcement-bar" id="announcement-slider">
-        <button class="announcement-arrow prev-arrow" onclick="prevAnnouncement()" aria-label="Previous Announcement">
-            <i data-lucide="chevron-left"></i>
+    <div class="announcement-bar" id="announcement-slider" style="background: #000; border-bottom: 1px solid #1a1a1a; padding: 10px 0; display: flex; justify-content: center; align-items: center; position: relative;">
+        <button class="announcement-arrow prev-arrow" onclick="prevAnnouncement()" aria-label="Previous Announcement" style="background: none; border: none; color: #fff; cursor: pointer; position: absolute; left: 20px;">
+            <i data-lucide="chevron-left" style="width: 14px; height: 14px;"></i>
         </button>
-        <div class="announcement-content">
+        <div class="announcement-content" style="text-align: center; color: #fff; font-size: 0.65rem; font-weight: 700; letter-spacing: 1px; width: 100%; overflow: hidden; position: relative; height: 15px;">
             <?php 
-                $a_text_raw = getSetting('announcement_bar', 'FREE DOORSTEP DELIVERY ANYWHERE IN INDIA 🇮🇳'); 
+                $a_text_raw = getSetting('announcement_bar', '🔥 LIMITED TIME OFFER — SHOP NOW'); 
                 $announcements = array_filter(array_map('trim', explode('|', $a_text_raw)));
                 if (empty($announcements)) {
-                    $announcements = ['FREE DOORSTEP DELIVERY ANYWHERE IN INDIA 🇮🇳'];
-                }
-                // Duplicate if only one announcement so the slider animation works
-                if (count($announcements) === 1) {
-                    $announcements[] = $announcements[0];
+                    $announcements = ['🔥 LIMITED TIME OFFER — SHOP NOW'];
                 }
                 foreach($announcements as $index => $ann) {
                     $activeClass = $index === 0 ? 'active' : 'prev';
-                    $style = $index === 0 ? '' : 'style="transform: translateY(100%);"';
-                    echo '<div class="announcement-slide ' . $activeClass . '" ' . $style . '>' . htmlspecialchars($ann) . '</div>';
+                    $style = $index === 0 ? 'position: absolute; top: 0; left: 0; width: 100%; transition: transform 0.5s;' : 'position: absolute; top: 0; left: 0; width: 100%; transform: translateY(100%); transition: transform 0.5s;';
+                    echo '<div class="announcement-slide ' . $activeClass . '" style="' . $style . '">' . htmlspecialchars($ann) . '</div>';
                 }
             ?>
         </div>
-        <button class="announcement-arrow next-arrow" onclick="nextAnnouncement()" aria-label="Next Announcement">
-            <i data-lucide="chevron-right"></i>
+        <button class="announcement-arrow next-arrow" onclick="nextAnnouncement()" aria-label="Next Announcement" style="background: none; border: none; color: #fff; cursor: pointer; position: absolute; right: 20px;">
+            <i data-lucide="chevron-right" style="width: 14px; height: 14px;"></i>
         </button>
     </div>
     <script>
         let currentAnnouncement = 0;
         const slides = document.querySelectorAll('.announcement-slide');
-        
         function nextAnnouncement() {
             if(slides.length <= 1) return;
-            slides[currentAnnouncement].classList.remove('active');
             slides[currentAnnouncement].style.transform = 'translateY(-100%)';
-            slides[currentAnnouncement].style.opacity = '0';
-            
+            slides[currentAnnouncement].classList.remove('active');
             currentAnnouncement = (currentAnnouncement + 1) % slides.length;
-            
             slides[currentAnnouncement].style.transition = 'none';
             slides[currentAnnouncement].style.transform = 'translateY(100%)';
-            
-            // Force reflow
             void slides[currentAnnouncement].offsetWidth;
-            
-            setTimeout(() => {
-                slides[currentAnnouncement].style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease';
-                slides[currentAnnouncement].classList.add('active');
-                slides[currentAnnouncement].style.transform = '';
-                slides[currentAnnouncement].style.opacity = '1';
-            }, 20);
+            slides[currentAnnouncement].style.transition = 'transform 0.5s';
+            slides[currentAnnouncement].style.transform = 'translateY(0)';
+            slides[currentAnnouncement].classList.add('active');
         }
-
         function prevAnnouncement() {
             if(slides.length <= 1) return;
-            slides[currentAnnouncement].classList.remove('active');
             slides[currentAnnouncement].style.transform = 'translateY(100%)';
-            slides[currentAnnouncement].style.opacity = '0';
-            
+            slides[currentAnnouncement].classList.remove('active');
             currentAnnouncement = (currentAnnouncement - 1 + slides.length) % slides.length;
-            
             slides[currentAnnouncement].style.transition = 'none';
             slides[currentAnnouncement].style.transform = 'translateY(-100%)';
-            
-            // Force reflow
             void slides[currentAnnouncement].offsetWidth;
-            
-            setTimeout(() => {
-                slides[currentAnnouncement].style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease';
-                slides[currentAnnouncement].classList.add('active');
-                slides[currentAnnouncement].style.transform = '';
-                slides[currentAnnouncement].style.opacity = '1';
-            }, 20);
+            slides[currentAnnouncement].style.transition = 'transform 0.5s';
+            slides[currentAnnouncement].style.transform = 'translateY(0)';
+            slides[currentAnnouncement].classList.add('active');
         }
-
-        if(slides.length > 1) {
-            setInterval(nextAnnouncement, 4000);
-        }
+        if(slides.length > 1) { setInterval(nextAnnouncement, 4000); }
     </script>
     <header class="header" id="main-header">
-        <div class="container header-inner">
-            <button class="menu-toggle header-menu-icon" id="mobile-menu-btn" onclick="document.getElementById('mobile-nav-drawer').classList.add('open'); document.body.style.overflow = 'hidden';">
-                <i data-lucide="menu"></i>
-            </button>
-            <div class="logo-wrapper">
+        <div class="container header-inner" style="grid-template-columns: 1fr auto 1fr; background: #000; padding: 15px 20px;">
+            <div style="justify-self: start; display: flex; align-items: center;">
+                <button class="menu-toggle header-menu-icon" id="mobile-menu-btn" onclick="document.getElementById('mobile-nav-drawer').classList.add('open'); document.body.style.overflow = 'hidden';" style="display: block; cursor: pointer; color: #fff; background: transparent; border: none;">
+                    <i data-lucide="menu" style="width: 24px; height: 24px;"></i>
+                </button>
+            </div>
+            
+            <div class="logo-wrapper" style="justify-self: center;">
                 <a href="<?php echo BASE_URL; ?>/index.php" class="logo">
-                    <?php $site_logo = getSetting('site_logo'); ?>
-                    <?php if ($site_logo): ?>
-                        <img src="<?php echo BASE_URL; ?>/assets/<?php echo htmlspecialchars($site_logo); ?>" alt="<?php echo htmlspecialchars(getSetting('site_title', 'Jevani Store')); ?>">
-                    <?php else: ?>
-                        <img src="<?php echo BASE_URL; ?>/assets/logo.png" alt="<?php echo htmlspecialchars(getSetting('site_title', 'Jevani Store')); ?>">
-                    <?php endif; ?>
+                    <img src="<?php echo BASE_URL; ?>/assets/logo.png" alt="Jevani Store" style="height: 40px; width: auto;" onerror="this.src='<?php echo BASE_URL; ?>/assets/logoOD.png';">
                 </a>
             </div>
             
-            <nav class="nav-links" id="nav-links">
-                <a href="<?php echo BASE_URL; ?>/shop.php">All Bags</a>
-                <a href="<?php echo BASE_URL; ?>/shop.php?category=1">Shoulder Bags</a>
-                <a href="<?php echo BASE_URL; ?>/shop.php?category=2">Totes</a>
-                <a href="<?php echo BASE_URL; ?>/lookbook.php">Lookbook</a>
-                <a href="<?php echo BASE_URL; ?>/about.php">About</a>
+            <nav class="nav-links" id="nav-links" style="display: none;">
+                <!-- Hide nav links for the minimalist header, moved to hamburger -->
             </nav>
             
-            <div class="header-icons">
-                <button class="icon-btn header-search-icon" aria-label="Search" onclick="document.getElementById('header-search-bar').classList.toggle('active'); document.getElementById('search-input').focus();"><i data-lucide="search"></i></button>
-                <?php if(isLoggedIn()): ?>
-                    <a href="<?php echo isAdmin() ? BASE_URL . '/admin/index.php' : BASE_URL . '/customer/index.php'; ?>" class="icon-btn header-user-icon hide-mobile" aria-label="Account" title="Dashboard">
-                        <i data-lucide="user"></i>
-                    </a>
-                <?php else: ?>
-                    <a href="<?php echo BASE_URL; ?>/login.php" class="icon-btn header-user-icon hide-mobile" aria-label="Account" title="Login">
-                        <i data-lucide="user"></i>
-                    </a>
-                <?php endif; ?>
-                <a href="<?php echo BASE_URL; ?>/wishlist.php" class="icon-btn header-wishlist-icon hide-mobile" aria-label="Wishlist"><i data-lucide="heart"></i></a>
-                <button class="icon-btn header-cart-icon" id="cart-toggle-btn" aria-label="Cart" onclick="document.getElementById('cart-overlay').classList.add('active'); document.getElementById('cart-panel').classList.add('active'); document.body.classList.add('cart-open');">
-                    <i data-lucide="shopping-bag"></i>
-                    <span class="cart-count" id="cart-count"><?php echo isset($_SESSION['cart']) ? count($_SESSION['cart']) : '0'; ?></span>
+            <div class="header-icons" style="justify-self: end; display: flex; gap: 1rem; align-items: center;">
+                <button class="icon-btn header-search-icon" aria-label="Search" onclick="document.getElementById('header-search-bar').classList.toggle('active'); document.getElementById('search-input').focus();" style="color: #fff; background: transparent; border: none; cursor: pointer;">
+                    <i data-lucide="search" style="width: 20px; height: 20px;"></i>
+                </button>
+                <button class="icon-btn header-cart-icon" id="cart-toggle-btn" aria-label="Cart" onclick="document.getElementById('cart-overlay').classList.add('active'); document.getElementById('cart-panel').classList.add('active'); document.body.classList.add('cart-open');" style="position: relative; color: #fff; background: transparent; border: none; cursor: pointer;">
+                    <i data-lucide="shopping-bag" style="width: 20px; height: 20px;"></i>
+                    <span class="cart-count" id="cart-count" style="position: absolute; top: -5px; right: -8px; font-size: 0.65rem; background: transparent; color: #fff; border: none; width: auto; height: auto; display: flex; align-items: center; justify-content: center;"><?php echo isset($_SESSION['cart']) ? count($_SESSION['cart']) : '0'; ?></span>
                 </button>
             </div>
         </div>
