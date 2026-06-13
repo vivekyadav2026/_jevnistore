@@ -318,7 +318,23 @@
         text-transform: uppercase;
     }
 
+    .info-mobile-only {
+        display: none;
+    }
+    .info-desktop-only {
+        display: block;
+    }
+
     @media(max-width: 900px) {
+        .icon-infographic {
+            padding: 0 !important;
+        }
+        .info-desktop-only {
+            display: none !important;
+        }
+        .info-mobile-only {
+            display: block !important;
+        }
         .info-container { grid-template-columns: 1fr; }
         .info-header { grid-column: 1 / -1; text-align: center; }
         .info-subtitle { margin: 0 auto; }
@@ -334,7 +350,7 @@
     /* 5. Lookbook Section (Signature Bag) */
     .lookbook-section {
         background: linear-gradient(135deg, #d3ccc5 0%, #c1b9b1 100%);
-        padding: 60px 20px 40px 20px;
+        padding: 20px 20px 40px 20px;
     }
     .lookbook-container {
         max-width: 800px;
@@ -555,91 +571,99 @@
 
 <!-- 4. Icon Infographic Section -->
 <section class="icon-infographic">
-    <div class="info-container">
-        <!-- Decorative Text -->
-        <div style="position: absolute; top: 10px; right: 28%; z-index: 20;" class="info-handwriting">
-            <div style="border: 1px solid #333; border-radius: 50%; padding: 25px 35px; text-align: center; background: rgba(255,255,255,0.2);">
-                The best Y2K<br>shoulder bag for<br>laptops & other<br>essentials
-            </div>
-        </div>
-
-        <div class="info-header">
-            <h2 class="info-title">THE ICON.<br>YOUR EVERYDAY.</h2>
-            <p class="info-subtitle">
-                The ultimate Y2K shoulder bag designed to carry your world. Laptop, essentials, and attitude.
-            </p>
-        </div>
-
-        <div class="info-center-bag">
-            <img src="<?php echo BASE_URL; ?>/assets/bag_shoulder.png" alt="The Icon Bag" class="info-bag-img">
-            <div class="info-measurements">
-                <span>← 42CM →</span>
-                <span>↑ 28CM ↓</span>
-                <span>↗ 15CM ↙</span>
-            </div>
-        </div>
-
-        <div class="info-made-for">
-            <h4>Made For:</h4>
-            <ul>
-                <li><i data-lucide="check-circle-2" style="width:16px; height:16px;"></i> Laptops up to 15"</li>
-                <li><i data-lucide="check-circle-2" style="width:16px; height:16px;"></i> Daily essentials</li>
-                <li><i data-lucide="check-circle-2" style="width:16px; height:16px;"></i> Books & Notebooks</li>
-                <li><i data-lucide="check-circle-2" style="width:16px; height:16px;"></i> Wallets & Pouches</li>
-                <li><i data-lucide="check-circle-2" style="width:16px; height:16px;"></i> Gym Gear & More</li>
-            </ul>
-        </div>
-
-        <!-- Polaroids -->
-        <div class="polaroid p-left">
-            <img src="<?php echo BASE_URL; ?>/assets/campaign_lifestyle.jpg" alt="Model">
-            <div class="info-handwriting" style="text-align:center; font-size:1.4rem; margin-top:10px; color:#555;">chaotic life<br>iconic bag</div>
-        </div>
-        <div class="polaroid p-right">
-            <img src="<?php echo BASE_URL; ?>/assets/lookbook_edit_2.png" alt="Model">
-            <div class="info-handwriting" style="text-align:center; font-size:1.4rem; margin-top:10px; color:#555;">your go to<br>every damn day</div>
-        </div>
-
-        <div class="info-bottom-row">
-            <div class="info-box">
-                <div class="info-box-label">FITS YOUR WORLD</div>
-                <div class="fits-icons">
-                    <div class="fit-item"><i data-lucide="laptop"></i><span>Laptop<br>up to 15"</span></div>
-                    <div class="fit-item"><i data-lucide="cup-soda"></i><span>Water<br>Bottle</span></div>
-                    <div class="fit-item"><i data-lucide="book"></i><span>Notebooks</span></div>
-                    <div class="fit-item"><i data-lucide="headphones"></i><span>Headphones</span></div>
-                    <div class="fit-item"><i data-lucide="briefcase"></i><span>Makeup<br>Pouch</span></div>
-                    <div class="fit-item"><i data-lucide="wallet"></i><span>Wallet</span></div>
-                    <div class="fit-item"><i data-lucide="smartphone"></i><span>Phone</span></div>
-                    <div class="fit-item"><i data-lucide="glasses"></i><span>Sunglasses</span></div>
+    <!-- Desktop View (Interactive HTML) -->
+    <div class="info-desktop-only">
+        <div class="info-container">
+            <!-- Decorative Text -->
+            <div style="position: absolute; top: 10px; right: 28%; z-index: 20;" class="info-handwriting">
+                <div style="border: 1px solid #333; border-radius: 50%; padding: 25px 35px; text-align: center; background: rgba(255,255,255,0.2);">
+                    The best Y2K<br>shoulder bag for<br>laptops & other<br>essentials
                 </div>
             </div>
-            <div class="info-box">
-                <div class="info-box-label">SPACIOUS & FUNCTIONAL</div>
-                <img src="<?php echo BASE_URL; ?>/assets/hero_banner_bags.png" style="width:100%; height:80px; object-fit:cover; margin-bottom:10px; filter:grayscale(30%);" alt="Inside Bag">
-                <p style="font-size:0.7rem; color:#444; margin:0; font-family:monospace;">Everything has its place.<br>You have everything you need.</p>
-            </div>
-        </div>
 
-        <div class="info-details-row">
-            <div class="detail-card">
-                <div class="detail-label">PREMIUM SUEDE FINISH</div>
-                <img src="<?php echo BASE_URL; ?>/assets/craft_machine.jpg" alt="Suede">
+            <div class="info-header">
+                <h2 class="info-title">THE ICON.<br>YOUR EVERYDAY.</h2>
+                <p class="info-subtitle">
+                    The ultimate Y2K shoulder bag designed to carry your world. Laptop, essentials, and attitude.
+                </p>
             </div>
-            <div class="detail-card">
-                <div class="detail-label">SIGNATURE HARDWARE</div>
-                <img src="<?php echo BASE_URL; ?>/assets/bags/acc_2.jpeg" alt="Hardware">
-            </div>
-            <div class="detail-card">
-                <div class="detail-label">SECURE ZIP CLOSURE</div>
-                <img src="<?php echo BASE_URL; ?>/assets/craft_workshop.jpg" alt="Zip">
-            </div>
-            <div class="detail-card">
-                <div class="detail-label">STRONG SHOULDER STRAPS</div>
-                <img src="<?php echo BASE_URL; ?>/assets/lookbook_hero.png" alt="Straps">
-            </div>
-        </div>
 
+            <div class="info-center-bag">
+                <img src="<?php echo BASE_URL; ?>/assets/bag_shoulder.png" alt="The Icon Bag" class="info-bag-img">
+                <div class="info-measurements">
+                    <span>← 42CM →</span>
+                    <span>↑ 28CM ↓</span>
+                    <span>↗ 15CM ↙</span>
+                </div>
+            </div>
+
+            <div class="info-made-for">
+                <h4>Made For:</h4>
+                <ul>
+                    <li><i data-lucide="check-circle-2" style="width:16px; height:16px;"></i> Laptops up to 15"</li>
+                    <li><i data-lucide="check-circle-2" style="width:16px; height:16px;"></i> Daily essentials</li>
+                    <li><i data-lucide="check-circle-2" style="width:16px; height:16px;"></i> Books & Notebooks</li>
+                    <li><i data-lucide="check-circle-2" style="width:16px; height:16px;"></i> Wallets & Pouches</li>
+                    <li><i data-lucide="check-circle-2" style="width:16px; height:16px;"></i> Gym Gear & More</li>
+                </ul>
+            </div>
+
+            <!-- Polaroids -->
+            <div class="polaroid p-left">
+                <img src="<?php echo BASE_URL; ?>/assets/campaign_lifestyle.jpg" alt="Model">
+                <div class="info-handwriting" style="text-align:center; font-size:1.4rem; margin-top:10px; color:#555;">chaotic life<br>iconic bag</div>
+            </div>
+            <div class="polaroid p-right">
+                <img src="<?php echo BASE_URL; ?>/assets/lookbook_edit_2.png" alt="Model">
+                <div class="info-handwriting" style="text-align:center; font-size:1.4rem; margin-top:10px; color:#555;">your go to<br>every damn day</div>
+            </div>
+
+            <div class="info-bottom-row">
+                <div class="info-box">
+                    <div class="info-box-label">FITS YOUR WORLD</div>
+                    <div class="fits-icons">
+                        <div class="fit-item"><i data-lucide="laptop"></i><span>Laptop<br>up to 15"</span></div>
+                        <div class="fit-item"><i data-lucide="cup-soda"></i><span>Water<br>Bottle</span></div>
+                        <div class="fit-item"><i data-lucide="book"></i><span>Notebooks</span></div>
+                        <div class="fit-item"><i data-lucide="headphones"></i><span>Headphones</span></div>
+                        <div class="fit-item"><i data-lucide="briefcase"></i><span>Makeup<br>Pouch</span></div>
+                        <div class="fit-item"><i data-lucide="wallet"></i><span>Wallet</span></div>
+                        <div class="fit-item"><i data-lucide="smartphone"></i><span>Phone</span></div>
+                        <div class="fit-item"><i data-lucide="glasses"></i><span>Sunglasses</span></div>
+                    </div>
+                </div>
+                <div class="info-box">
+                    <div class="info-box-label">SPACIOUS & FUNCTIONAL</div>
+                    <img src="<?php echo BASE_URL; ?>/assets/hero_banner_bags.png" style="width:100%; height:80px; object-fit:cover; margin-bottom:10px; filter:grayscale(30%);" alt="Inside Bag">
+                    <p style="font-size:0.7rem; color:#444; margin:0; font-family:monospace;">Everything has its place.<br>You have everything you need.</p>
+                </div>
+            </div>
+
+            <div class="info-details-row">
+                <div class="detail-card">
+                    <div class="detail-label">PREMIUM SUEDE FINISH</div>
+                    <img src="<?php echo BASE_URL; ?>/assets/craft_machine.jpg" alt="Suede">
+                </div>
+                <div class="detail-card">
+                    <div class="detail-label">SIGNATURE HARDWARE</div>
+                    <img src="<?php echo BASE_URL; ?>/assets/bags/acc_2.jpeg" alt="Hardware">
+                </div>
+                <div class="detail-card">
+                    <div class="detail-label">SECURE ZIP CLOSURE</div>
+                    <img src="<?php echo BASE_URL; ?>/assets/craft_workshop.jpg" alt="Zip">
+                </div>
+                <div class="detail-card">
+                    <div class="detail-label">STRONG SHOULDER STRAPS</div>
+                    <img src="<?php echo BASE_URL; ?>/assets/lookbook_hero.png" alt="Straps">
+                </div>
+            </div>
+
+        </div>
+    </div>
+    
+    <!-- Mobile View (Single Graphic Image) -->
+    <div class="info-mobile-only">
+        <img src="<?php echo BASE_URL; ?>/assets/media_infographic.png" alt="The Icon Infographic" style="width: 100%; height: auto; display: block;">
     </div>
 </section>
 
