@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['save_settings'])) {
     // Handle Logo Image Upload
     if (isset($_FILES['site_logo']) && $_FILES['site_logo']['error'] == 0) {
         $filename = uniqid() . '_' . basename($_FILES['site_logo']['name']);
-        if (compressAndSaveImage($_FILES['site_logo']['tmp_name'], '../assets/' . $filename)) {
+        if (move_uploaded_file($_FILES['site_logo']['tmp_name'], '../assets/' . $filename)) {
             $check_stmt = $conn->query("SELECT `key` FROM settings WHERE `key` = 'site_logo'");
             if ($check_stmt && $check_stmt->num_rows > 0) {
                 $stmt = $conn->prepare("UPDATE settings SET value = ? WHERE `key` = 'site_logo'");

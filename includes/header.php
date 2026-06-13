@@ -202,11 +202,11 @@ require_once __DIR__ . '/functions.php';
     </script>
 
     <!-- Header -->
-    <div class="announcement-bar" id="announcement-slider" style="background: #000; border-bottom: 1px solid #1a1a1a; padding: 10px 0; display: flex; justify-content: center; align-items: center; position: relative;">
-        <button class="announcement-arrow prev-arrow" onclick="prevAnnouncement()" aria-label="Previous Announcement" style="background: none; border: none; color: #fff; cursor: pointer; position: absolute; left: 20px;">
-            <i data-lucide="chevron-left" style="width: 14px; height: 14px;"></i>
+    <div class="announcement-bar" id="announcement-slider">
+        <button class="announcement-arrow prev-arrow" onclick="prevAnnouncement()" aria-label="Previous Announcement">
+            <i data-lucide="chevron-left"></i>
         </button>
-        <div class="announcement-content" style="text-align: center; color: #fff; font-size: 0.65rem; font-weight: 700; letter-spacing: 1px; width: 100%; overflow: hidden; position: relative; height: 15px;">
+        <div class="announcement-content" style="font-size: 0.65rem; font-weight: 700; letter-spacing: 1px; color: #fff; width: calc(100% - 100px); margin: 0 auto;">
             <?php 
                 $a_text_raw = getSetting('announcement_bar', '🔥 LIMITED TIME OFFER — SHOP NOW'); 
                 $announcements = array_filter(array_map('trim', explode('|', $a_text_raw)));
@@ -214,14 +214,14 @@ require_once __DIR__ . '/functions.php';
                     $announcements = ['🔥 LIMITED TIME OFFER — SHOP NOW'];
                 }
                 foreach($announcements as $index => $ann) {
-                    $activeClass = $index === 0 ? 'active' : 'prev';
-                    $style = $index === 0 ? 'position: absolute; top: 0; left: 0; width: 100%; transition: transform 0.5s;' : 'position: absolute; top: 0; left: 0; width: 100%; transform: translateY(100%); transition: transform 0.5s;';
+                    $activeClass = $index === 0 ? 'active' : '';
+                    $style = $index === 0 ? 'top: 0; left: 0; height: 100%; transform: translateY(0); transition: transform 0.5s, opacity 0.5s;' : 'top: 0; left: 0; height: 100%; transform: translateY(100%); transition: transform 0.5s, opacity 0.5s;';
                     echo '<div class="announcement-slide ' . $activeClass . '" style="' . $style . '">' . htmlspecialchars($ann) . '</div>';
                 }
             ?>
         </div>
-        <button class="announcement-arrow next-arrow" onclick="nextAnnouncement()" aria-label="Next Announcement" style="background: none; border: none; color: #fff; cursor: pointer; position: absolute; right: 20px;">
-            <i data-lucide="chevron-right" style="width: 14px; height: 14px;"></i>
+        <button class="announcement-arrow next-arrow" onclick="nextAnnouncement()" aria-label="Next Announcement">
+            <i data-lucide="chevron-right"></i>
         </button>
     </div>
     <script>
@@ -235,7 +235,7 @@ require_once __DIR__ . '/functions.php';
             slides[currentAnnouncement].style.transition = 'none';
             slides[currentAnnouncement].style.transform = 'translateY(100%)';
             void slides[currentAnnouncement].offsetWidth;
-            slides[currentAnnouncement].style.transition = 'transform 0.5s';
+            slides[currentAnnouncement].style.transition = 'transform 0.5s, opacity 0.5s';
             slides[currentAnnouncement].style.transform = 'translateY(0)';
             slides[currentAnnouncement].classList.add('active');
         }
@@ -247,23 +247,26 @@ require_once __DIR__ . '/functions.php';
             slides[currentAnnouncement].style.transition = 'none';
             slides[currentAnnouncement].style.transform = 'translateY(-100%)';
             void slides[currentAnnouncement].offsetWidth;
-            slides[currentAnnouncement].style.transition = 'transform 0.5s';
+            slides[currentAnnouncement].style.transition = 'transform 0.5s, opacity 0.5s';
             slides[currentAnnouncement].style.transform = 'translateY(0)';
             slides[currentAnnouncement].classList.add('active');
         }
         if(slides.length > 1) { setInterval(nextAnnouncement, 4000); }
     </script>
     <header class="header" id="main-header">
-        <div class="container header-inner" style="grid-template-columns: 1fr auto 1fr; background: #000; padding: 15px 20px;">
+        <div class="container header-inner" style="grid-template-columns: 1fr auto 1fr; padding: 15px 20px;">
             <div style="justify-self: start; display: flex; align-items: center;">
-                <button class="menu-toggle header-menu-icon" id="mobile-menu-btn" onclick="document.getElementById('mobile-nav-drawer').classList.add('open'); document.body.style.overflow = 'hidden';" style="display: block; cursor: pointer; color: #fff; background: transparent; border: none;">
+                <button class="menu-toggle header-menu-icon" id="mobile-menu-btn" onclick="document.getElementById('mobile-nav-drawer').classList.add('open'); document.body.style.overflow = 'hidden';" style="display: block; cursor: pointer; color: #1a1a1a; background: transparent; border: none;">
                     <i data-lucide="menu" style="width: 24px; height: 24px;"></i>
                 </button>
             </div>
             
             <div class="logo-wrapper" style="justify-self: center;">
                 <a href="<?php echo BASE_URL; ?>/index.php" class="logo">
-                    <img src="<?php echo BASE_URL; ?>/assets/logo.png" alt="Jevani Store" style="height: 60px; width: auto;" onerror="this.src='<?php echo BASE_URL; ?>/assets/logoOD.png';">
+                    <?php 
+                    $site_logo = getSetting('site_logo') ?: 'logo.png'; 
+                    ?>
+                    <img src="<?php echo BASE_URL; ?>/assets/<?php echo htmlspecialchars($site_logo); ?>" alt="Jevani Store" style="height: 60px; width: auto;" onerror="this.src='<?php echo BASE_URL; ?>/assets/logoOD.png';">
                 </a>
             </div>
             
@@ -272,12 +275,12 @@ require_once __DIR__ . '/functions.php';
             </nav>
             
             <div class="header-icons" style="justify-self: end; display: flex; gap: 1rem; align-items: center;">
-                <button class="icon-btn header-search-icon" aria-label="Search" onclick="document.getElementById('header-search-bar').classList.toggle('active'); document.getElementById('search-input').focus();" style="color: #fff; background: transparent; border: none; cursor: pointer;">
+                <button class="icon-btn header-search-icon" aria-label="Search" onclick="document.getElementById('header-search-bar').classList.toggle('active'); document.getElementById('search-input').focus();" style="color: #1a1a1a; background: transparent; border: none; cursor: pointer;">
                     <i data-lucide="search" style="width: 20px; height: 20px;"></i>
                 </button>
-                <button class="icon-btn header-cart-icon" id="cart-toggle-btn" aria-label="Cart" onclick="document.getElementById('cart-overlay').classList.add('active'); document.getElementById('cart-panel').classList.add('active'); document.body.classList.add('cart-open');" style="position: relative; color: #fff; background: transparent; border: none; cursor: pointer;">
+                <button class="icon-btn header-cart-icon" id="cart-toggle-btn" aria-label="Cart" onclick="document.getElementById('cart-overlay').classList.add('active'); document.getElementById('cart-panel').classList.add('active'); document.body.classList.add('cart-open');" style="position: relative; color: #1a1a1a; background: transparent; border: none; cursor: pointer;">
                     <i data-lucide="shopping-bag" style="width: 20px; height: 20px;"></i>
-                    <span class="cart-count" id="cart-count" style="position: absolute; top: -5px; right: -8px; font-size: 0.65rem; background: transparent; color: #fff; border: none; width: auto; height: auto; display: flex; align-items: center; justify-content: center;"><?php echo isset($_SESSION['cart']) ? count($_SESSION['cart']) : '0'; ?></span>
+                    <span class="cart-count" id="cart-count" style="position: absolute; top: -5px; right: -8px; font-size: 0.65rem; background: transparent; color: #1a1a1a; border: none; width: auto; height: auto; display: flex; align-items: center; justify-content: center;"><?php echo isset($_SESSION['cart']) ? count($_SESSION['cart']) : '0'; ?></span>
                 </button>
             </div>
         </div>

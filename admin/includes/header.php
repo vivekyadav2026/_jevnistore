@@ -319,7 +319,10 @@ requireAdmin();
 <div class="admin-layout">
     <aside class="admin-sidebar" id="admin-sidebar">
         <a href="<?php echo BASE_URL; ?>/index.php" class="logo" style="display: block; text-align: center; margin-bottom: 2rem;">
-            <img src="<?php echo BASE_URL; ?>/assets/logo.png" alt="Jevani Store Admin" style="height: 50px; width: auto;">
+            <?php 
+            $site_logo = getSetting('site_logo') ?: 'logo.png'; 
+            ?>
+            <img src="<?php echo BASE_URL; ?>/assets/<?php echo htmlspecialchars($site_logo); ?>" alt="Jevani Store Admin" style="height: 50px; width: auto;" onerror="this.src='<?php echo BASE_URL; ?>/assets/logo.png';">
         </a>
         <nav class="admin-nav">
             <a href="index.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : ''; ?>"><i data-lucide="layout-dashboard"></i> Dashboard</a>

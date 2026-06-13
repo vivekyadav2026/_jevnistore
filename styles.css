@@ -167,30 +167,27 @@ h1, h2, h3, h4, h5, h6 { font-weight: 500; letter-spacing: -0.01em; }
 @media (max-width: 480px)  { .shop-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; } }
 .product-card { 
     position: relative; 
-    background: var(--bg-primary); 
+    background: transparent; 
     display: flex; 
     flex-direction: column; 
-    border-radius: 16px; 
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .product-card:hover {
-    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-    transform: translateY(-5px);
+    /* No card shadow or border, per user request */
 }
 .product-img-wrapper { 
     position: relative; 
     aspect-ratio: 4/5; 
     overflow: hidden; 
-    background: var(--bg-secondary); 
+    background: transparent; 
     margin-bottom: 15px; 
-    border-radius: 16px 16px 0 0;
 }
 .product-img { 
     position: absolute; 
     inset: 0; 
     width: 100%; 
     height: 100%; 
-    object-fit: cover; 
+    object-fit: contain; 
     transition: opacity 0.8s ease, transform 1.2s ease; 
     z-index: 1; 
 }
@@ -205,7 +202,6 @@ h1, h2, h3, h4, h5, h6 { font-weight: 500; letter-spacing: -0.01em; }
     right: 15px;
     width: 40px;
     height: 40px;
-    border-radius: 50%;
     background: #fff;
     color: #000;
     display: flex;
@@ -229,9 +225,9 @@ h1, h2, h3, h4, h5, h6 { font-weight: 500; letter-spacing: -0.01em; }
     color: #fff;
 }
 
-.product-info { padding: 10px 15px 20px 15px; display: flex; flex-direction: column; align-items: flex-start; text-align: left; gap: 8px; }
-.product-title { font-size: 16px; font-weight: 500; text-transform: capitalize; letter-spacing: 0.5px; color: var(--text-primary); margin: 0; }
-.product-price { font-size: 16px; font-weight: 600; color: var(--text-primary); margin: 0; }
+.product-info { padding: 10px 10px 20px 10px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px; }
+.product-title { font-size: 14px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; color: var(--text-primary); margin: 0; }
+.product-price { font-size: 14px; font-weight: 400; color: var(--text-secondary); margin: 0; }
 
 /* ── Testimonials ── */
 .testimonial-grid {
@@ -3994,14 +3990,14 @@ body:has(.product-detail-container) .y2k-add-btn:hover {
     text-align: center;
 }
 .product-img-box {
-    background: #ffffff;
+    background: transparent;
     width: 100%;
-    aspect-ratio: 1/1;
+    aspect-ratio: 4/5;
     display: flex;
     align-items: center;
     justify-content: center;
     margin-bottom: 15px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    box-shadow: none;
     position: relative; /* Enable absolute overlays */
 }
 .product-img-box > a:not(.add-btn-overlay) {
@@ -4012,8 +4008,8 @@ body:has(.product-detail-container) .y2k-add-btn:hover {
     height: 100%;
 }
 .product-img-box img {
-    width: 80%;
-    height: 80%;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
 }
 .product-img-box .ajax-cart-form {
@@ -4027,16 +4023,16 @@ body:has(.product-detail-container) .y2k-add-btn:hover {
     padding: 0;
 }
 .product-min-title {
-    font-size: 0.6rem;
-    font-weight: 700;
+    font-size: 0.75rem;
+    font-weight: 500;
     text-transform: uppercase;
-    margin-bottom: 4px;
-    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+    letter-spacing: 1px;
     color: inherit;
 }
 .product-min-price {
-    font-size: 0.6rem;
-    font-weight: 600;
+    font-size: 0.75rem;
+    font-weight: 400;
     margin-bottom: 12px;
     color: inherit;
     opacity: 0.8;
@@ -4478,6 +4474,37 @@ body:has(.shop-page-container) .slider-handle::-moz-range-thumb {
     background: #ffffff;
     overflow: hidden;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.thumb-item {
+    width: 80px;
+    height: 80px;
+    background: transparent;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+.thumb-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.main-image-container {
+    width: 100%;
+    background: transparent;
+    overflow: hidden;
+    cursor: zoom-in;
+    aspect-ratio: 4/5;
+    position: relative;
+}
+.main-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: transform 0.1s ease;
 }
 
 .image-slide-item img {

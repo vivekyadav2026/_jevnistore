@@ -147,7 +147,10 @@
             <!-- Column 1: Brand & Newsletter -->
             <div class="footer-brand">
                 <a href="<?php echo BASE_URL; ?>/index.php" style="display: inline-block;">
-                    <img src="<?php echo BASE_URL; ?>/assets/logo_gothic.png" alt="JEVANI" style="height: 70px; width: auto; object-fit: contain;">
+                    <?php 
+                    $site_logo = getSetting('site_logo') ?: 'logo_gothic.png'; 
+                    ?>
+                    <img src="<?php echo BASE_URL; ?>/assets/<?php echo htmlspecialchars($site_logo); ?>" alt="JEVANI" style="height: 70px; width: auto; object-fit: contain;">
                 </a>
                 <p>Every stitch carries purpose. Jevani is a premium streetwear accessories brand redefining everyday carry for the modern urbanite. Proudly homegrown in India.</p>
                 
