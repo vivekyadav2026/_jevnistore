@@ -65,16 +65,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            --black: #09090b;
-            --white: #18181b;
-            --gray-50: #09090b;
-            --gray-100: #121217;
-            --gray-200: rgba(255,255,255,0.08);
-            --gray-400: #a1a1aa;
-            --gray-600: #a1a1aa;
-            --gray-900: #ffffff;
-            --accent: #adff2f;
-            --accent-hover: #c0ff00;
+            --black: #1a1a1a;
+            --white: #d6d3d1;
+            --gray-50: #ffffff;
+            --gray-100: #f4f4f5;
+            --gray-200: rgba(0, 0, 0, 0.08);
+            --gray-400: #555555;
+            --gray-600: #333333;
+            --gray-900: #1a1a1a;
+            --accent: #1a1a1a;
+            --accent-hover: #333333;
             --error: #ef4444;
             --success: #22c55e;
             --font: 'Inter', sans-serif;
@@ -85,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         body {
             font-family: var(--font);
-            background: url('<?php echo BASE_URL; ?>/assets/craft_workshop.jpg') center/cover no-repeat;
+            background-color: #d6d3d1;
             color: var(--gray-900);
             display: flex;
             align-items: center;
@@ -96,12 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
 
         body::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: rgba(9, 9, 11, 0.75);
-            backdrop-filter: blur(8px);
-            z-index: 0;
+            display: none;
         }
 
         /* ── Centered Card Layout ── */
@@ -111,12 +106,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             flex: none;
             width: 100%;
             max-width: 480px;
-            background: rgba(24, 24, 27, 0.6);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.08);
             border-radius: 24px;
             padding: 48px 40px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
             z-index: 1;
             margin: 20px;
         }
@@ -200,20 +194,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         .form-input {
             width: 100%;
             padding: 12px 12px 12px 40px;
-            border: 1.5px solid var(--gray-200);
+            border: 1.5px solid rgba(0, 0, 0, 0.15);
             border-radius: 10px;
             font-size: 0.9rem;
             font-family: var(--font);
             color: var(--gray-900);
-            background: rgba(9, 9, 11, 0.5);
+            background: #ffffff;
             transition: all 0.2s;
             outline: none;
         }
 
         .form-input:focus {
             border-color: var(--accent);
-            background: rgba(9, 9, 11, 0.8);
-            box-shadow: 0 0 0 4px rgba(173,255,47,0.08);
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.08);
         }
 
         .form-input.has-toggle { padding-right: 42px; }
@@ -273,7 +267,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             width: 100%;
             padding: 14px;
             background: var(--accent);
-            color: #000000;
+            color: #ffffff;
             border: none;
             border-radius: 10px;
             font-size: 0.95rem;
@@ -291,7 +285,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         .auth-btn:hover {
             background: var(--accent-hover);
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(173, 255, 47, 0.25);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
         }
 
         .auth-btn:active { transform: translateY(0); }
@@ -310,7 +304,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             transition: color 0.2s;
         }
 
-        .auth-form-footer a:hover { color: var(--accent); }
+        .auth-form-footer a:hover { color: var(--accent-hover); }
 
         /* Responsive */
         .auth-mobile-logo {
@@ -319,10 +313,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             text-align: center;
         }
         .auth-mobile-logo img {
-            height: 64px; /* INCREASED LOGO SIZE */
+            height: 64px;
             width: auto;
             object-fit: contain;
-            filter: brightness(0) invert(1);
         }
 
         @media (max-width: 480px) {
@@ -369,40 +362,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         .quick-login-btn:hover {
             border-color: var(--accent);
             color: var(--accent);
-            background: rgba(173, 255, 47, 0.05);
+            background: rgba(0, 0, 0, 0.04);
         }
 
         .quick-login-btn svg { width: 16px; height: 16px; color: var(--accent); }
-
-        /* Footer links */
-        .auth-form-footer {
-            margin-top: 28px;
-            text-align: center;
-            font-size: 0.875rem;
-            color: var(--gray-400);
-        }
-
-        .auth-form-footer a {
-            color: var(--gray-900);
-            font-weight: 600;
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-
-        .auth-form-footer a:hover { color: var(--accent); }
-
-        /* Responsive */
-        .auth-mobile-logo {
-            display: none;
-            margin-bottom: 24px;
-            text-align: center;
-        }
-        .auth-mobile-logo img {
-            height: 40px;
-            width: auto;
-            object-fit: contain;
-            filter: brightness(0) invert(1);
-        }
 
         @media (max-width: 900px) {
             .auth-left { display: none; }

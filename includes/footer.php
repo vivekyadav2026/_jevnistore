@@ -232,27 +232,61 @@
     <div class="mobile-nav-drawer" id="mobile-nav-drawer">
         <div class="mobile-nav-backdrop" onclick="closeMobileNav()"></div>
         <div class="mobile-nav-panel">
-            <div class="mobile-nav-header" style="justify-content: flex-end;">
+            <div class="mobile-nav-header">
                 <button class="mobile-nav-close" onclick="closeMobileNav()">
                     <i data-lucide="x"></i>
                 </button>
             </div>
+            <?php
+            $current_page = basename($_SERVER['PHP_SELF']);
+            $category = isset($_GET['category']) ? $_GET['category'] : null;
+            ?>
             <div class="mobile-nav-links">
-                <a href="<?php echo BASE_URL; ?>/shop.php">All Bags</a>
-                <a href="<?php echo BASE_URL; ?>/shop.php?category=1">Shoulder Bags</a>
-                <a href="<?php echo BASE_URL; ?>/shop.php?category=2">Totes</a>
-                <a href="<?php echo BASE_URL; ?>/wishlist.php">Wishlist</a>
-                <a href="<?php echo BASE_URL; ?>/lookbook.php">Lookbook</a>
-                <a href="<?php echo BASE_URL; ?>/about.php">About</a>
-            </div>
-            <div class="mobile-nav-footer">
-                <?php if(isLoggedIn()): ?>
-                    <a href="<?php echo isAdmin() ? BASE_URL . '/admin/index.php' : BASE_URL . '/customer/index.php'; ?>">My Account</a>
-                    <a href="<?php echo BASE_URL; ?>/logout.php" style="color: #666; border-color: rgba(255,255,255,0.05);">Logout</a>
-                <?php else: ?>
-                    <a href="<?php echo BASE_URL; ?>/login.php">Login</a>
-                    <a href="<?php echo BASE_URL; ?>/register.php">Register</a>
-                <?php endif; ?>
+                <a href="<?php echo BASE_URL; ?>/shop.php" class="<?php echo ($current_page == 'shop.php' && $category === null) ? 'active' : ''; ?>">ALL BAGS</a>
+                <!-- <a href="<?php echo BASE_URL; ?>/shop.php?category=1" class="<?php echo ($current_page == 'shop.php' && strval($category) === '1') ? 'active' : ''; ?>">SHOULDER BAGS</a> -->
+                <!-- <a href="<?php echo BASE_URL; ?>/shop.php?category=2" class="<?php echo ($current_page == 'shop.php' && strval($category) === '2') ? 'active' : ''; ?>">TOTES</a> -->
+                <a href="<?php echo BASE_URL; ?>/wishlist.php" class="<?php echo ($current_page == 'wishlist.php') ? 'active' : ''; ?>">WISHLIST</a>
+                <a href="<?php echo BASE_URL; ?>/lookbook.php" class="<?php echo ($current_page == 'lookbook.php') ? 'active' : ''; ?>">LOOKBOOK</a>
+                <a href="<?php echo BASE_URL; ?>/about.php" class="<?php echo ($current_page == 'about.php') ? 'active' : ''; ?>">ABOUT</a>
+
+                
+                <!-- Spacer pushing login and currency to bottom -->
+                <div class="mobile-nav-bottom-section">
+                    <?php if(isLoggedIn()): ?>
+                        <a href="<?php echo isAdmin() ? BASE_URL . '/admin/index.php' : BASE_URL . '/customer/index.php'; ?>">
+                            <i data-lucide="user" class="login-icon"></i>
+                            <span>My Account</span>
+                        </a>
+                        <a href="<?php echo BASE_URL; ?>/logout.php">
+                            <i data-lucide="log-out" class="login-icon"></i>
+                            <span>Logout</span>
+                        </a>
+                    <?php else: ?>
+                        <a href="<?php echo BASE_URL; ?>/login.php">
+                            <i data-lucide="user" class="login-icon"></i>
+                            <span>Login</span>
+                        </a>
+                    <?php endif; ?>
+                    
+                    <div class="currency-selector">
+                        <div class="currency-left">
+                            <svg class="flag-icon" width="20" height="14" viewBox="0 0 900 600">
+                                <rect width="900" height="200" fill="#FF9933"/>
+                                <rect y="200" width="900" height="200" fill="#FFFFFF"/>
+                                <rect y="400" width="900" height="200" fill="#128807"/>
+                                <circle cx="450" cy="300" r="80" fill="none" stroke="#000080" stroke-width="10"/>
+                                <circle cx="450" cy="300" r="15" fill="#000080"/>
+                                <circle cx="450" cy="300" r="80" fill="none" stroke="#000080" stroke-width="8"/>
+                                <line x1="450" y1="220" x2="450" y2="380" stroke="#000080" stroke-width="6"/>
+                                <line x1="370" y1="300" x2="530" y2="300" stroke="#000080" stroke-width="6"/>
+                                <line x1="393" y1="243" x2="507" y2="357" stroke="#000080" stroke-width="6"/>
+                                <line x1="393" y1="357" x2="507" y2="243" stroke="#000080" stroke-width="6"/>
+                            </svg>
+                            <span>INR ₹</span>
+                        </div>
+                        <i data-lucide="chevron-down" class="currency-chevron"></i>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -517,7 +551,7 @@
                     JEVANI
                 </div>
                 <button id="chk-close-btn" style="background: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 5px;" title="Cancel & Return to Cart">
-                    <i data-lucide="x" style="width: 20px; height: 20px; color: #ffffff;"></i>
+                    <i data-lucide="x" style="width: 20px; height: 20px; color: #000000;"></i>
                 </button>
             </div>
             
@@ -571,15 +605,15 @@
                             <div style="margin-bottom: 10px;">
                                 <div style="position: relative;">
                                     <svg style="position:absolute;left:11px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:#94a3b8;pointer-events:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-                                    <input type="email" id="chk-email-field" placeholder="Email address" autocomplete="email"
-                                        style="width:100%;padding:10px 10px 10px 34px;border:1.5px solid rgba(255,255,255,0.15);border-radius:8px;font-size:0.875rem;font-family:inherit;color:#ffffff;background:#0f0f13;outline:none;transition:border-color 0.2s;">
+                                    <input type="email" id="chk-email-field" placeholder="Email address" autocomplete="email" class="chk-login-input"
+                                        style="padding-left: 34px;">
                                 </div>
                             </div>
                             <!-- Password field -->
                             <div style="position: relative;">
                                 <svg style="position:absolute;left:11px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:#94a3b8;pointer-events:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                                <input type="password" id="chk-password-field" placeholder="Password" autocomplete="current-password"
-                                    style="width:100%;padding:10px 36px 10px 34px;border:1.5px solid rgba(255,255,255,0.15);border-radius:8px;font-size:0.875rem;font-family:inherit;color:#ffffff;background:#0f0f13;outline:none;transition:border-color 0.2s;">
+                                <input type="password" id="chk-password-field" placeholder="Password" autocomplete="current-password" class="chk-login-input"
+                                    style="padding-left: 34px; padding-right: 36px;">
                                 <button type="button" id="chk-pwd-toggle" onclick="chkTogglePwd()" tabindex="-1"
                                     style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#94a3b8;display:flex;align-items:center;">
                                     <svg id="chk-eye-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -736,7 +770,7 @@
         <div class="chk-cancel-card">
             <!-- Circular Close Button on Top -->
             <button type="button" class="chk-cancel-close-circle" onclick="window.closeCancelModal()">
-                <i data-lucide="x" style="width: 18px; height: 18px; color: #fff;"></i>
+                <i data-lucide="x" style="width: 18px; height: 18px; color: #000000;"></i>
             </button>
             
             <div class="chk-cancel-body">
@@ -991,11 +1025,7 @@
             chkEmailField.addEventListener('input', chkValidateLoginFields);
             chkPasswordField.addEventListener('input', chkValidateLoginFields);
 
-            // Focus styles for checkout inputs
-            [chkEmailField, chkPasswordField].forEach(function(el) {
-                el.addEventListener('focus', function() { el.style.borderColor = 'var(--accent)'; el.style.background = '#0f0f13'; });
-                el.addEventListener('blur',  function() { el.style.borderColor = 'rgba(255,255,255,0.15)'; el.style.background = '#0f0f13'; });
-            });
+
 
             chkEmailField.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') { chkPasswordField.focus(); }

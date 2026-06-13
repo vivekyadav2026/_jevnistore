@@ -6,6 +6,7 @@ if (!isset($_SESSION['wishlist'])) {
 }
 ?>
 
+<div class="wishlist-page-container">
 <div class="page-header">
     <div class="container">
         <h1 class="section-title" style="margin-bottom: 10px;">WISHLIST</h1>
@@ -49,60 +50,21 @@ if (!isset($_SESSION['wishlist'])) {
                         $discount_pct = round((($product['compare_at_price'] - $product['price']) / $product['compare_at_price']) * 100);
                     }
                     ?>
-                    <div class="y2k-card" id="wishlist-item-<?php echo $product['id']; ?>" style="transition: all 0.4s ease;">
-                        <div class="y2k-img-wrapper">
-                            <!-- Badges -->
-                            <div class="y2k-badges">
-                                <?php if ($product['stock'] <= 0): ?>
-                                    <span class="y2k-badge sold-out">SOLD OUT</span>
-                                <?php endif; ?>
-                                <?php if ($discount_pct > 0): ?>
-                                    <span class="y2k-badge sale">SAVE <?php echo $discount_pct; ?>%</span>
-                                <?php endif; ?>
-                            </div>
-                            
-                            <!-- Wishlist Toggle (Remove from wishlist on click) -->
-                            <button type="button" class="y2k-wishlist-btn in-wishlist" onclick="removeWishlistItem(<?php echo $product['id']; ?>)" aria-label="Remove from Wishlist">
-                                <i data-lucide="heart" fill="#ef4444" style="width: 18px; height: 18px; color: #ef4444;"></i>
-                            </button>
-                            
-                            <!-- Product Image -->
-                            <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $product['id']; ?>">
-                                <img src="<?php echo $image; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" class="y2k-img">
-                                <?php if ($hover_image): ?>
-                                    <img src="<?php echo $hover_image; ?>" alt="<?php echo htmlspecialchars($product['name']); ?> hover" class="y2k-img-hover">
-                                <?php endif; ?>
-                            </a>
-                            
-                            <!-- Quick View Trigger -->
-                            <button type="button" class="y2k-quickview-btn" onclick="openQuickView(<?php echo $product['id']; ?>)">Quick View</button>
-                        </div>
+                    <div class="product-card-min" id="wishlist-item-<?php echo $product['id']; ?>" style="transition: all 0.4s ease; text-align: center; display: flex; flex-direction: column; align-items: center;">
+                        <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $product['id']; ?>" class="product-img-box">
+                            <img src="<?php echo $image; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
+                        </a>
                         
-                        <!-- Details -->
-                        <div class="y2k-info">
-                            <div>
-                                <span class="y2k-brand">JEVANI STORE</span>
-                                <h3 class="y2k-title">
-                                    <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $product['id']; ?>">
-                                        <?php echo htmlspecialchars($product['name']); ?>
-                                    </a>
-                                </h3>
-                            </div>
-                            
-                            <div class="y2k-price-row">
-                                <span class="y2k-price-sale">₹<?php echo number_format($product['price']); ?></span>
-                                <?php if (!empty($product['compare_at_price']) && $product['compare_at_price'] > $product['price']): ?>
-                                    <span class="y2k-price-compare">₹<?php echo number_format($product['compare_at_price']); ?></span>
-                                    <span class="y2k-discount-badge">(<?php echo $discount_pct; ?>% OFF)</span>
-                                <?php endif; ?>
-                            </div>
-                            
-                            <!-- Add to Bag button specific to wishlist page -->
-                            <button type="button" class="y2k-add-btn" onclick="addWishlistItemToCart(<?php echo $product['id']; ?>)">
-                                <i data-lucide="shopping-bag"></i>
-                                Add to Bag
-                            </button>
-                        </div>
+                        <div class="product-min-title"><?php echo htmlspecialchars($product['name']); ?></div>
+                        <div class="product-min-price">₹<?php echo number_format($product['price']); ?></div>
+                        
+                        <!-- Add to Bag button specific to wishlist page -->
+                        <button type="button" class="add-btn-small" onclick="addWishlistItemToCart(<?php echo $product['id']; ?>)" aria-label="Add to Bag">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5v14"/></svg>
+                        </button>
+
+                        <!-- Remove Link -->
+                        <a href="#" class="wishlist-remove-link" onclick="removeWishlistItem(<?php echo $product['id']; ?>); return false;" style="font-size: 0.55rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #555555; margin-top: 8px; cursor: pointer; border-bottom: 1px solid rgba(0, 0, 0, 0.2); padding-bottom: 1px; display: inline-block;">REMOVE</a>
                     </div>
                     <?php
                 }
@@ -279,5 +241,6 @@ function showEmptyWishlistState() {
     }, 100);
 }
 </script>
+</div>
 
 <?php require_once 'includes/footer.php'; ?>

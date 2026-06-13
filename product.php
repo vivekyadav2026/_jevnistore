@@ -16,10 +16,31 @@ if ($result->num_rows === 0) {
 
 $product = $result->fetch_assoc();
 $image = $product['image'] ? BASE_URL . '/assets/' . htmlspecialchars($product['image']) : BASE_URL . '/assets/bag_shoulder.png';
+
+// Recently Viewed Session Tracking
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+if (!isset($_SESSION['recently_viewed'])) {
+    $_SESSION['recently_viewed'] = [];
+}
+if (($key = array_search($product_id, $_SESSION['recently_viewed'])) !== false) {
+    unset($_SESSION['recently_viewed'][$key]);
+}
+array_unshift($_SESSION['recently_viewed'], $product_id);
+$_SESSION['recently_viewed'] = array_slice($_SESSION['recently_viewed'], 0, 5);
 ?>
 
     <!-- Main Product Section -->
     <div class="container product-detail-container" style="max-width: 1600px; margin-bottom: 3rem;">
+        
+        <!-- Responsive Breadcrumbs -->
+        <div class="breadcrumb">
+            <a href="<?php echo BASE_URL; ?>">Home</a> / 
+            <a href="<?php echo BASE_URL; ?>/shop.php">Shop</a> / 
+            <span class="breadcrumb-current"><?php echo htmlspecialchars($product['name']); ?></span>
+        </div>
+
         <div class="product-split-layout">
             <?php
             $img_stmt = $conn->prepare("SELECT image_path FROM product_images WHERE product_id = ? ORDER BY sort_order ASC");
@@ -33,83 +54,81 @@ $image = $product['image'] ? BASE_URL . '/assets/' . htmlspecialchars($product['
             if(empty($images)) $images[] = BASE_URL . '/assets/bag_shoulder.png';
             ?>
             
-            <!-- Left: Sticky Thumbnails -->
-            <div class="product-thumbnails">
-                <?php foreach($images as $idx => $imgSrc): ?>
-                    <a href="#gallery-img-<?php echo $idx; ?>">
-                        <img src="<?php echo $imgSrc; ?>" alt="Thumbnail <?php echo $idx+1; ?>">
-                    </a>
-                <?php endforeach; ?>
-            </div>
-
-            <!-- Center: Large Image Gallery -->
-            <div class="product-gallery">
-                <?php foreach($images as $idx => $imgSrc): ?>
-                    <img id="gallery-img-<?php echo $idx; ?>" src="<?php echo $imgSrc; ?>" alt="<?php echo htmlspecialchars($product['name']); ?> Image <?php echo $idx+1; ?>">
-                <?php endforeach; ?>
+            <!-- Left: Main Image & Zoom Button -->
+            <div class="product-images-section">
+                <!-- Center: Large Image with Zoom Button -->
+                <div class="product-gallery">
+                    <div class="main-image-container" id="main-image-container" onclick="openLightbox(currentImageIndex)">
+                        <img id="main-product-image" src="<?php echo $images[0]; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
+                        <!-- Zoom button in top right -->
+                        <button type="button" class="zoom-trigger-btn" onclick="event.stopPropagation(); openLightbox(currentImageIndex)" aria-label="Zoom Image">
+                            <i data-lucide="zoom-in"></i>
+                        </button>
+                    </div>
+                </div>
+                <!-- Thumbnails -->
+                <div class="product-thumbnails-horizontal">
+                    <?php foreach($images as $idx => $imgSrc): ?>
+                        <div class="thumb-item <?php echo $idx === 0 ? 'active' : ''; ?>" onclick="changeMainImage(this, '<?php echo $imgSrc; ?>', <?php echo $idx; ?>)">
+                            <img src="<?php echo $imgSrc; ?>" alt="Thumbnail <?php echo $idx+1; ?>">
+                        </div>
+                    <?php endforeach; ?>
+                </div>
             </div>
             
             <!-- Right: Product Info -->
             <div class="product-info-panel">
                 <div class="product-vendor">JEVANI STORE</div>
                 <h1 class="product-detail-title"><?php echo htmlspecialchars($product['name']); ?></h1>
-                <div class="product-detail-price">
-                    RS. <?php echo number_format($product['price'], 2); ?>
+                
+                <!-- Star Rating Block -->
+                <div class="product-rating-stars">
+                    <div class="stars">
+                        <i data-lucide="star" class="star-filled"></i>
+                        <i data-lucide="star" class="star-filled"></i>
+                        <i data-lucide="star" class="star-filled"></i>
+                        <i data-lucide="star" class="star-filled"></i>
+                        <div class="star-half-container">
+                            <i data-lucide="star" class="star-empty"></i>
+                            <div class="star-half-clip">
+                                <i data-lucide="star" class="star-filled"></i>
+                            </div>
+                        </div>
+                        <span class="rating-count-text">(15)</span>
+                    </div>
                 </div>
+
+                <div class="product-detail-price">
+                    <span class="current-price">RS. <?php echo number_format($product['price'], 2); ?></span>
+                    <?php if (!empty($product['compare_at_price']) && $product['compare_at_price'] > $product['price']): ?>
+                        <span class="compare-price">RS. <?php echo number_format($product['compare_at_price'], 2); ?></span>
+                    <?php endif; ?>
+                </div>
+                <div class="tax-shipping-text">Tax included. Shipping calculated at checkout.</div>
                 
                 <form action="<?php echo BASE_URL; ?>/cart_action.php" method="POST" id="add-to-cart-form" class="ajax-cart-form">
                     <input type="hidden" name="action" value="add">
                     <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
-                    <input type="hidden" name="size" id="selected-size" value="">
-
-                    <!-- Hardware Selector -->
-                    <div style="margin-bottom: 2rem;">
-                        <div class="size-selector-label">
-                            <span>HARDWARE FINISH</span>
-                        </div>
-                        <div class="size-grid" style="grid-template-columns: repeat(2, 1fr);">
-                            <button type="button" class="size-btn active" onclick="selectSize(this, 'Silver')">SILVER</button>
-                            <button type="button" class="size-btn" onclick="selectSize(this, 'Gold')">GOLD</button>
-                        </div>
-                    </div>
+                    <input type="hidden" name="size" id="selected-size" value="Standard">
 
                     <!-- Quantity & Buttons -->
                     <div class="detail-actions">
                         <div class="quantity-selector">
-                            <button type="button" class="qty-btn-large" onclick="updateDetailQty(-1)">-</button>
+                            <button type="button" class="qty-btn" onclick="updateDetailQty(-1)">-</button>
                             <input type="number" id="detail-qty" name="quantity" value="1" min="1" readonly>
-                            <button type="button" class="qty-btn-large" onclick="updateDetailQty(1)">+</button>
+                            <button type="button" class="qty-btn" onclick="updateDetailQty(1)">+</button>
                         </div>
-                        <button type="submit" class="btn btn-outline" style="height: 50px; font-size: 0.9rem; letter-spacing: 2px;">ADD TO CART</button>
                     </div>
                     
+                    <button type="submit" class="btn-add-cart">ADD TO CART</button>
                     <button type="button" class="btn-buy-now" onclick="buyNow()">BUY IT NOW</button>
                 </form>
-            </div>
-        </div>
 
-        <!-- Below: Product Meta Information (Accordions) -->
-        <div class="product-meta-accordion" style="margin-top: 2rem; max-width: 800px; margin-left: auto; margin-right: auto;">
-            <div class="accordion-item" style="border-bottom: 1px solid var(--border-color); padding: 20px 0;">
-                <h4 style="margin: 0; font-size: 1rem; letter-spacing: 1px; display: flex; justify-content: space-between; cursor: pointer;" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
-                    DESCRIPTION & DETAILS <i data-lucide="chevron-down"></i>
-                </h4>
-                <div style="display: none; padding-top: 20px; color: var(--text-secondary); line-height: 1.8; font-size: 0.95rem;">
-                    <div class="product-description-content">
-                        <?php echo $product['description'] ?: '<p>Premium bag designed for the modern landscape. Featuring custom hardware and luxury finish.</p>'; ?>
-                    </div>
+                <!-- Product Inline Details -->
+                <div class="product-inline-details">
+                    <?php echo $product['description'] ?: '<p>Premium bag designed for the modern landscape. Featuring custom hardware and luxury finish.</p>'; ?>
                 </div>
             </div>
-
-            <!-- <div class="accordion-item" style="border-bottom: 1px solid var(--border-color); padding: 20px 0;">
-                <h4 style="margin: 0; font-size: 1rem; letter-spacing: 1px; display: flex; justify-content: space-between; cursor: pointer;" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
-                    SHIPPING & RETURNS <i data-lucide="chevron-down"></i>
-                </h4>
-                <div style="display: none; padding-top: 20px; color: var(--text-secondary); line-height: 1.8; font-size: 0.95rem;">
-                    <p><strong>Free Standard Shipping:</strong> 3-5 Business Days on orders over ₹1500.<br><strong>Express Shipping:</strong> 1-2 Business Days available at checkout.</p>
-                    <p><strong>Returns:</strong> Accepted within 14 days of delivery. Items must be unused with original tags and hardware protectors attached.</p>
-                </div>
-            </div> -->
         </div>
     </div>
 
@@ -137,44 +156,101 @@ $image = $product['image'] ? BASE_URL . '/assets/' . htmlspecialchars($product['
     <!-- Reviews Section -->
     <section class="reviews-section">
         <div class="container">
-            <div class="reviews-header">
-                <h2 class="section-title" style="margin-bottom: 0;">CUSTOMER REVIEWS</h2>
-                <div class="reviews-rating-summary">
+            <h2 class="reviews-title">CUSTOMER REVIEWS</h2>
+            
+            <div class="reviews-summary-block">
+                <div class="rating-overall">
+                    <div class="rating-score">4.8</div>
                     <div class="stars">
-                        <i data-lucide="star"></i>
-                        <i data-lucide="star"></i>
-                        <i data-lucide="star"></i>
-                        <i data-lucide="star"></i>
-                        <i data-lucide="star" style="fill: transparent; stroke: var(--accent);"></i>
+                        <i data-lucide="star"></i><i data-lucide="star"></i><i data-lucide="star"></i><i data-lucide="star"></i><i data-lucide="star" style="fill: transparent; stroke: var(--accent);"></i>
                     </div>
-                    <span style="color: var(--text-secondary); font-size: 0.9rem; letter-spacing: 1px;">4.8 / 5 based on 124 reviews</span>
+                    <div class="rating-count">Based on 124 reviews</div>
+                </div>
+                
+                <div class="rating-bars">
+                    <div class="rating-bar-row">
+                        <div class="rating-stars">5 Stars</div>
+                        <div class="progress-bar"><div class="progress-fill" style="width: 80%;"></div></div>
+                        <div class="rating-pct">80%</div>
+                    </div>
+                    <div class="rating-bar-row">
+                        <div class="rating-stars">4 Stars</div>
+                        <div class="progress-bar"><div class="progress-fill" style="width: 15%;"></div></div>
+                        <div class="rating-pct">15%</div>
+                    </div>
+                    <div class="rating-bar-row">
+                        <div class="rating-stars">3 Stars</div>
+                        <div class="progress-bar"><div class="progress-fill" style="width: 5%;"></div></div>
+                        <div class="rating-pct">5%</div>
+                    </div>
+                    <div class="rating-bar-row">
+                        <div class="rating-stars">2 Stars</div>
+                        <div class="progress-bar"><div class="progress-fill" style="width: 0%;"></div></div>
+                        <div class="rating-pct">0%</div>
+                    </div>
+                    <div class="rating-bar-row">
+                        <div class="rating-stars">1 Star</div>
+                        <div class="progress-bar"><div class="progress-fill" style="width: 0%;"></div></div>
+                        <div class="rating-pct">0%</div>
+                    </div>
+                </div>
+                
+                <div class="write-review-action">
+                    <button class="btn btn-outline btn-write-review">Write a Review</button>
                 </div>
             </div>
 
-            <div class="reviews-grid">
-                <div class="review-card y2k-fade-in">
-                    <div class="stars" style="margin-bottom: 15px;">
-                        <i data-lucide="star" style="width: 14px; height: 14px;"></i><i data-lucide="star" style="width: 14px; height: 14px;"></i><i data-lucide="star" style="width: 14px; height: 14px;"></i><i data-lucide="star" style="width: 14px; height: 14px;"></i><i data-lucide="star" style="width: 14px; height: 14px;"></i>
+            <div class="reviews-grid new-reviews-grid">
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="stars">
+                            <i data-lucide="star"></i><i data-lucide="star"></i><i data-lucide="star"></i><i data-lucide="star"></i><i data-lucide="star"></i>
+                        </div>
+                        <div class="review-date">10/12/2026</div>
                     </div>
-                    <div class="review-author">Sarah M. <span class="verified-badge"><i data-lucide="check-circle" style="width: 12px; height: 12px;"></i> Verified</span></div>
-                    <div class="review-date">Oct 12, 2026</div>
-                    <p class="review-text">Absolutely obsessed with this bag. The hardware feels super heavy and premium, and the leather quality is insane for the price. Best streetwear accessory I own.</p>
+                    <h4 class="review-title">Absolutely obsessed!</h4>
+                    <p class="review-text">The hardware feels super heavy and premium, and the leather quality is insane for the price. Best streetwear accessory I own.</p>
+                    <div class="review-author">Sarah M. <span class="verified-badge"><i data-lucide="check-circle"></i> Verified Buyer</span></div>
                 </div>
-                <div class="review-card y2k-fade-in" style="transition-delay: 0.1s;">
-                    <div class="stars" style="margin-bottom: 15px;">
-                        <i data-lucide="star" style="width: 14px; height: 14px;"></i><i data-lucide="star" style="width: 14px; height: 14px;"></i><i data-lucide="star" style="width: 14px; height: 14px;"></i><i data-lucide="star" style="width: 14px; height: 14px;"></i><i data-lucide="star" style="width: 14px; height: 14px;"></i>
+                
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="stars">
+                            <i data-lucide="star"></i><i data-lucide="star"></i><i data-lucide="star"></i><i data-lucide="star"></i><i data-lucide="star"></i>
+                        </div>
+                        <div class="review-date">10/08/2026</div>
                     </div>
-                    <div class="review-author">Jordan K. <span class="verified-badge"><i data-lucide="check-circle" style="width: 12px; height: 12px;"></i> Verified</span></div>
-                    <div class="review-date">Oct 08, 2026</div>
+                    <h4 class="review-title">Elevates my fits</h4>
                     <p class="review-text">The chain detailing is everything. It instantly elevates my fits. Holds all my essentials perfectly. 10/10 would recommend.</p>
+                    <div class="review-author">Jordan K. <span class="verified-badge"><i data-lucide="check-circle"></i> Verified Buyer</span></div>
                 </div>
-                <div class="review-card y2k-fade-in" style="transition-delay: 0.2s;">
-                    <div class="stars" style="margin-bottom: 15px;">
-                        <i data-lucide="star" style="width: 14px; height: 14px;"></i><i data-lucide="star" style="width: 14px; height: 14px;"></i><i data-lucide="star" style="width: 14px; height: 14px;"></i><i data-lucide="star" style="width: 14px; height: 14px;"></i><i data-lucide="star" style="width: 14px; height: 14px; fill: transparent; stroke: var(--accent);"></i>
+                
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="stars">
+                            <i data-lucide="star"></i><i data-lucide="star"></i><i data-lucide="star"></i><i data-lucide="star"></i><i data-lucide="star" style="fill: transparent; stroke: var(--accent);"></i>
+                        </div>
+                        <div class="review-date">09/29/2026</div>
                     </div>
-                    <div class="review-author">Elena R. <span class="verified-badge"><i data-lucide="check-circle" style="width: 12px; height: 12px;"></i> Verified</span></div>
-                    <div class="review-date">Sep 29, 2026</div>
-                    <p class="review-text">Love the aesthetic! It's slightly smaller than I expected, but it still fits my phone and wallet. The magnetic closure is really satisfying.</p>
+                    <h4 class="review-title">Love the aesthetic!</h4>
+                    <p class="review-text">It's slightly smaller than I expected, but it still fits my phone and wallet. The magnetic closure is really satisfying.</p>
+                    <div class="review-author">Elena R. <span class="verified-badge"><i data-lucide="check-circle"></i> Verified Buyer</span></div>
+                </div>
+            </div>
+            
+            <!-- Trust Seals circular badges at bottom of reviews container -->
+            <div class="trust-seals-grid">
+                <div class="trust-seal-circle">
+                    <span>Free<br>Shipping</span>
+                </div>
+                <div class="trust-seal-circle" style="animation-direction: reverse;">
+                    <span>3 Days<br>Return</span>
+                </div>
+                <div class="trust-seal-circle">
+                    <span>100%<br>Secure</span>
+                </div>
+                <div class="trust-seal-circle" style="animation-direction: reverse;">
+                    <span>Premium<br>Quality</span>
                 </div>
             </div>
         </div>
@@ -183,8 +259,8 @@ $image = $product['image'] ? BASE_URL . '/assets/' . htmlspecialchars($product['
     <!-- Related Products -->
     <section style="padding: 4rem 0; border-top: 1px solid var(--border-color); background: var(--bg-secondary);">
         <div class="container">
-            <h2 class="section-title" style="font-size: 2rem; margin-bottom: 2rem;">COMPLETE THE LOOK</h2>
-            <div class="new-arrivals-grid" id="related-products">
+            <h2 class="section-title" style="font-size: 2rem; margin-bottom: 2rem; text-align: center; text-transform: uppercase; letter-spacing: 2px;">RELATED PRODUCTS</h2>
+            <div class="products-grid-detail" id="related-products">
                 <?php
                 // Fetch up to 4 products of the same category
                 $related_products = [];
@@ -220,89 +296,75 @@ $image = $product['image'] ? BASE_URL . '/assets/' . htmlspecialchars($product['
                     }
                 }
                 
-                $index = 0;
                 foreach ($related_products as $rel_product) {
                     $image = $rel_product['image'] ? BASE_URL . '/assets/' . htmlspecialchars($rel_product['image']) : BASE_URL . '/assets/bag_shoulder.png';
-                    $hover_image = !empty($rel_product['image2']) ? BASE_URL . '/assets/' . htmlspecialchars($rel_product['image2']) : '';
-                    
-                    $discount_pct = 0;
-                    if (!empty($rel_product['compare_at_price']) && $rel_product['compare_at_price'] > $rel_product['price']) {
-                        $discount_pct = round((($rel_product['compare_at_price'] - $rel_product['price']) / $rel_product['compare_at_price']) * 100);
-                    }
-                    
-                    $in_wish = isset($_SESSION['wishlist']) && in_array($rel_product['id'], $_SESSION['wishlist']);
-                    $heart_fill = $in_wish ? '#ef4444' : 'none';
-                    $heart_color = $in_wish ? '#ef4444' : '#ffffff';
-                    $wish_class = $in_wish ? 'in-wishlist' : '';
                     ?>
-                    <div class="y2k-card y2k-fade-in" style="transition-delay: <?php echo ($index % 4) * 0.1; ?>s;">
-                        <div class="y2k-img-wrapper">
-                            <!-- Badges -->
-                            <div class="y2k-badges">
-                                <?php if ($rel_product['stock'] <= 0): ?>
-                                    <span class="y2k-badge sold-out">SOLD OUT</span>
-                                <?php endif; ?>
-                                <?php if ($discount_pct > 0): ?>
-                                    <span class="y2k-badge sale">SAVE <?php echo $discount_pct; ?>%</span>
-                                <?php endif; ?>
-                            </div>
-                            
-                            <!-- Wishlist Toggle -->
-                            <button type="button" class="y2k-wishlist-btn <?php echo $wish_class; ?>" onclick="toggleWishlist(<?php echo $rel_product['id']; ?>, this)" aria-label="Add to Wishlist">
-                                <i data-lucide="heart" fill="<?php echo $heart_fill; ?>" style="width: 18px; height: 18px; color: <?php echo $heart_color; ?>;"></i>
+                    <div class="product-card-min">
+                        <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $rel_product['id']; ?>" class="product-img-box">
+                            <img src="<?php echo $image; ?>" alt="<?php echo htmlspecialchars($rel_product['name']); ?>">
+                        </a>
+                        <div class="product-min-title"><?php echo htmlspecialchars($rel_product['name']); ?></div>
+                        <div class="product-min-price">₹<?php echo number_format($rel_product['price']); ?></div>
+                        <form action="<?php echo BASE_URL; ?>/cart_action.php" method="POST" class="ajax-cart-form">
+                            <input type="hidden" name="action" value="add">
+                            <input type="hidden" name="product_id" value="<?php echo $rel_product['id']; ?>">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="add-btn-small" aria-label="Add to Bag">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5v14"/></svg>
                             </button>
-                            
-                            <!-- Product Image -->
-                            <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $rel_product['id']; ?>">
-                                <img src="<?php echo $image; ?>" alt="<?php echo htmlspecialchars($rel_product['name']); ?>" class="y2k-img">
-                                <?php if ($hover_image): ?>
-                                    <img src="<?php echo $hover_image; ?>" alt="<?php echo htmlspecialchars($rel_product['name']); ?> hover" class="y2k-img-hover">
-                                <?php endif; ?>
-                            </a>
-                            
-                            <!-- Quick View Trigger -->
-                            <button type="button" class="y2k-quickview-btn" onclick="openQuickView(<?php echo $rel_product['id']; ?>)">Quick View</button>
-                        </div>
-                        
-                        <!-- Details -->
-                        <div class="y2k-info">
-                            <div>
-                                <span class="y2k-brand">JEVANI STORE</span>
-                                <h3 class="y2k-title">
-                                    <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $rel_product['id']; ?>">
-                                        <?php echo htmlspecialchars($rel_product['name']); ?>
-                                    </a>
-                                </h3>
-                            </div>
-                            
-                            <div class="y2k-price-row">
-                                <span class="y2k-price-sale">₹<?php echo number_format($rel_product['price']); ?></span>
-                                <?php if (!empty($rel_product['compare_at_price']) && $rel_product['compare_at_price'] > $rel_product['price']): ?>
-                                    <span class="y2k-price-compare">₹<?php echo number_format($rel_product['compare_at_price']); ?></span>
-                                    <span class="y2k-discount-badge">(<?php echo $discount_pct; ?>% OFF)</span>
-                                <?php endif; ?>
-                            </div>
-                            
-                            <!-- AJAX Add to Cart form -->
-                            <form action="<?php echo BASE_URL; ?>/cart_action.php" method="POST" class="ajax-cart-form">
-                                <input type="hidden" name="action" value="add">
-                                <input type="hidden" name="product_id" value="<?php echo $rel_product['id']; ?>">
-                                <input type="hidden" name="quantity" value="1">
-                                <input type="hidden" name="size" value="Silver">
-                                <button type="submit" class="y2k-add-btn">
-                                    <i data-lucide="shopping-bag"></i>
-                                    Add to Bag
-                                </button>
-                            </form>
-                        </div>
+                        </form>
                     </div>
-                    <?php
-                    $index++;
+                <?php
                 }
                 ?>
             </div>
         </div>
     </section>
+
+    <!-- Recently Viewed Products -->
+    <?php
+    $recent_ids = [];
+    if (isset($_SESSION['recently_viewed'])) {
+        $recent_ids = array_filter($_SESSION['recently_viewed'], function($id) use ($product_id) {
+            return $id != $product_id;
+        });
+    }
+    if (!empty($recent_ids)):
+    ?>
+    <section style="padding: 4rem 0; border-top: 1px solid var(--border-color); background: var(--bg-primary);">
+        <div class="container">
+            <h2 class="section-title" style="font-size: 2rem; margin-bottom: 2rem; text-align: center; text-transform: uppercase; letter-spacing: 2px;">RECENTLY VIEWED PRODUCTS</h2>
+            <div class="products-grid-detail">
+                <?php
+                $placeholders = implode(',', array_fill(0, count($recent_ids), '?'));
+                $rv_stmt = $conn->prepare("SELECT * FROM products WHERE id IN ($placeholders) LIMIT 4");
+                $types = str_repeat('i', count($recent_ids));
+                $rv_stmt->bind_param($types, ...$recent_ids);
+                $rv_stmt->execute();
+                $rv_res = $rv_stmt->get_result();
+                while ($rv_product = $rv_res->fetch_assoc()):
+                    $image = $rv_product['image'] ? BASE_URL . '/assets/' . htmlspecialchars($rv_product['image']) : BASE_URL . '/assets/bag_shoulder.png';
+                    ?>
+                    <div class="product-card-min">
+                        <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $rv_product['id']; ?>" class="product-img-box">
+                            <img src="<?php echo $image; ?>" alt="<?php echo htmlspecialchars($rv_product['name']); ?>">
+                        </a>
+                        <div class="product-min-title"><?php echo htmlspecialchars($rv_product['name']); ?></div>
+                        <div class="product-min-price">₹<?php echo number_format($rv_product['price']); ?></div>
+                        <form action="<?php echo BASE_URL; ?>/cart_action.php" method="POST" class="ajax-cart-form">
+                            <input type="hidden" name="action" value="add">
+                            <input type="hidden" name="product_id" value="<?php echo $rv_product['id']; ?>">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="add-btn-small" aria-label="Add to Bag">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5v14"/></svg>
+                            </button>
+                        </form>
+                    </div>
+                <?php endwhile; ?>
+            </div>
+        </div>
+    </section>
+    <?php endif; ?>
 
     <script>
         // Scroll Intersection Observer — makes related product cards visible
@@ -329,19 +391,45 @@ $image = $product['image'] ? BASE_URL . '/assets/' . htmlspecialchars($product['
             });
         });
 
-        // Set default hardware
-        document.getElementById('selected-size').value = 'Silver';
 
-        function selectSize(btn, size) {
-            document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            document.getElementById('selected-size').value = size;
-        }
 
         function updateDetailQty(change) {
             const input = document.getElementById('detail-qty');
             let val = parseInt(input.value) + change;
             if (val >= 1) input.value = val;
+        }
+
+        function toggleAccordion(el) {
+            const content = el.nextElementSibling;
+            const icon = el.querySelector('i');
+            
+            if (content.style.maxHeight) {
+                content.style.maxHeight = null;
+                icon.style.transform = "rotate(0deg)";
+            } else {
+                content.style.maxHeight = content.scrollHeight + "px";
+                icon.style.transform = "rotate(180deg)";
+            }
+        }
+        
+        // Initialize first accordion as open
+        document.addEventListener('DOMContentLoaded', () => {
+            const firstAccordion = document.querySelector('.accordion-item:first-child .accordion-content');
+            if(firstAccordion) {
+                firstAccordion.style.maxHeight = firstAccordion.scrollHeight + "px";
+                firstAccordion.previousElementSibling.querySelector('i').style.transform = "rotate(180deg)";
+            }
+        });
+
+        // Image click index and Thumbnail click
+        let currentImageIndex = 0;
+
+        function changeMainImage(thumb, src, index) {
+            document.querySelectorAll('.thumb-item').forEach(t => t.classList.remove('active'));
+            thumb.classList.add('active');
+            const mainImg = document.getElementById('main-product-image');
+            mainImg.src = src;
+            currentImageIndex = index;
         }
 
         function buyNow() {
@@ -419,56 +507,23 @@ $image = $product['image'] ? BASE_URL . '/assets/' . htmlspecialchars($product['
             }, 150);
         }
 
-        // Bind click events on gallery images
+        // Bind click events and initial Lucide icons
         document.addEventListener('DOMContentLoaded', () => {
-            const galleryImgs = document.querySelectorAll('.product-gallery img');
-            galleryImgs.forEach((img, idx) => {
-                img.style.cursor = 'zoom-in';
-                img.addEventListener('click', (e) => {
-                    let targetIdx = idx;
-                    if (window.innerWidth <= 991 && idx === 0) {
-                        const activeIdxAttr = e.currentTarget.getAttribute('data-active-idx');
-                        if (activeIdxAttr !== null) targetIdx = parseInt(activeIdxAttr);
-                    }
-                    openLightbox(targetIdx);
-                });
-            });
+            lucide.createIcons();
+        });
             
-            const thumbnailLinks = document.querySelectorAll('.product-thumbnails a');
-            thumbnailLinks.forEach((link, idx) => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    if (window.innerWidth <= 991) {
-                        const mainImg = document.querySelector('.product-gallery img:first-child');
-                        if (mainImg) {
-                            mainImg.src = lightboxImages[idx];
-                            mainImg.setAttribute('data-active-idx', idx);
-                            mainImg.style.opacity = '0.5';
-                            setTimeout(() => mainImg.style.opacity = '1', 50);
-                            
-                            // Highlight active thumbnail
-                            thumbnailLinks.forEach(l => l.classList.remove('active-thumb'));
-                            link.classList.add('active-thumb');
-                        }
-                    } else {
-                        openLightbox(idx);
-                    }
-                });
-            });
-            
-            // Keyboard navigation
-            document.addEventListener('keydown', (e) => {
-                const lightbox = document.getElementById('product-lightbox');
-                if (lightbox && lightbox.style.display === 'flex') {
-                    if (e.key === 'ArrowLeft') {
-                        changeLightboxImage(-1);
-                    } else if (e.key === 'ArrowRight') {
-                        changeLightboxImage(1);
-                    } else if (e.key === 'Escape') {
-                        closeLightbox();
-                    }
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            const lightbox = document.getElementById('product-lightbox');
+            if (lightbox && lightbox.style.display === 'flex') {
+                if (e.key === 'ArrowLeft') {
+                    changeLightboxImage(-1);
+                } else if (e.key === 'ArrowRight') {
+                    changeLightboxImage(1);
+                } else if (e.key === 'Escape') {
+                    closeLightbox();
                 }
-            });
+            }
         });
     </script>
 

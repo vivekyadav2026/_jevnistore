@@ -124,16 +124,18 @@ unset($_SESSION['_dev_reset_link']);
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            --black: #09090b;
-            --white: #18181b;
-            --gray-50: #09090b;
-            --gray-100: #121217;
-            --gray-200: rgba(255,255,255,0.08);
-            --gray-400: #a1a1aa;
-            --gray-600: #a1a1aa;
-            --gray-900: #ffffff;
-            --accent: #adff2f;
-            --accent-hover: #c0ff00;
+            --black: #1a1a1a;
+            --white: #d6d3d1;
+            --gray-50: #ffffff;
+            --gray-100: #f4f4f5;
+            --gray-200: rgba(0, 0, 0, 0.08);
+            --gray-400: #555555;
+            --gray-600: #333333;
+            --gray-900: #1a1a1a;
+            --accent: #1a1a1a;
+            --accent-hover: #333333;
+            --error: #ef4444;
+            --success: #22c55e;
             --font: 'Inter', sans-serif;
             --serif: 'Playfair Display', serif;
         }
@@ -142,7 +144,7 @@ unset($_SESSION['_dev_reset_link']);
 
         body {
             font-family: var(--font);
-            background: url('<?php echo BASE_URL; ?>/assets/craft_workshop.jpg') center/cover no-repeat;
+            background-color: #d6d3d1;
             color: var(--gray-900);
             display: flex;
             align-items: center;
@@ -153,12 +155,7 @@ unset($_SESSION['_dev_reset_link']);
         }
 
         body::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: rgba(9, 9, 11, 0.75);
-            backdrop-filter: blur(8px);
-            z-index: 0;
+            display: none;
         }
 
         /* ── Centered Card Layout ── */
@@ -168,12 +165,11 @@ unset($_SESSION['_dev_reset_link']);
             flex: none;
             width: 100%;
             max-width: 480px;
-            background: rgba(24, 24, 27, 0.6);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.08);
             border-radius: 24px;
             padding: 48px 40px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
             z-index: 1;
             margin: 20px;
         }
@@ -203,14 +199,15 @@ unset($_SESSION['_dev_reset_link']);
         .icon-header {
             display: flex;
             flex-direction: column;
-            align-items: flex-start;
+            align-items: center;
+            text-align: center;
             margin-bottom: 32px;
         }
 
         .icon-circle {
             width: 54px;
             height: 54px;
-            border-radius: 14px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -218,8 +215,8 @@ unset($_SESSION['_dev_reset_link']);
         }
 
         .icon-circle.indigo {
-            background: rgba(173, 255, 47, 0.1);
-            border: 1px solid rgba(173, 255, 47, 0.2);
+            background: rgba(0, 0, 0, 0.03);
+            border: 1.5px solid var(--accent);
             color: var(--accent);
         }
 
@@ -306,21 +303,21 @@ unset($_SESSION['_dev_reset_link']);
 
         .form-input {
             width: 100%;
-            padding: 13px 13px 13px 40px;
-            border: 1.5px solid var(--gray-200);
+            padding: 12px 12px 12px 40px;
+            border: 1.5px solid rgba(0, 0, 0, 0.15);
             border-radius: 10px;
             font-size: 0.9rem;
             font-family: var(--font);
             color: var(--gray-900);
-            background: var(--gray-50);
+            background: #ffffff;
             transition: all 0.2s;
             outline: none;
         }
 
         .form-input:focus {
             border-color: var(--accent);
-            background: var(--white);
-            box-shadow: 0 0 0 4px rgba(99,102,241,0.08);
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.08);
         }
 
         .form-input.has-toggle { padding-right: 42px; }
@@ -348,11 +345,11 @@ unset($_SESSION['_dev_reset_link']);
             width: 100%;
             padding: 14px;
             background: var(--accent);
-            color: #000000;
+            color: #ffffff;
             border: none;
             border-radius: 10px;
-            font-size: 0.9rem;
-            font-weight: 600;
+            font-size: 0.95rem;
+            font-weight: 700;
             font-family: var(--font);
             letter-spacing: 0.5px;
             cursor: pointer;
@@ -368,7 +365,7 @@ unset($_SESSION['_dev_reset_link']);
         .auth-btn:hover {
             background: var(--accent-hover);
             transform: translateY(-1px);
-            box-shadow: 0 8px 20px rgba(173, 255, 47, 0.25);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
         }
 
         .auth-btn:active { transform: translateY(0); }
@@ -381,14 +378,14 @@ unset($_SESSION['_dev_reset_link']);
         .sent-icon {
             width: 72px;
             height: 72px;
-            background: rgba(59, 130, 246, 0.1);
-            border: 2px solid rgba(59, 130, 246, 0.2);
+            background: rgba(0, 0, 0, 0.03);
+            border: 1.5px solid var(--accent);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto 20px;
-            color: #3b82f6;
+            color: var(--accent);
         }
 
         .sent-icon svg { width: 32px; height: 32px; }
@@ -409,17 +406,18 @@ unset($_SESSION['_dev_reset_link']);
 
         /* Dev mode reset link */
         .dev-link-box {
-            background: rgba(234, 179, 8, 0.1);
-            border: 1px solid rgba(234, 179, 8, 0.25);
-            border-radius: 10px;
-            padding: 14px 16px;
-            margin-bottom: 20px;
-            font-size: 0.8rem;
+            background: #fffbeb;
+            border: 1.5px solid #eab308;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 24px;
+            font-size: 0.82rem;
+            text-align: left;
         }
 
         .dev-link-box strong {
             display: block;
-            color: #eab308;
+            color: #854d0e;
             margin-bottom: 6px;
             font-size: 0.75rem;
             letter-spacing: 0.5px;
@@ -427,17 +425,19 @@ unset($_SESSION['_dev_reset_link']);
         }
 
         .dev-link-box a {
-            color: var(--accent);
+            color: #1a1a1a;
+            font-family: monospace;
             word-break: break-all;
             line-height: 1.5;
+            font-weight: 500;
         }
 
         /* Done state */
         .done-icon {
             width: 72px;
             height: 72px;
-            background: rgba(34, 197, 94, 0.1);
-            border: 2px solid rgba(34, 197, 94, 0.2);
+            background: rgba(34, 197, 94, 0.08);
+            border: 1.5px solid #22c55e;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -461,7 +461,7 @@ unset($_SESSION['_dev_reset_link']);
             text-decoration: none;
         }
 
-        .auth-form-footer a:hover { color: var(--accent); }
+        .auth-form-footer a:hover { color: var(--accent-hover); }
 
         .auth-mobile-logo {
             display: block;
@@ -469,10 +469,9 @@ unset($_SESSION['_dev_reset_link']);
             text-align: center;
         }
         .auth-mobile-logo img {
-            height: 64px; /* INCREASED LOGO SIZE */
+            height: 64px;
             width: auto;
             object-fit: contain;
-            filter: brightness(0) invert(1);
         }
 
         @media (max-width: 900px) {
@@ -543,7 +542,7 @@ unset($_SESSION['_dev_reset_link']);
 
             <div class="icon-header">
                 <div class="icon-circle indigo">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15.05 5A5 5 0 0 1 19 8.95M15.05 1A9 9 0 0 1 23 8.94m-1 7.98v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.72 9.5 19.79 19.79 0 0 1 1.64 4.8 2 2 0 0 1 3.61 2.6h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 10.1a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.62 17.52z"/></svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18v3c0 .6.4 1 1 1h4v-3h3v-3h2l1.4-1.4c.9.2 1.8.2 2.7-.1 2.9-.8 4.9-3.7 4.9-6.8a8 8 0 1 0-16 0c0 3 2 6 4.9 6.8L5 15l-3 3Z"/><circle cx="16" cy="8" r="2"/></svg>
                 </div>
                 <div class="auth-form-eyebrow">Account Recovery</div>
                 <h1 class="auth-form-title">Forgot your password?</h1>

@@ -56,69 +56,23 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
             
             $in_wish = isset($_SESSION['wishlist']) && in_array($product['id'], $_SESSION['wishlist']);
             $heart_fill = $in_wish ? '#ef4444' : 'none';
-            $heart_color = $in_wish ? '#ef4444' : '#ffffff';
+            $heart_color = $in_wish ? '#ef4444' : '#1a1a1a';
             $wish_class = $in_wish ? 'in-wishlist' : '';
             ?>
-            <div class="y2k-card">
-                <div class="y2k-img-wrapper">
-                    <!-- Badges -->
-                    <div class="y2k-badges">
-                        <?php if ($product['stock'] <= 0): ?>
-                            <span class="y2k-badge sold-out">SOLD OUT</span>
-                        <?php endif; ?>
-                        <?php if ($discount_pct > 0): ?>
-                            <span class="y2k-badge sale">SAVE <?php echo $discount_pct; ?>%</span>
-                        <?php endif; ?>
-                    </div>
-                    
-                    <!-- Wishlist Toggle -->
-                    <button type="button" class="y2k-wishlist-btn <?php echo $wish_class; ?>" onclick="toggleWishlist(<?php echo $product['id']; ?>, this)" aria-label="Add to Wishlist">
-                        <i data-lucide="heart" fill="<?php echo $heart_fill; ?>" style="width: 18px; height: 18px; color: <?php echo $heart_color; ?>;"></i>
+            <div class="product-card-min">
+                <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $product['id']; ?>" class="product-img-box">
+                    <img src="<?php echo $image; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
+                </a>
+                <div class="product-min-title"><?php echo htmlspecialchars($product['name']); ?></div>
+                <div class="product-min-price">₹<?php echo number_format($product['price']); ?></div>
+                <form action="<?php echo BASE_URL; ?>/cart_action.php" method="POST" class="ajax-cart-form">
+                    <input type="hidden" name="action" value="add">
+                    <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
+                    <input type="hidden" name="quantity" value="1">
+                    <button type="submit" class="add-btn-small" aria-label="Add to Bag">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5v14"/></svg>
                     </button>
-                    
-                    <!-- Product Image -->
-                    <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $product['id']; ?>">
-                        <img src="<?php echo $image; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" class="y2k-img">
-                        <?php if ($hover_image): ?>
-                            <img src="<?php echo $hover_image; ?>" alt="<?php echo htmlspecialchars($product['name']); ?> hover" class="y2k-img-hover">
-                        <?php endif; ?>
-                    </a>
-                    
-                    <!-- Quick View Trigger -->
-                    <button type="button" class="y2k-quickview-btn" onclick="openQuickView(<?php echo $product['id']; ?>)">Quick View</button>
-                </div>
-                
-                <!-- Details -->
-                <div class="y2k-info">
-                    <div>
-                        <span class="y2k-brand">JEVANI STORE</span>
-                        <h3 class="y2k-title">
-                            <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $product['id']; ?>">
-                                <?php echo htmlspecialchars($product['name']); ?>
-                            </a>
-                        </h3>
-                    </div>
-                    
-                    <div class="y2k-price-row">
-                        <span class="y2k-price-sale">₹<?php echo number_format($product['price']); ?></span>
-                        <?php if (!empty($product['compare_at_price']) && $product['compare_at_price'] > $product['price']): ?>
-                            <span class="y2k-price-compare">₹<?php echo number_format($product['compare_at_price']); ?></span>
-                            <span class="y2k-discount-badge">(<?php echo $discount_pct; ?>% OFF)</span>
-                        <?php endif; ?>
-                    </div>
-                    
-                    <!-- AJAX Add to Cart form -->
-                    <form action="<?php echo BASE_URL; ?>/cart_action.php" method="POST" class="ajax-cart-form">
-                        <input type="hidden" name="action" value="add">
-                        <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
-                        <input type="hidden" name="quantity" value="1">
-                        <input type="hidden" name="size" value="Silver">
-                        <button type="submit" class="y2k-add-btn">
-                            <i data-lucide="shopping-bag"></i>
-                            Add to Bag
-                        </button>
-                    </form>
-                </div>
+                </form>
             </div>
             <?php
         }
@@ -135,17 +89,18 @@ $total_products_count = $cnt_res ? $cnt_res->fetch_assoc()['cnt'] : 0;
 require_once 'includes/header.php';
 ?>
 
+<div class="shop-page-container">
     <!-- Shop Hero Banner -->
-    <div class="hero" style="min-height: 40vh; height: 40vh; margin-bottom: 0;">
-        <img src="<?php echo BASE_URL; ?>/assets/hero_banner_bags.png" alt="Shop Collection" class="hero-img">
-        <div class="hero-overlay" style="background: rgba(9,9,11,0.65);"></div>
-        <div class="hero-content">
-            <h1 class="hero-title font-serif" style="font-size: clamp(2.5rem, 5vw, 60px); color: var(--text-primary); font-weight: 400; font-style: italic;">THE COLLECTION</h1>
-        </div>
+    <div style="width: 100%; overflow: hidden; background: #000;">
+        <img src="<?php echo BASE_URL; ?>/assets/hero_banner_bags.png" alt="Shop Collection" style="width: 100%; height: auto; max-height: 350px; object-fit: cover; display: block;">
+    </div>
+
+    <div style="text-align: center; padding: 40px 20px 0 20px; background: transparent;">
+        <h1 style="font-family: var(--font-primary); font-size: 1.8rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #1a1a1a; margin: 0;">THE COLLECTION</h1>
     </div>
 
     <!-- Main Editorial Shop Section -->
-    <section class="section shop-editorial-bg" style="padding-top: 5rem; padding-bottom: 8rem; background: var(--bg-primary);">
+    <section class="section shop-editorial-bg" style="padding-top: 3rem; padding-bottom: 8rem; background: var(--bg-primary);">
         <div class="container">
             <!-- Mobile Filter Toggle -->
             <div class="shop-header-row hide-desktop" style="margin-bottom: 20px; display: none;">
@@ -243,69 +198,23 @@ require_once 'includes/header.php';
                                 
                                 $in_wish = isset($_SESSION['wishlist']) && in_array($product['id'], $_SESSION['wishlist']);
                                 $heart_fill = $in_wish ? '#ef4444' : 'none';
-                                $heart_color = $in_wish ? '#ef4444' : '#ffffff';
+                                $heart_color = $in_wish ? '#ef4444' : '#1a1a1a';
                                 $wish_class = $in_wish ? 'in-wishlist' : '';
                                 ?>
-                                <div class="y2k-card">
-                                    <div class="y2k-img-wrapper">
-                                        <!-- Badges -->
-                                        <div class="y2k-badges">
-                                            <?php if ($product['stock'] <= 0): ?>
-                                                <span class="y2k-badge sold-out">SOLD OUT</span>
-                                            <?php endif; ?>
-                                            <?php if ($discount_pct > 0): ?>
-                                                <span class="y2k-badge sale">SAVE <?php echo $discount_pct; ?>%</span>
-                                            <?php endif; ?>
-                                        </div>
-                                        
-                                        <!-- Wishlist Toggle -->
-                                        <button type="button" class="y2k-wishlist-btn <?php echo $wish_class; ?>" onclick="toggleWishlist(<?php echo $product['id']; ?>, this)" aria-label="Add to Wishlist">
-                                            <i data-lucide="heart" fill="<?php echo $heart_fill; ?>" style="width: 18px; height: 18px; color: <?php echo $heart_color; ?>;"></i>
+                                <div class="product-card-min">
+                                    <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $product['id']; ?>" class="product-img-box">
+                                        <img src="<?php echo $image; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
+                                    </a>
+                                    <div class="product-min-title"><?php echo htmlspecialchars($product['name']); ?></div>
+                                    <div class="product-min-price">₹<?php echo number_format($product['price']); ?></div>
+                                    <form action="<?php echo BASE_URL; ?>/cart_action.php" method="POST" class="ajax-cart-form">
+                                        <input type="hidden" name="action" value="add">
+                                        <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
+                                        <input type="hidden" name="quantity" value="1">
+                                        <button type="submit" class="add-btn-small" aria-label="Add to Bag">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5v14"/></svg>
                                         </button>
-                                        
-                                        <!-- Product Image -->
-                                        <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $product['id']; ?>">
-                                            <img src="<?php echo $image; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" class="y2k-img">
-                                            <?php if ($hover_image): ?>
-                                                <img src="<?php echo $hover_image; ?>" alt="<?php echo htmlspecialchars($product['name']); ?> hover" class="y2k-img-hover">
-                                            <?php endif; ?>
-                                        </a>
-                                        
-                                        <!-- Quick View Trigger -->
-                                        <button type="button" class="y2k-quickview-btn" onclick="openQuickView(<?php echo $product['id']; ?>)">Quick View</button>
-                                    </div>
-                                    
-                                    <!-- Details -->
-                                    <div class="y2k-info">
-                                        <div>
-                                            <span class="y2k-brand">JEVANI STORE</span>
-                                            <h3 class="y2k-title">
-                                                <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $product['id']; ?>">
-                                                    <?php echo htmlspecialchars($product['name']); ?>
-                                                </a>
-                                            </h3>
-                                        </div>
-                                        
-                                        <div class="y2k-price-row">
-                                            <span class="y2k-price-sale">₹<?php echo number_format($product['price']); ?></span>
-                                            <?php if (!empty($product['compare_at_price']) && $product['compare_at_price'] > $product['price']): ?>
-                                                <span class="y2k-price-compare">₹<?php echo number_format($product['compare_at_price']); ?></span>
-                                                <span class="y2k-discount-badge">(<?php echo $discount_pct; ?>% OFF)</span>
-                                            <?php endif; ?>
-                                        </div>
-                                        
-                                        <!-- AJAX Add to Cart form -->
-                                        <form action="<?php echo BASE_URL; ?>/cart_action.php" method="POST" class="ajax-cart-form">
-                                            <input type="hidden" name="action" value="add">
-                                            <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
-                                            <input type="hidden" name="quantity" value="1">
-                                            <input type="hidden" name="size" value="Silver">
-                                            <button type="submit" class="y2k-add-btn">
-                                                <i data-lucide="shopping-bag"></i>
-                                                Add to Bag
-                                            </button>
-                                        </form>
-                                    </div>
+                                    </form>
                                 </div>
                                 <?php
                             }
@@ -465,5 +374,6 @@ require_once 'includes/header.php';
         updateTrackHighlight();
     });
     </script>
+</div>
 
 <?php require_once 'includes/footer.php'; ?>

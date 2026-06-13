@@ -1,5 +1,6 @@
 <?php require_once 'includes/header.php'; ?>
 
+<div class="lookbook-page-container">
     <!-- Lookbook Hero -->
     <section class="lookbook-hero">
         <img src="<?php echo BASE_URL; ?>/assets/lookbook_hero.png" alt="Editorial Archive" class="lb-hero-img">
@@ -169,7 +170,6 @@
         .ed-tile {
             position: relative;
             overflow: hidden;
-            border-radius: 12px;
             background: #111;
         }
         .ed-tile img {
@@ -243,7 +243,6 @@
             gap: 20px;
         }
         #lb-masonry .masonry-item {
-            border-radius: 12px;
             overflow: hidden;
             background: var(--bg-secondary);
             aspect-ratio: 1 / 1;
@@ -268,5 +267,7 @@
             }
         }
     </style>
+
+</div>
 
 <?php require_once 'includes/footer.php'; ?>

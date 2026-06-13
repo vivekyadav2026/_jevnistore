@@ -1,5 +1,6 @@
 <?php require_once 'includes/header.php'; ?>
 
+<div class="about-page-container">
     <!-- Editorial Hero -->
     <div class="hero" style="min-height: 70vh; height: 70vh; margin-bottom: 0;">
         <img src="assets/hero_banner_bags.png" alt="Jevani Store Identity" class="hero-img">
@@ -34,10 +35,10 @@
             
             <!-- Image Split -->
             <div class="about-features-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 6rem;">
-                <div style="background: var(--bg-secondary); padding: 40px; display: flex; align-items: center; justify-content: center; border-radius: 12px; border: 1px solid var(--border-color);">
+                <div style="background: var(--bg-secondary); padding: 40px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border-color);">
                     <img src="assets/bag_mini.png" alt="Mini Bag" style="width: 100%; max-width: 300px; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                 </div>
-                <div style="background: var(--bg-secondary); padding: 40px; display: flex; align-items: center; justify-content: center; border-radius: 12px; border: 1px solid var(--border-color);">
+                <div style="background: var(--bg-secondary); padding: 40px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border-color);">
                     <img src="assets/bag_shoulder.png" alt="Shoulder Bag" style="width: 100%; max-width: 300px; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                 </div>
             </div>
@@ -48,5 +49,7 @@
             </div>
         </div>
     </section>
+
+</div>
 
 <?php require_once 'includes/footer.php'; ?>
