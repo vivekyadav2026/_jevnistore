@@ -51,18 +51,24 @@ if (!isset($_SESSION['wishlist'])) {
                     }
                     ?>
                     <div class="product-card-min" id="wishlist-item-<?php echo $product['id']; ?>" style="transition: all 0.4s ease; text-align: center; display: flex; flex-direction: column; align-items: center;">
-                        <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $product['id']; ?>" class="product-img-box">
-                            <img src="<?php echo $image; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
-                        </a>
+                        <div class="product-img-box">
+                            <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $product['id']; ?>">
+                                <img src="<?php echo $image; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
+                            </a>
+                            <?php if (isset($product['is_waitlist']) && $product['is_waitlist'] == 1): ?>
+                                <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $product['id']; ?>" class="add-btn-overlay" aria-label="Join Waitlist" style="display:flex; align-items:center; justify-content:center; text-decoration:none;">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:20px;height:20px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                </a>
+                            <?php else: ?>
+                                <button type="button" class="add-btn-overlay" onclick="addWishlistItemToCart(<?php echo $product['id']; ?>)" aria-label="Add to Bag">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5v14"/></svg>
+                                </button>
+                            <?php endif; ?>
+                        </div>
                         
                         <div class="product-min-title"><?php echo htmlspecialchars($product['name']); ?></div>
                         <div class="product-min-price">₹<?php echo number_format($product['price']); ?></div>
                         
-                        <!-- Add to Bag button specific to wishlist page -->
-                        <button type="button" class="add-btn-small" onclick="addWishlistItemToCart(<?php echo $product['id']; ?>)" aria-label="Add to Bag">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5v14"/></svg>
-                        </button>
-
                         <!-- Remove Link -->
                         <a href="#" class="wishlist-remove-link" onclick="removeWishlistItem(<?php echo $product['id']; ?>); return false;" style="font-size: 0.55rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #555555; margin-top: 8px; cursor: pointer; border-bottom: 1px solid rgba(0, 0, 0, 0.2); padding-bottom: 1px; display: inline-block;">REMOVE</a>
                     </div>

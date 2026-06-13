@@ -327,6 +327,7 @@ requireAdmin();
             <a href="products.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'products.php' ? 'active' : ''; ?>"><i data-lucide="box"></i> Products</a>
             <a href="orders.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'orders.php' ? 'active' : ''; ?>"><i data-lucide="shopping-cart"></i> Orders</a>
             <a href="users.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'users.php' ? 'active' : ''; ?>"><i data-lucide="users"></i> Customers</a>
+            <a href="waitlist.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'waitlist.php' ? 'active' : ''; ?>"><i data-lucide="list"></i> Waitlist</a>
             <a href="settings.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'settings.php' ? 'active' : ''; ?>"><i data-lucide="settings"></i> Settings</a>
             <a href="<?php echo BASE_URL; ?>/logout.php" style="margin-top: auto; color: #ff4444;"><i data-lucide="log-out"></i> Logout</a>
         </nav>

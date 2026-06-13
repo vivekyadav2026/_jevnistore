@@ -4002,11 +4002,29 @@ body:has(.product-detail-container) .y2k-add-btn:hover {
     justify-content: center;
     margin-bottom: 15px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    position: relative; /* Enable absolute overlays */
+}
+.product-img-box > a:not(.add-btn-overlay) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
 }
 .product-img-box img {
     width: 80%;
     height: 80%;
     object-fit: contain;
+}
+.product-img-box .ajax-cart-form {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    margin: 0;
+    padding: 0;
 }
 .product-min-title {
     font-size: 0.6rem;
@@ -4041,6 +4059,35 @@ body:has(.product-detail-container) .y2k-add-btn:hover {
     border-color: #1a1a1a !important;
 }
 .add-btn-small svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* Overlay Plus Button matching modern streetwear e-commerce layout */
+.add-btn-overlay {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    background: #ffffff;
+    color: #1a1a1a;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    z-index: 10;
+    pointer-events: auto;
+}
+.add-btn-overlay:hover {
+    background: #1a1a1a;
+    color: #ffffff;
+    transform: scale(1.05);
+}
+.add-btn-overlay svg {
     width: 14px;
     height: 14px;
 }
@@ -4220,4 +4267,265 @@ body:has(.shop-page-container) .slider-handle::-webkit-slider-thumb {
 }
 body:has(.shop-page-container) .slider-handle::-moz-range-thumb {
     background: #1a1a1a !important;
+}
+
+/* Sticky Mobile Add to Cart Bar */
+.sticky-mobile-cart-bar {
+    position: fixed;
+    bottom: calc(30px + env(safe-area-inset-bottom, 0px));
+    left: 16px;
+    right: 16px;
+    background-color: #1a1a1a;
+    z-index: 999;
+    padding: 16px 20px;
+    transform: translateY(200%);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    display: none;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.sticky-mobile-cart-bar:hover {
+    background-color: #2a2a2a;
+}
+
+@media (max-width: 768px) {
+    .sticky-mobile-cart-bar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    body:has(.product-detail-container) {
+        padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px)) !important;
+    }
+}
+
+.sticky-mobile-cart-bar.visible {
+    transform: translateY(0);
+}
+
+.sticky-cart-btn-text {
+    color: #ffffff;
+    font-family: var(--font-primary);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+/* Mobile Video and Instagram Slider Section */
+.mobile-video-slider-section {
+    padding: 30px 0 20px 0;
+    background: transparent;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.video-slider-container {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.video-slides-wrapper {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    padding: 0 27.5vw;
+}
+
+.video-slide {
+    flex: 0 0 45vw;
+    aspect-ratio: 9/16;
+    position: relative;
+    overflow: hidden;
+    background: #000;
+    transition: transform 0.4s, opacity 0.4s;
+    opacity: 0.5;
+    transform: scale(0.9);
+}
+
+.video-slide.active {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.video-slide video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.video-duration {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    background: rgba(0, 0, 0, 0.5);
+    color: #ffffff;
+    font-family: monospace;
+    font-size: 0.65rem;
+    padding: 3px 6px;
+    z-index: 5;
+    letter-spacing: 0.5px;
+}
+
+.video-slider-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    color: #1a1a1a;
+    transition: background 0.2s;
+}
+
+.video-slider-nav:hover {
+    background: #ffffff;
+}
+
+.video-slider-nav.prev {
+    left: 8px;
+}
+
+.video-slider-nav.next {
+    right: 8px;
+}
+
+/* Video Progress Bar */
+.video-progress-container {
+    width: 60%;
+    height: 2px;
+    background: rgba(0, 0, 0, 0.15);
+    margin-top: 25px;
+    position: relative;
+    overflow: hidden;
+}
+
+.video-progress-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: #1a1a1a;
+    transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1), width 0.4s;
+}
+
+/* Instagram Header styling */
+.mobile-instagram-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 30px 16px 15px 16px;
+    background: transparent;
+    font-family: var(--font-primary);
+}
+
+.instagram-handle {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    text-decoration: none;
+    letter-spacing: 0.5px;
+}
+
+.instagram-view-link {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    text-decoration: none;
+    border-bottom: 1px solid #1a1a1a;
+    padding-bottom: 2px;
+    letter-spacing: 0.5px;
+}
+
+/* Small Image Slider styling */
+.mobile-image-slider-section {
+    padding: 0 0 30px 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.mobile-image-slider-section::-webkit-scrollbar {
+    display: none;
+}
+
+.image-slider-wrapper {
+    display: flex;
+    gap: 8px;
+    padding: 0 16px;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.image-slide-item {
+    flex: 0 0 110px;
+    aspect-ratio: 1/1;
+    background: #ffffff;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.image-slide-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Home Page Marquee Strip under Hero Banner */
+.announcement-marquee-strip {
+    background-color: #000000;
+    overflow: hidden;
+    white-space: nowrap;
+    padding: 14px 0;
+    border-bottom: 1px solid #ffffff;
+    width: 100%;
+    display: flex;
+}
+
+.marquee-content-wrapper {
+    display: flex;
+    width: max-content;
+}
+
+.marquee-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    gap: 80px;
+    padding-right: 80px;
+    animation: marquee-scroll 25s linear infinite;
+}
+
+.marquee-text {
+    color: #ffffff;
+    font-family: var(--font-primary), sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+@keyframes marquee-scroll {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
 }

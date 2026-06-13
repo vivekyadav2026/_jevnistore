@@ -3,6 +3,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 require_once 'includes/db.php';
+require_once 'includes/functions.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $action = $_POST['action'] ?? '';
@@ -15,13 +16,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($action == 'add' && $product_id > 0) {
         $qty = isset($_POST['quantity']) ? (int)$_POST['quantity'] : 1;
         
-        $stmt = $conn->prepare("SELECT name, price, image FROM products WHERE id = ?");
+        $stmt = $conn->prepare("SELECT name, price, image, is_waitlist FROM products WHERE id = ?");
         $stmt->bind_param("i", $product_id);
         $stmt->execute();
         $res = $stmt->get_result();
         
         if ($res->num_rows > 0) {
             $product = $res->fetch_assoc();
+            
+            if (isset($product['is_waitlist']) && $product['is_waitlist'] == 1) {
+                // Reject adding waitlist item to cart
+                if (isset($_POST['ajax']) && $_POST['ajax'] == '1') {
+                    echo json_encode(['status' => 'error', 'message' => 'This item is on waitlist and cannot be added to cart.']);
+                    exit();
+                } else {
+                    setFlash('This item is on waitlist and cannot be added to cart.', 'error');
+                    header("Location: " . ($_SERVER['HTTP_REFERER'] ?? 'index.php'));
+                    exit();
+                }
+            }
             
             if (isset($_SESSION['cart'][$product_id])) {
                 $_SESSION['cart'][$product_id]['quantity'] += $qty;
@@ -40,12 +53,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             foreach ($pids as $pid) {
                 $pid = (int)$pid;
                 if ($pid > 0) {
-                    $stmt = $conn->prepare("SELECT name, price, image FROM products WHERE id = ?");
+                    $stmt = $conn->prepare("SELECT name, price, image, is_waitlist FROM products WHERE id = ?");
                     $stmt->bind_param("i", $pid);
                     $stmt->execute();
                     $res = $stmt->get_result();
                     if ($res->num_rows > 0) {
                         $product = $res->fetch_assoc();
+                        
+                        // Skip if waitlist
+                        if (isset($product['is_waitlist']) && $product['is_waitlist'] == 1) {
+                            continue;
+                        }
+                        
                         if (isset($_SESSION['cart'][$pid])) {
                             $_SESSION['cart'][$pid]['quantity'] += 1;
                         } else {

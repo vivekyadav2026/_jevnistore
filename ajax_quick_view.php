@@ -27,21 +27,26 @@ $image = $p['image'] ? BASE_URL . '/assets/' . htmlspecialchars($p['image']) : '
         <button type="button" class="qv-size-btn" onclick="document.querySelectorAll('.qv-size-btn').forEach(b => b.classList.remove('active')); this.classList.add('active'); document.getElementById('qv-size-input').value = 'Gold';">GOLD</button>
     </div>
     
-    <form action="<?php echo BASE_URL; ?>/cart_action.php" method="POST" class="ajax-cart-form" style="display: flex; flex-direction: column; gap: 15px;">
-        <input type="hidden" name="action" value="add">
-        <input type="hidden" name="product_id" value="<?php echo $p['id']; ?>">
-        <input type="hidden" name="size" id="qv-size-input" value="Silver">
-        
-        <div style="display: flex; gap: 15px; height: 55px; margin-bottom: 5px;">
-            <div class="qv-qty-selector" style="margin-bottom: 0; height: 100%;">
-                <button type="button" onclick="document.getElementById('qv-qty').value = Math.max(1, parseInt(document.getElementById('qv-qty').value) - 1)">-</button>
-                <input type="number" id="qv-qty" name="quantity" value="1" readonly>
-                <button type="button" onclick="document.getElementById('qv-qty').value = parseInt(document.getElementById('qv-qty').value) + 1">+</button>
+    <?php if (isset($p['is_waitlist']) && $p['is_waitlist'] == 1): ?>
+        <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $p['id']; ?>" class="qv-btn" style="text-decoration:none; display:flex; align-items:center; justify-content:center; margin-bottom:15px; border:1px solid white;">JOIN WAITING LIST</a>
+        <p style="font-size:0.8rem; color:#888; margin-bottom:15px;">This product is currently in manufacturing.</p>
+    <?php else: ?>
+        <form action="<?php echo BASE_URL; ?>/cart_action.php" method="POST" class="ajax-cart-form" style="display: flex; flex-direction: column; gap: 15px;">
+            <input type="hidden" name="action" value="add">
+            <input type="hidden" name="product_id" value="<?php echo $p['id']; ?>">
+            <input type="hidden" name="size" id="qv-size-input" value="Silver">
+            
+            <div style="display: flex; gap: 15px; height: 55px; margin-bottom: 5px;">
+                <div class="qv-qty-selector" style="margin-bottom: 0; height: 100%;">
+                    <button type="button" onclick="document.getElementById('qv-qty').value = Math.max(1, parseInt(document.getElementById('qv-qty').value) - 1)">-</button>
+                    <input type="number" id="qv-qty" name="quantity" value="1" readonly>
+                    <button type="button" onclick="document.getElementById('qv-qty').value = parseInt(document.getElementById('qv-qty').value) + 1">+</button>
+                </div>
+                <button type="submit" class="qv-btn" style="margin-bottom: 0; height: 100%; flex: 1;">ADD TO CART</button>
             </div>
-            <button type="submit" class="qv-btn" style="margin-bottom: 0; height: 100%; flex: 1;">ADD TO CART</button>
-        </div>
-        <button type="submit" name="buy_now" value="1" class="qv-btn qv-btn-buy" style="margin-bottom: 0;">BUY IT NOW</button>
-    </form>
+            <button type="submit" name="buy_now" value="1" class="qv-btn qv-btn-buy" style="margin-bottom: 0;">BUY IT NOW</button>
+        </form>
+    <?php endif; ?>
     
     <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $p['id']; ?>" class="qv-view-details">View details</a>
 </div>

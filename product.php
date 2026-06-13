@@ -106,23 +106,28 @@ $_SESSION['recently_viewed'] = array_slice($_SESSION['recently_viewed'], 0, 5);
                 </div>
                 <div class="tax-shipping-text">Tax included. Shipping calculated at checkout.</div>
                 
-                <form action="<?php echo BASE_URL; ?>/cart_action.php" method="POST" id="add-to-cart-form" class="ajax-cart-form">
-                    <input type="hidden" name="action" value="add">
-                    <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
-                    <input type="hidden" name="size" id="selected-size" value="Standard">
+                <?php if (isset($product['is_waitlist']) && $product['is_waitlist'] == 1): ?>
+                    <button type="button" class="btn-add-cart" style="background: transparent; color: white; border: 1px solid white; cursor: pointer;" onclick="openWaitlistModal()">JOIN WAITING LIST</button>
+                    <p style="margin-top: 15px; font-size: 0.85rem; color: #888;">This product is currently in manufacturing. Join the waitlist to be notified.</p>
+                <?php else: ?>
+                    <form action="<?php echo BASE_URL; ?>/cart_action.php" method="POST" id="add-to-cart-form" class="ajax-cart-form">
+                        <input type="hidden" name="action" value="add">
+                        <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
+                        <input type="hidden" name="size" id="selected-size" value="Standard">
 
-                    <!-- Quantity & Buttons -->
-                    <div class="detail-actions">
-                        <div class="quantity-selector">
-                            <button type="button" class="qty-btn" onclick="updateDetailQty(-1)">-</button>
-                            <input type="number" id="detail-qty" name="quantity" value="1" min="1" readonly>
-                            <button type="button" class="qty-btn" onclick="updateDetailQty(1)">+</button>
+                        <!-- Quantity & Buttons -->
+                        <div class="detail-actions">
+                            <div class="quantity-selector">
+                                <button type="button" class="qty-btn" onclick="updateDetailQty(-1)">-</button>
+                                <input type="number" id="detail-qty" name="quantity" value="1" min="1" readonly>
+                                <button type="button" class="qty-btn" onclick="updateDetailQty(1)">+</button>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <button type="submit" class="btn-add-cart">ADD TO CART</button>
-                    <button type="button" class="btn-buy-now" onclick="buyNow()">BUY IT NOW</button>
-                </form>
+                        
+                        <button type="submit" class="btn-add-cart">ADD TO CART</button>
+                        <button type="button" class="btn-buy-now" onclick="buyNow()">BUY IT NOW</button>
+                    </form>
+                <?php endif; ?>
 
                 <!-- Product Inline Details -->
                 <div class="product-inline-details">
@@ -239,7 +244,7 @@ $_SESSION['recently_viewed'] = array_slice($_SESSION['recently_viewed'], 0, 5);
             </div>
             
             <!-- Trust Seals circular badges at bottom of reviews container -->
-            <div class="trust-seals-grid">
+            <!-- <div class="trust-seals-grid">
                 <div class="trust-seal-circle">
                     <span>Free<br>Shipping</span>
                 </div>
@@ -252,7 +257,7 @@ $_SESSION['recently_viewed'] = array_slice($_SESSION['recently_viewed'], 0, 5);
                 <div class="trust-seal-circle" style="animation-direction: reverse;">
                     <span>Premium<br>Quality</span>
                 </div>
-            </div>
+            </div> -->
         </div>
     </section>
 
@@ -300,19 +305,27 @@ $_SESSION['recently_viewed'] = array_slice($_SESSION['recently_viewed'], 0, 5);
                     $image = $rel_product['image'] ? BASE_URL . '/assets/' . htmlspecialchars($rel_product['image']) : BASE_URL . '/assets/bag_shoulder.png';
                     ?>
                     <div class="product-card-min">
-                        <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $rel_product['id']; ?>" class="product-img-box">
-                            <img src="<?php echo $image; ?>" alt="<?php echo htmlspecialchars($rel_product['name']); ?>">
-                        </a>
+                        <div class="product-img-box">
+                            <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $rel_product['id']; ?>">
+                                <img src="<?php echo $image; ?>" alt="<?php echo htmlspecialchars($rel_product['name']); ?>">
+                            </a>
+                            <?php if (isset($rel_product['is_waitlist']) && $rel_product['is_waitlist'] == 1): ?>
+                                <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $rel_product['id']; ?>" class="add-btn-overlay" aria-label="Join Waitlist" style="display:flex; align-items:center; justify-content:center; text-decoration:none;">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:20px;height:20px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                </a>
+                            <?php else: ?>
+                                <form action="<?php echo BASE_URL; ?>/cart_action.php" method="POST" class="ajax-cart-form">
+                                    <input type="hidden" name="action" value="add">
+                                    <input type="hidden" name="product_id" value="<?php echo $rel_product['id']; ?>">
+                                    <input type="hidden" name="quantity" value="1">
+                                    <button type="submit" class="add-btn-overlay" aria-label="Add to Bag">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5v14"/></svg>
+                                    </button>
+                                </form>
+                            <?php endif; ?>
+                        </div>
                         <div class="product-min-title"><?php echo htmlspecialchars($rel_product['name']); ?></div>
                         <div class="product-min-price">₹<?php echo number_format($rel_product['price']); ?></div>
-                        <form action="<?php echo BASE_URL; ?>/cart_action.php" method="POST" class="ajax-cart-form">
-                            <input type="hidden" name="action" value="add">
-                            <input type="hidden" name="product_id" value="<?php echo $rel_product['id']; ?>">
-                            <input type="hidden" name="quantity" value="1">
-                            <button type="submit" class="add-btn-small" aria-label="Add to Bag">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5v14"/></svg>
-                            </button>
-                        </form>
                     </div>
                 <?php
                 }
@@ -346,19 +359,27 @@ $_SESSION['recently_viewed'] = array_slice($_SESSION['recently_viewed'], 0, 5);
                     $image = $rv_product['image'] ? BASE_URL . '/assets/' . htmlspecialchars($rv_product['image']) : BASE_URL . '/assets/bag_shoulder.png';
                     ?>
                     <div class="product-card-min">
-                        <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $rv_product['id']; ?>" class="product-img-box">
-                            <img src="<?php echo $image; ?>" alt="<?php echo htmlspecialchars($rv_product['name']); ?>">
-                        </a>
+                        <div class="product-img-box">
+                            <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $rv_product['id']; ?>">
+                                <img src="<?php echo $image; ?>" alt="<?php echo htmlspecialchars($rv_product['name']); ?>">
+                            </a>
+                            <?php if (isset($rv_product['is_waitlist']) && $rv_product['is_waitlist'] == 1): ?>
+                                <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $rv_product['id']; ?>" class="add-btn-overlay" aria-label="Join Waitlist" style="display:flex; align-items:center; justify-content:center; text-decoration:none;">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:20px;height:20px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                </a>
+                            <?php else: ?>
+                                <form action="<?php echo BASE_URL; ?>/cart_action.php" method="POST" class="ajax-cart-form">
+                                    <input type="hidden" name="action" value="add">
+                                    <input type="hidden" name="product_id" value="<?php echo $rv_product['id']; ?>">
+                                    <input type="hidden" name="quantity" value="1">
+                                    <button type="submit" class="add-btn-overlay" aria-label="Add to Bag">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5v14"/></svg>
+                                    </button>
+                                </form>
+                            <?php endif; ?>
+                        </div>
                         <div class="product-min-title"><?php echo htmlspecialchars($rv_product['name']); ?></div>
                         <div class="product-min-price">₹<?php echo number_format($rv_product['price']); ?></div>
-                        <form action="<?php echo BASE_URL; ?>/cart_action.php" method="POST" class="ajax-cart-form">
-                            <input type="hidden" name="action" value="add">
-                            <input type="hidden" name="product_id" value="<?php echo $rv_product['id']; ?>">
-                            <input type="hidden" name="quantity" value="1">
-                            <button type="submit" class="add-btn-small" aria-label="Add to Bag">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5v14"/></svg>
-                            </button>
-                        </form>
                     </div>
                 <?php endwhile; ?>
             </div>
@@ -467,6 +488,33 @@ $_SESSION['recently_viewed'] = array_slice($_SESSION['recently_viewed'], 0, 5);
         </div>
     </div>
 
+    <!-- Waitlist Modal -->
+    <div id="waitlist-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.85); z-index:100; padding: 40px 20px; overflow-y: auto;">
+        <div style="background:#111; max-width: 500px; margin: 50px auto; padding: 30px; border-radius: 8px; border: 1px solid #333; color: white;">
+            <div style="display:flex; justify-content:space-between; margin-bottom: 20px; border-bottom: 1px solid #222; padding-bottom: 10px;">
+                <h4 style="margin:0; font-size:1.1rem; text-transform:uppercase; letter-spacing:1px;">Join Waiting List</h4>
+                <button onclick="closeWaitlistModal()" style="background:none; border:none; color:white; cursor:pointer;"><i data-lucide="x"></i></button>
+            </div>
+            <p style="color: #ccc; font-size: 0.9rem; margin-bottom: 20px;">This product is currently in manufacturing. Join the waitlist to be notified as soon as it becomes available.</p>
+            <form method="POST" action="<?php echo BASE_URL; ?>/waitlist_action.php">
+                <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
+                <div style="margin-bottom: 15px;">
+                    <label style="display:block; margin-bottom:5px; font-size:13px; color:#888;">Name <span style="color:#ef4444">*</span></label>
+                    <input type="text" name="name" class="form-control" placeholder="Your Name" required>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display:block; margin-bottom:5px; font-size:13px; color:#888;">Email Address <span style="color:#ef4444">*</span></label>
+                    <input type="email" name="email" class="form-control" placeholder="Your Email Address" required>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display:block; margin-bottom:5px; font-size:13px; color:#888;">Phone Number</label>
+                    <input type="tel" name="phone" class="form-control" placeholder="Your Phone Number (Optional)">
+                </div>
+                <button type="submit" class="btn btn-block" style="margin-top: 15px; padding: 12px; width: 100%; background: white; color: black; font-weight: bold; border-radius: 4px; border: none; cursor: pointer; text-transform: uppercase;">Join List</button>
+            </form>
+        </div>
+    </div>
+
     <script>
         // Lightbox Gallery Javascript
         let lightboxActiveIndex = 0;
@@ -492,6 +540,16 @@ $_SESSION['recently_viewed'] = array_slice($_SESSION['recently_viewed'], 0, 5);
             document.body.style.overflow = ''; // restore scrolling
         }
 
+        function openWaitlistModal() {
+            document.getElementById('waitlist-modal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeWaitlistModal() {
+            document.getElementById('waitlist-modal').style.display = 'none';
+            document.body.style.overflow = '';
+        }
+
         function changeLightboxImage(direction) {
             const activeImg = document.getElementById('lightbox-active-img');
             
@@ -510,7 +568,38 @@ $_SESSION['recently_viewed'] = array_slice($_SESSION['recently_viewed'], 0, 5);
         // Bind click events and initial Lucide icons
         document.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
+
+            // Sticky mobile cart bar Intersection Observer
+            const mainAddToCartBtn = document.querySelector('.btn-add-cart');
+            const stickyBar = document.getElementById('sticky-mobile-cart-bar');
+            if (mainAddToCartBtn && stickyBar) {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (!entry.isIntersecting) {
+                            stickyBar.classList.add('visible');
+                        } else {
+                            stickyBar.classList.remove('visible');
+                        }
+                    });
+                }, {
+                    threshold: 0,
+                    rootMargin: '0px'
+                });
+                observer.observe(mainAddToCartBtn);
+            }
         });
+
+        function submitMainAddToCartForm() {
+            const form = document.getElementById('add-to-cart-form');
+            if (form) {
+                const submitBtn = form.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.click();
+                } else {
+                    form.submit();
+                }
+            }
+        }
             
         // Keyboard navigation
         document.addEventListener('keydown', (e) => {
@@ -526,5 +615,16 @@ $_SESSION['recently_viewed'] = array_slice($_SESSION['recently_viewed'], 0, 5);
             }
         });
     </script>
+
+    <!-- Sticky Mobile Add to Cart Bar -->
+    <?php if (isset($product['is_waitlist']) && $product['is_waitlist'] == 1): ?>
+        <div class="sticky-mobile-cart-bar" id="sticky-mobile-cart-bar" onclick="openWaitlistModal()">
+            <div class="sticky-cart-btn-text">JOIN WAITLIST</div>
+        </div>
+    <?php else: ?>
+        <div class="sticky-mobile-cart-bar" id="sticky-mobile-cart-bar" onclick="submitMainAddToCartForm()">
+            <div class="sticky-cart-btn-text">ADD TO CART</div>
+        </div>
+    <?php endif; ?>
 
 <?php require_once 'includes/footer.php'; ?>

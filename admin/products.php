@@ -9,6 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_product'])) {
     $compare_at_price = !empty($_POST['compare_at_price']) ? (float)$_POST['compare_at_price'] : null;
     $description = $_POST['description'] ?? '';
     $stock = $_POST['stock'] ?? 0;
+    $is_waitlist = isset($_POST['is_waitlist']) ? 1 : 0;
     
     // Handle primary image upload
     $image = '';
@@ -24,8 +25,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_product'])) {
         compressAndSaveImage($_FILES['image2']['tmp_name'], '../assets/' . $image2);
     }
 
-    $stmt = $conn->prepare("INSERT INTO products (category_id, name, description, price, compare_at_price, stock, image, image2) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("issddiss", $category_id, $name, $description, $price, $compare_at_price, $stock, $image, $image2);
+    $stmt = $conn->prepare("INSERT INTO products (category_id, name, description, price, compare_at_price, stock, is_waitlist, image, image2) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("issddiiss", $category_id, $name, $description, $price, $compare_at_price, $stock, $is_waitlist, $image, $image2);
     $stmt->execute();
     $product_id = $conn->insert_id;
 
@@ -66,6 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['edit_product'])) {
     $compare_at_price = !empty($_POST['compare_at_price']) ? (float)$_POST['compare_at_price'] : null;
     $description = $_POST['description'] ?? '';
     $stock = $_POST['stock'] ?? 0;
+    $is_waitlist = isset($_POST['is_waitlist']) ? 1 : 0;
     
     // Get existing product images
     $p_stmt = $conn->prepare("SELECT image, image2 FROM products WHERE id = ?");
@@ -94,8 +96,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['edit_product'])) {
         $conn->query("INSERT INTO product_images (product_id, image_path, sort_order) VALUES ($product_id, '$image2', 1)");
     }
     
-    $stmt = $conn->prepare("UPDATE products SET category_id = ?, name = ?, description = ?, price = ?, compare_at_price = ?, stock = ?, image = ?, image2 = ? WHERE id = ?");
-    $stmt->bind_param("issddissi", $category_id, $name, $description, $price, $compare_at_price, $stock, $image, $image2, $product_id);
+    $stmt = $conn->prepare("UPDATE products SET category_id = ?, name = ?, description = ?, price = ?, compare_at_price = ?, stock = ?, is_waitlist = ?, image = ?, image2 = ? WHERE id = ?");
+    $stmt->bind_param("issddiissi", $category_id, $name, $description, $price, $compare_at_price, $stock, $is_waitlist, $image, $image2, $product_id);
     $stmt->execute();
     
     // Handle multiple new gallery images
@@ -178,6 +180,10 @@ if (isset($_GET['delete_gallery_image_id'])) {
             <input type="number" step="0.01" name="price" class="form-control" placeholder="Price (INR)" required>
             <input type="number" step="0.01" name="compare_at_price" class="form-control" placeholder="Compare-At Price (Original Price, optional)">
             <input type="number" name="stock" class="form-control" placeholder="Stock Quantity" required>
+            <div style="margin-top: 15px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+                <input type="checkbox" name="is_waitlist" id="add-is-waitlist" value="1">
+                <label for="add-is-waitlist" style="font-size: 13px; color: #888; cursor: pointer;">Waitlist Only (Product is in manufacturing / coming soon)</label>
+            </div>
             <textarea name="description" id="add-description" class="form-control" placeholder="Description" rows="4"></textarea>
             
             <div style="margin-top: 15px;">
@@ -242,6 +248,11 @@ if (isset($_GET['delete_gallery_image_id'])) {
             <div style="margin-bottom: 15px;">
                 <label style="display:block; margin-bottom:5px; font-size:13px; color:#888;">Stock</label>
                 <input type="number" name="stock" id="edit-stock" class="form-control" required>
+            </div>
+            
+            <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+                <input type="checkbox" name="is_waitlist" id="edit-is-waitlist" value="1">
+                <label for="edit-is-waitlist" style="font-size: 13px; color: #888; cursor: pointer;">Waitlist Only (Product is in manufacturing / coming soon)</label>
             </div>
             
             <div style="margin-bottom: 15px;">
@@ -558,6 +569,7 @@ function openEditModal(product, gallery) {
     document.getElementById('edit-price').value = product.price;
     document.getElementById('edit-compare-at-price').value = product.compare_at_price || '';
     document.getElementById('edit-stock').value = product.stock;
+    document.getElementById('edit-is-waitlist').checked = product.is_waitlist == 1;
     document.getElementById('edit-description').value = product.description || '';
     if (editDescEditor) {
         editDescEditor.setData(product.description || '');

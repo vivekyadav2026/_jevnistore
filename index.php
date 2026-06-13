@@ -70,11 +70,29 @@
         justify-content: center;
         margin-bottom: 15px;
         box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        position: relative;
+    }
+    .product-img-box > a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
     }
     .product-img-box img {
         width: 80%;
         height: 80%;
         object-fit: contain;
+    }
+    .product-img-box .ajax-cart-form {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        margin: 0;
+        padding: 0;
     }
     .product-min-title {
         font-size: 0.6rem;
@@ -349,7 +367,7 @@
 
     /* 5. Lookbook Section (Signature Bag) */
     .lookbook-section {
-        background: linear-gradient(135deg, #d3ccc5 0%, #c1b9b1 100%);
+        background: #d6d3d1;
         padding: 20px 20px 40px 20px;
     }
     .lookbook-container {
@@ -527,6 +545,25 @@
     </picture>
 </section>
 
+<!-- Sliding Announcement Strip -->
+<div class="announcement-marquee-strip">
+    <div class="marquee-content-wrapper">
+        <div class="marquee-group">
+            <span class="marquee-text">LOWEST PRICES EVER</span>
+            <span class="marquee-text">OFFER ENDS TODAY</span>
+            <span class="marquee-text">ANNUAL SUMMER SALE</span>
+            <span class="marquee-text">FREE DELIVERY ALL OVER INDIA</span>
+        </div>
+        <div class="marquee-group" aria-hidden="true">
+            <span class="marquee-text">LOWEST PRICES EVER</span>
+            <span class="marquee-text">OFFER ENDS TODAY</span>
+            <span class="marquee-text">ANNUAL SUMMER SALE</span>
+            <span class="marquee-text">FREE DELIVERY ALL OVER INDIA</span>
+        </div>
+    </div>
+</div>
+
+
 <!-- 2. Products Row (THE DROP +) -->
 <section class="products-row-section">
     <div class="products-header">
@@ -544,19 +581,27 @@
             $image = $product['image'] ? BASE_URL . '/assets/' . htmlspecialchars($product['image']) : BASE_URL . '/assets/bag_shoulder.png';
             ?>
             <div class="product-card-min">
-                <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $product['id']; ?>" class="product-img-box">
-                    <img src="<?php echo $image; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
-                </a>
+                <div class="product-img-box">
+                    <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $product['id']; ?>">
+                        <img src="<?php echo $image; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
+                    </a>
+                    <?php if (isset($product['is_waitlist']) && $product['is_waitlist'] == 1): ?>
+                        <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $product['id']; ?>" class="add-btn-overlay" aria-label="Join Waitlist" style="display:flex; align-items:center; justify-content:center; text-decoration:none;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:20px;height:20px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        </a>
+                    <?php else: ?>
+                        <form action="<?php echo BASE_URL; ?>/cart_action.php" method="POST" class="ajax-cart-form">
+                            <input type="hidden" name="action" value="add">
+                            <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="add-btn-overlay" aria-label="Add to Bag">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5v14"/></svg>
+                            </button>
+                        </form>
+                    <?php endif; ?>
+                </div>
                 <div class="product-min-title"><?php echo htmlspecialchars($product['name']); ?></div>
                 <div class="product-min-price">₹<?php echo number_format($product['price']); ?></div>
-                <form action="<?php echo BASE_URL; ?>/cart_action.php" method="POST" class="ajax-cart-form">
-                    <input type="hidden" name="action" value="add">
-                    <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
-                    <input type="hidden" name="quantity" value="1">
-                    <button type="submit" class="add-btn-small" aria-label="Add to Bag">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5v14"/></svg>
-                    </button>
-                </form>
             </div>
             <?php
         }
@@ -661,10 +706,256 @@
         </div>
     </div>
     
-    <!-- Mobile View (Single Graphic Image) -->
-    <div class="info-mobile-only">
-        <img src="<?php echo BASE_URL; ?>/assets/media_infographic.png" alt="The Icon Infographic" style="width: 100%; height: auto; display: block;">
+    <!-- Mobile View (Video & Instagram Sliders) -->
+    <div class="info-mobile-only" style="background: var(--bg-tan); padding-bottom: 40px;">
+        
+        <!-- 1. Video Slider Section -->
+        <div class="mobile-video-slider-section">
+            <div class="video-slider-container">
+                <button type="button" class="video-slider-nav prev" onclick="moveVideoSlide(-1, true)" aria-label="Previous Video">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width: 18px; height: 18px;"><path d="M15 18l-6-6 6-6"/></svg>
+                </button>
+                
+                <div class="video-slides-wrapper" id="video-slides-wrapper">
+                    <!-- Slide 1 -->
+                    <div class="video-slide">
+                        <video loop muted playsinline autoplay>
+                            <source src="<?php echo BASE_URL; ?>/assets/campaign.mp4#t=0,10" type="video/mp4">
+                        </video>
+                        <div class="video-duration">00:10</div>
+                    </div>
+                    <!-- Slide 2 -->
+                    <div class="video-slide active">
+                        <video loop muted playsinline autoplay>
+                            <source src="<?php echo BASE_URL; ?>/assets/y2k_video.mp4#t=5,12" type="video/mp4">
+                        </video>
+                        <div class="video-duration">00:07</div>
+                    </div>
+                    <!-- Slide 3 -->
+                    <div class="video-slide">
+                        <video loop muted playsinline autoplay>
+                            <source src="<?php echo BASE_URL; ?>/assets/campaign.mp4#t=15,25" type="video/mp4">
+                        </video>
+                        <div class="video-duration">00:10</div>
+                    </div>
+                    <!-- Slide 4 -->
+                    <div class="video-slide">
+                        <video loop muted playsinline autoplay>
+                            <source src="<?php echo BASE_URL; ?>/assets/y2k_video.mp4#t=12,19" type="video/mp4">
+                        </video>
+                        <div class="video-duration">00:07</div>
+                    </div>
+                    <!-- Slide 5 -->
+                    <div class="video-slide">
+                        <video loop muted playsinline autoplay>
+                            <source src="<?php echo BASE_URL; ?>/assets/campaign.mp4#t=30,40" type="video/mp4">
+                        </video>
+                        <div class="video-duration">00:10</div>
+                    </div>
+                    <!-- Slide 6 -->
+                    <div class="video-slide">
+                        <video loop muted playsinline autoplay>
+                            <source src="<?php echo BASE_URL; ?>/assets/y2k_video.mp4#t=20,27" type="video/mp4">
+                        </video>
+                        <div class="video-duration">00:07</div>
+                    </div>
+                    <!-- Slide 7 -->
+                    <div class="video-slide">
+                        <video loop muted playsinline autoplay>
+                            <source src="<?php echo BASE_URL; ?>/assets/campaign.mp4#t=45,55" type="video/mp4">
+                        </video>
+                        <div class="video-duration">00:10</div>
+                    </div>
+                    <!-- Slide 8 -->
+                    <div class="video-slide">
+                        <video loop muted playsinline autoplay>
+                            <source src="<?php echo BASE_URL; ?>/assets/y2k_video.mp4#t=0,7" type="video/mp4">
+                        </video>
+                        <div class="video-duration">00:07</div>
+                    </div>
+                </div>
+
+                <button type="button" class="video-slider-nav next" onclick="moveVideoSlide(1, true)" aria-label="Next Video">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width: 18px; height: 18px;"><path d="M9 18l6-6-6-6"/></svg>
+                </button>
+            </div>
+            
+            <!-- Video Progress Bar -->
+            <div class="video-progress-container">
+                <div class="video-progress-bar" id="video-progress-bar" style="width: 12.5%; left: 0%;"></div>
+            </div>
+        </div>
+
+        <!-- 2. Instagram Handle & Link -->
+        <div class="mobile-instagram-header">
+            <a href="https://instagram.com" target="_blank" class="instagram-handle">@jevanistore</a>
+            <a href="https://instagram.com" target="_blank" class="instagram-view-link">VIEW OUR INSTAGRAM</a>
+        </div>
+
+        <!-- 3. Small Image Slider Section -->
+        <div class="mobile-image-slider-section">
+            <div class="image-slider-wrapper">
+                <div class="image-slide-item">
+                    <img src="<?php echo BASE_URL; ?>/assets/campaign_lifestyle.jpg" alt="Lifestyle" onerror="this.src='<?php echo BASE_URL; ?>/assets/bag_mini.png';">
+                </div>
+                <div class="image-slide-item">
+                    <img src="<?php echo BASE_URL; ?>/assets/bags/acc_2.jpeg" alt="Hardware detail" onerror="this.src='<?php echo BASE_URL; ?>/assets/bag_shoulder.png';">
+                </div>
+                <div class="image-slide-item">
+                    <img src="<?php echo BASE_URL; ?>/assets/isolated_bag.png" alt="Isolated bag">
+                </div>
+                <div class="image-slide-item">
+                    <img src="<?php echo BASE_URL; ?>/assets/lookbook_edit_2.png" alt="Lookbook model" onerror="this.src='<?php echo BASE_URL; ?>/assets/bag_tote.png';">
+                </div>
+                <div class="image-slide-item">
+                    <img src="<?php echo BASE_URL; ?>/assets/streetwear_bag.png" alt="Streetwear bag">
+                </div>
+                <div class="image-slide-item">
+                    <img src="<?php echo BASE_URL; ?>/assets/craft_workshop.jpg" alt="Workshop details" onerror="this.src='<?php echo BASE_URL; ?>/assets/bag_crossbody.png';">
+                </div>
+            </div>
+        </div>
+
     </div>
+
+    <!-- Video Slider JS Logic -->
+    <script>
+        let currentVideoSlide = 1; // Start on index 1 (second slide)
+        let autoSlideInterval;
+
+        function startAutoSlide() {
+            stopAutoSlide();
+            autoSlideInterval = setInterval(() => {
+                moveVideoSlide(1, false);
+            }, 4000); // Auto slide every 4 seconds
+        }
+
+        function stopAutoSlide() {
+            if (autoSlideInterval) {
+                clearInterval(autoSlideInterval);
+            }
+        }
+
+        function moveVideoSlide(direction, isManual = false) {
+            const wrapper = document.getElementById('video-slides-wrapper');
+            const slides = document.querySelectorAll('.video-slide');
+            const progressBar = document.getElementById('video-progress-bar');
+            if (!wrapper || slides.length === 0) return;
+            
+            // Pause all videos first
+            slides.forEach(slide => {
+                const video = slide.querySelector('video');
+                if (video) video.pause();
+                slide.classList.remove('active');
+            });
+
+            currentVideoSlide = (currentVideoSlide + direction + slides.length) % slides.length;
+            
+            // Set active class
+            slides[currentVideoSlide].classList.add('active');
+            
+            // Play active video
+            const activeVideo = slides[currentVideoSlide].querySelector('video');
+            if (activeVideo) {
+                activeVideo.currentTime = 0;
+                activeVideo.play();
+            }
+            
+            // Translate the wrapper for centering (using new 8px gap)
+            wrapper.style.transform = `translateX(calc(-${currentVideoSlide * 45}vw - ${currentVideoSlide * 8}px))`;
+            
+            // Update progress bar position and width dynamically
+            if (progressBar) {
+                progressBar.style.width = `${(1 / slides.length) * 100}%`;
+                progressBar.style.left = `${(currentVideoSlide / slides.length) * 100}%`;
+            }
+
+            if (isManual) {
+                startAutoSlide(); // Reset auto slide timer on user action
+            }
+        }
+
+        // Add touch swipe detection and start auto-sliding
+        document.addEventListener('DOMContentLoaded', () => {
+            const wrapper = document.getElementById('video-slides-wrapper');
+            const slides = document.querySelectorAll('.video-slide');
+            const progressBar = document.getElementById('video-progress-bar');
+            
+            // Initial translate and progress setup for Slide index 1
+            if (slides.length > 1) {
+                if (wrapper) {
+                    wrapper.style.transform = `translateX(calc(-45vw - 8px))`;
+                }
+                if (progressBar) {
+                    progressBar.style.width = `${(1 / slides.length) * 100}%`;
+                    progressBar.style.left = `${(1 / slides.length) * 100}%`;
+                }
+                
+                // Play second video
+                const secondVideo = slides[1].querySelector('video');
+                if (secondVideo) {
+                    secondVideo.play();
+                }
+            }
+
+            // Start auto sliding initially
+            startAutoSlide();
+
+            // ── Instagram Image Slider Auto sliding logic ──
+            const imgSection = document.querySelector('.mobile-image-slider-section');
+            const imgWrapper = document.querySelector('.image-slider-wrapper');
+            const imgItems = document.querySelectorAll('.image-slide-item');
+            if (imgSection && imgWrapper && imgItems.length > 0) {
+                let currentImgIndex = 0;
+                const slideWidth = 118; // 110px width + 8px gap
+                
+                // Create clone nodes at end for infinite scrolling feel
+                const visibleCount = Math.ceil(window.innerWidth / slideWidth);
+                for (let i = 0; i < visibleCount; i++) {
+                    const clone = imgItems[i].cloneNode(true);
+                    imgWrapper.appendChild(clone);
+                }
+
+                setInterval(() => {
+                    currentImgIndex++;
+                    imgWrapper.style.transition = 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
+                    imgWrapper.style.transform = `translateX(-${currentImgIndex * slideWidth}px)`;
+                    
+                    // Reset positions smoothly without animation transition
+                    if (currentImgIndex >= imgItems.length) {
+                        setTimeout(() => {
+                            imgWrapper.style.transition = 'none';
+                            currentImgIndex = 0;
+                            imgWrapper.style.transform = `translateX(0px)`;
+                        }, 600);
+                    }
+                }, 3000); // Slide images every 3 seconds
+            }
+
+            if (wrapper) {
+                let touchStartX = 0;
+                let touchEndX = 0;
+                
+                wrapper.addEventListener('touchstart', (e) => {
+                    touchStartX = e.changedTouches[0].screenX;
+                }, { passive: true });
+                
+                wrapper.addEventListener('touchend', (e) => {
+                    touchEndX = e.changedTouches[0].screenX;
+                    handleSwipe();
+                }, { passive: true });
+                
+                function handleSwipe() {
+                    const swipeDistance = touchEndX - touchStartX;
+                    if (swipeDistance > 50) {
+                        moveVideoSlide(-1, true); // swipe right -> previous slide (manual)
+                    } else if (swipeDistance < -50) {
+                        moveVideoSlide(1, true);  // swipe left -> next slide (manual)
+                    }
+                }
+            }
+        });
+    </script>
 </section>
 
 <!-- 5. Lookbook Section (Signature Bag) -->

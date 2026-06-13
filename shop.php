@@ -60,19 +60,27 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
             $wish_class = $in_wish ? 'in-wishlist' : '';
             ?>
             <div class="product-card-min">
-                <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $product['id']; ?>" class="product-img-box">
-                    <img src="<?php echo $image; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
-                </a>
+                <div class="product-img-box">
+                    <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $product['id']; ?>">
+                        <img src="<?php echo $image; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
+                    </a>
+                    <?php if (isset($product['is_waitlist']) && $product['is_waitlist'] == 1): ?>
+                        <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $product['id']; ?>" class="add-btn-overlay" aria-label="Join Waitlist" style="display:flex; align-items:center; justify-content:center; text-decoration:none;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:20px;height:20px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        </a>
+                    <?php else: ?>
+                        <form action="<?php echo BASE_URL; ?>/cart_action.php" method="POST" class="ajax-cart-form">
+                            <input type="hidden" name="action" value="add">
+                            <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="add-btn-overlay" aria-label="Add to Bag">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5v14"/></svg>
+                            </button>
+                        </form>
+                    <?php endif; ?>
+                </div>
                 <div class="product-min-title"><?php echo htmlspecialchars($product['name']); ?></div>
                 <div class="product-min-price">₹<?php echo number_format($product['price']); ?></div>
-                <form action="<?php echo BASE_URL; ?>/cart_action.php" method="POST" class="ajax-cart-form">
-                    <input type="hidden" name="action" value="add">
-                    <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
-                    <input type="hidden" name="quantity" value="1">
-                    <button type="submit" class="add-btn-small" aria-label="Add to Bag">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5v14"/></svg>
-                    </button>
-                </form>
             </div>
             <?php
         }
@@ -202,19 +210,27 @@ require_once 'includes/header.php';
                                 $wish_class = $in_wish ? 'in-wishlist' : '';
                                 ?>
                                 <div class="product-card-min">
-                                    <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $product['id']; ?>" class="product-img-box">
-                                        <img src="<?php echo $image; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
-                                    </a>
+                                    <div class="product-img-box">
+                                        <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $product['id']; ?>">
+                                            <img src="<?php echo $image; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
+                                        </a>
+                                        <?php if (isset($product['is_waitlist']) && $product['is_waitlist'] == 1): ?>
+                                            <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $product['id']; ?>" class="add-btn-overlay" aria-label="Join Waitlist" style="display:flex; align-items:center; justify-content:center; text-decoration:none;">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:20px;height:20px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                            </a>
+                                        <?php else: ?>
+                                            <form action="<?php echo BASE_URL; ?>/cart_action.php" method="POST" class="ajax-cart-form">
+                                                <input type="hidden" name="action" value="add">
+                                                <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
+                                                <input type="hidden" name="quantity" value="1">
+                                                <button type="submit" class="add-btn-overlay" aria-label="Add to Bag">
+                                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5v14"/></svg>
+                                                </button>
+                                            </form>
+                                        <?php endif; ?>
+                                    </div>
                                     <div class="product-min-title"><?php echo htmlspecialchars($product['name']); ?></div>
                                     <div class="product-min-price">₹<?php echo number_format($product['price']); ?></div>
-                                    <form action="<?php echo BASE_URL; ?>/cart_action.php" method="POST" class="ajax-cart-form">
-                                        <input type="hidden" name="action" value="add">
-                                        <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
-                                        <input type="hidden" name="quantity" value="1">
-                                        <button type="submit" class="add-btn-small" aria-label="Add to Bag">
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5v14"/></svg>
-                                        </button>
-                                    </form>
                                 </div>
                                 <?php
                             }

@@ -23,6 +23,24 @@ if (empty($_SESSION['cart'])) {
     exit();
 }
 
+// Validate cart items
+foreach ($_SESSION['cart'] as $pid => $item) {
+    $stmt = $conn->prepare("SELECT is_waitlist FROM products WHERE id = ?");
+    $stmt->bind_param("i", $pid);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    if ($res->num_rows > 0) {
+        $product = $res->fetch_assoc();
+        if (isset($product['is_waitlist']) && $product['is_waitlist'] == 1) {
+            echo json_encode(['status' => 'error', 'message' => 'One or more items in your cart are currently on waitlist and cannot be ordered. Please remove them from your cart to proceed.']);
+            exit();
+        }
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'An item in your cart is no longer available.']);
+        exit();
+    }
+}
+
 $name = trim($_POST['name'] ?? '');
 $email = trim($_POST['email'] ?? '');
 $pincode = trim($_POST['pincode'] ?? '');
