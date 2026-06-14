@@ -43,22 +43,37 @@ $_SESSION['recently_viewed'] = array_slice($_SESSION['recently_viewed'], 0, 5);
 
         <div class="product-split-layout">
             <?php
-            $img_stmt = $conn->prepare("SELECT image_path FROM product_images WHERE product_id = ? ORDER BY sort_order ASC");
+            $images = [];
+            // Add primary image from products table
+            if (!empty($product['image'])) {
+                $images[] = BASE_URL . '/assets/' . htmlspecialchars($product['image']);
+            }
+            // Add secondary image from products table
+            if (!empty($product['image2'])) {
+                $images[] = BASE_URL . '/assets/' . htmlspecialchars($product['image2']);
+            }
+            // Fetch additional gallery images (sort_order >= 2)
+            $img_stmt = $conn->prepare("SELECT image_path FROM product_images WHERE product_id = ? AND sort_order >= 2 ORDER BY sort_order ASC");
             $img_stmt->bind_param("i", $product_id);
             $img_stmt->execute();
             $img_res = $img_stmt->get_result();
-            $images = [];
             while ($img_row = $img_res->fetch_assoc()) {
-                $images[] = BASE_URL . '/assets/' . htmlspecialchars($img_row['image_path']);
+                $gal_img = BASE_URL . '/assets/' . htmlspecialchars($img_row['image_path']);
+                if (!in_array($gal_img, $images)) {
+                    $images[] = $gal_img;
+                }
             }
-            if(empty($images)) $images[] = BASE_URL . '/assets/bag_shoulder.png';
+            // Fallback if no images are set
+            if(empty($images)) {
+                $images[] = BASE_URL . '/assets/bag_shoulder.png';
+            }
             ?>
             
             <!-- Left: Main Image & Zoom Button -->
             <div class="product-images-section">
                 <!-- Center: Large Image with Zoom Button -->
                 <div class="product-gallery">
-                    <div class="main-image-container" id="main-image-container" onclick="openLightbox(currentImageIndex)">
+                    <div class="main-image-container" id="main-image-container">
                         <img id="main-product-image" src="<?php echo $images[0]; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
                         <!-- Zoom button in top right -->
                         <button type="button" class="zoom-trigger-btn" onclick="event.stopPropagation(); openLightbox(currentImageIndex)" aria-label="Zoom Image">
@@ -449,8 +464,28 @@ $_SESSION['recently_viewed'] = array_slice($_SESSION['recently_viewed'], 0, 5);
             document.querySelectorAll('.thumb-item').forEach(t => t.classList.remove('active'));
             thumb.classList.add('active');
             const mainImg = document.getElementById('main-product-image');
-            mainImg.src = src;
+            if (mainImg) {
+                mainImg.style.transition = 'opacity 0.15s ease, transform 0.15s ease';
+                mainImg.style.opacity = '0.3';
+                mainImg.style.transform = 'scale(0.97)';
+                setTimeout(() => {
+                    mainImg.src = src;
+                    mainImg.style.opacity = '1';
+                    mainImg.style.transform = 'scale(1)';
+                }, 100);
+            }
             currentImageIndex = index;
+        }
+
+        function swipeImage(direction) {
+            const thumbs = document.querySelectorAll('.thumb-item');
+            if (thumbs.length <= 1) return;
+            let nextIndex = (currentImageIndex + direction + thumbs.length) % thumbs.length;
+            const nextThumb = thumbs[nextIndex];
+            const imgEl = nextThumb.querySelector('img');
+            if (imgEl) {
+                changeMainImage(nextThumb, imgEl.src, nextIndex);
+            }
         }
 
         function buyNow() {
@@ -586,6 +621,54 @@ $_SESSION['recently_viewed'] = array_slice($_SESSION['recently_viewed'], 0, 5);
                     rootMargin: '0px'
                 });
                 observer.observe(mainAddToCartBtn);
+            }
+
+            // Swipe and Tap Gestures for Main Image
+            const container = document.getElementById('main-image-container');
+            let touchstartX = 0;
+            let touchendX = 0;
+            let touchstartY = 0;
+            let touchendY = 0;
+            let isSwiping = false;
+
+            if (container) {
+                container.addEventListener('touchstart', function(event) {
+                    touchstartX = event.changedTouches[0].clientX;
+                    touchstartY = event.changedTouches[0].clientY;
+                    isSwiping = false;
+                }, { passive: true });
+
+                container.addEventListener('touchmove', function(event) {
+                    const currentX = event.changedTouches[0].clientX;
+                    const currentY = event.changedTouches[0].clientY;
+                    if (Math.abs(currentX - touchstartX) > 10 || Math.abs(currentY - touchstartY) > 10) {
+                        isSwiping = true;
+                    }
+                }, { passive: true });
+
+                container.addEventListener('touchend', function(event) {
+                    touchendX = event.changedTouches[0].clientX;
+                    touchendY = event.changedTouches[0].clientY;
+                    
+                    const diffX = touchendX - touchstartX;
+                    const diffY = touchendY - touchstartY;
+                    
+                    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 40) {
+                        isSwiping = true;
+                        if (diffX < 0) {
+                            swipeImage(1); // Swipe left -> Next
+                        } else {
+                            swipeImage(-1); // Swipe right -> Prev
+                        }
+                    }
+                }, { passive: true });
+
+                container.addEventListener('click', function(event) {
+                    // Block lightbox from opening if we just did a swipe gesture
+                    if (!isSwiping) {
+                        openLightbox(currentImageIndex);
+                    }
+                });
             }
         });
 

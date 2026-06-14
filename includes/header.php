@@ -206,7 +206,7 @@ require_once __DIR__ . '/functions.php';
         <button class="announcement-arrow prev-arrow" onclick="prevAnnouncement()" aria-label="Previous Announcement">
             <i data-lucide="chevron-left"></i>
         </button>
-        <div class="announcement-content" style="font-size: 0.65rem; font-weight: 700; letter-spacing: 1px; color: #fff; width: calc(100% - 100px); margin: 0 auto;">
+        <div class="announcement-content" style="font-size: 0.65rem; font-weight: 700; letter-spacing: 1px; color: #fff;">
             <?php 
                 $a_text_raw = getSetting('announcement_bar', '🔥 LIMITED TIME OFFER — SHOP NOW'); 
                 $announcements = array_filter(array_map('trim', explode('|', $a_text_raw)));
@@ -215,7 +215,7 @@ require_once __DIR__ . '/functions.php';
                 }
                 foreach($announcements as $index => $ann) {
                     $activeClass = $index === 0 ? 'active' : '';
-                    $style = $index === 0 ? 'top: 0; left: 0; height: 100%; transform: translateY(0); transition: transform 0.5s, opacity 0.5s;' : 'top: 0; left: 0; height: 100%; transform: translateY(100%); transition: transform 0.5s, opacity 0.5s;';
+                    $style = $index === 0 ? 'height: 100%; transform: translateY(0); transition: transform 0.5s, opacity 0.5s;' : 'height: 100%; transform: translateY(100%); transition: transform 0.5s, opacity 0.5s;';
                     echo '<div class="announcement-slide ' . $activeClass . '" style="' . $style . '">' . htmlspecialchars($ann) . '</div>';
                 }
             ?>
@@ -256,7 +256,7 @@ require_once __DIR__ . '/functions.php';
     <header class="header" id="main-header">
         <div class="container header-inner" style="grid-template-columns: 1fr auto 1fr; padding: 15px 20px;">
             <div style="justify-self: start; display: flex; align-items: center;">
-                <button class="menu-toggle header-menu-icon" id="mobile-menu-btn" onclick="document.getElementById('mobile-nav-drawer').classList.add('open'); document.body.style.overflow = 'hidden';" style="display: block; cursor: pointer; color: #1a1a1a; background: transparent; border: none;">
+                <button class="menu-toggle header-menu-icon" id="mobile-menu-btn" onclick="document.getElementById('mobile-nav-drawer').classList.add('open'); document.body.style.overflow = 'hidden';" style="display: block; cursor: pointer; color: var(--text-primary); background: transparent; border: none;">
                     <i data-lucide="menu" style="width: 24px; height: 24px;"></i>
                 </button>
             </div>
@@ -275,12 +275,12 @@ require_once __DIR__ . '/functions.php';
             </nav>
             
             <div class="header-icons" style="justify-self: end; display: flex; gap: 1rem; align-items: center;">
-                <button class="icon-btn header-search-icon" aria-label="Search" onclick="document.getElementById('header-search-bar').classList.toggle('active'); document.getElementById('search-input').focus();" style="color: #1a1a1a; background: transparent; border: none; cursor: pointer;">
+                <button class="icon-btn header-search-icon" aria-label="Search" onclick="document.getElementById('header-search-bar').classList.toggle('active'); document.getElementById('search-input').focus();" style="color: var(--text-primary); background: transparent; border: none; cursor: pointer;">
                     <i data-lucide="search" style="width: 20px; height: 20px;"></i>
                 </button>
-                <button class="icon-btn header-cart-icon" id="cart-toggle-btn" aria-label="Cart" onclick="document.getElementById('cart-overlay').classList.add('active'); document.getElementById('cart-panel').classList.add('active'); document.body.classList.add('cart-open');" style="position: relative; color: #1a1a1a; background: transparent; border: none; cursor: pointer;">
+                <button class="icon-btn header-cart-icon" id="cart-toggle-btn" aria-label="Cart" onclick="document.getElementById('cart-overlay').classList.add('active'); document.getElementById('cart-panel').classList.add('active'); document.body.classList.add('cart-open');" style="position: relative; color: var(--text-primary); background: transparent; border: none; cursor: pointer;">
                     <i data-lucide="shopping-bag" style="width: 20px; height: 20px;"></i>
-                    <span class="cart-count" id="cart-count" style="position: absolute; top: -5px; right: -8px; font-size: 0.65rem; background: transparent; color: #1a1a1a; border: none; width: auto; height: auto; display: flex; align-items: center; justify-content: center;"><?php echo isset($_SESSION['cart']) ? count($_SESSION['cart']) : '0'; ?></span>
+                    <span class="cart-count" id="cart-count" style="position: absolute; top: -5px; right: -8px; font-size: 0.65rem; background: transparent; color: var(--text-primary); border: none; width: auto; height: auto; display: flex; align-items: center; justify-content: center;"><?php echo isset($_SESSION['cart']) ? count($_SESSION['cart']) : '0'; ?></span>
                 </button>
             </div>
         </div>
