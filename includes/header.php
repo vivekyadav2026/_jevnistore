@@ -6,7 +6,7 @@ require_once __DIR__ . '/functions.php';
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title><?php echo htmlspecialchars(getSetting('site_title', 'Jevani Store | Modern Edgy Clothing')); ?></title>
     <meta name="description" content="<?php echo htmlspecialchars(getSetting('site_description', 'Shop the latest streetwear. Baggy pants, hoodies, and cyberpunk fashion.')); ?>">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/styles.css?v=<?php echo time(); ?>">
@@ -18,6 +18,9 @@ require_once __DIR__ . '/functions.php';
     <!-- Lucide Icons for minimal elegant icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
+        html, body {
+            touch-action: pan-x pan-y;
+        }
         .header-user {
             display: flex;
             align-items: center;
@@ -150,6 +153,36 @@ require_once __DIR__ . '/functions.php';
         .toast-warning .toast-title { color: #f59e0b; }
         .toast-warning .toast-progress { background: #f59e0b; }
     </style>
+    <!-- Disable Inspect Element & Mobile Zoom Gestures -->
+    <script>
+        // Disable context menu (right click)
+        document.addEventListener('contextmenu', e => e.preventDefault());
+
+        // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U, Ctrl+S
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F12' || e.keyCode === 123) {
+                e.preventDefault();
+                return false;
+            }
+            if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c' || e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
+                e.preventDefault();
+                return false;
+            }
+            if (e.ctrlKey && (e.key === 'U' || e.key === 'u' || e.keyCode === 85)) {
+                e.preventDefault();
+                return false;
+            }
+            if (e.ctrlKey && (e.key === 'S' || e.key === 's' || e.keyCode === 83)) {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        // Disable pinch zoom on iOS / Safari
+        document.addEventListener('gesturestart', function(e) {
+            e.preventDefault();
+        });
+    </script>
 </head>
 <body>
 

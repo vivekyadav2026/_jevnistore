@@ -113,7 +113,7 @@ unset($_SESSION['_dev_reset_link']);
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Forgot Password | Jevani Store</title>
     <meta name="description" content="Reset your Jevani Store account password.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -121,6 +121,9 @@ unset($_SESSION['_dev_reset_link']);
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
+        html, body {
+            touch-action: pan-x pan-y;
+        }
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
@@ -482,6 +485,36 @@ unset($_SESSION['_dev_reset_link']);
 
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
+    <!-- Disable Inspect Element & Mobile Zoom Gestures -->
+    <script>
+        // Disable context menu (right click)
+        document.addEventListener('contextmenu', e => e.preventDefault());
+
+        // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U, Ctrl+S
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F12' || e.keyCode === 123) {
+                e.preventDefault();
+                return false;
+            }
+            if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c' || e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
+                e.preventDefault();
+                return false;
+            }
+            if (e.ctrlKey && (e.key === 'U' || e.key === 'u' || e.keyCode === 85)) {
+                e.preventDefault();
+                return false;
+            }
+            if (e.ctrlKey && (e.key === 'S' || e.key === 's' || e.keyCode === 83)) {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        // Disable pinch zoom on iOS / Safari
+        document.addEventListener('gesturestart', function(e) {
+            e.preventDefault();
+        });
+    </script>
 </head>
 <body>
 

@@ -59,11 +59,16 @@
     /* 3. Alleyway Girl Section */
     .alleyway-section {
         width: 100%;
+        height: 90vh;
         background-color: #000;
+        display: flex;
+        overflow: hidden;
     }
     .alleyway-section img {
         width: 100%;
-        height: auto;
+        height: 100%;
+        object-fit: cover;
+        object-position: center 25%;
         display: block;
     }
 
@@ -455,6 +460,9 @@
         .products-grid { grid-template-columns: repeat(3, 1fr); }
     }
     @media (max-width: 768px) {
+        .alleyway-section {
+            height: 80vh;
+        }
         .products-grid { grid-template-columns: repeat(2, 1fr); }
         .lookbook-images { display: flex; align-items: center; justify-content: flex-start; gap: 10px; width: 100%; margin: 0 auto 25px auto; }
         .lookbook-main-img { width: 65%; margin-bottom: 0px; }
@@ -919,7 +927,7 @@
     </div>
     
     <div class="ragers-content">
-        <h2 class="ragers-title">Let RAGERS' speak for us</h2>
+        <h2 class="ragers-title">Let JEVANI speak for itself</h2>
         
         <div class="ragers-stars">★★★★★</div>
         <div class="ragers-count">
@@ -934,12 +942,6 @@
         </div>
         <div class="ragers-author">Lavanya Gupta</div>
         
-        <img src="<?php echo BASE_URL; ?>/assets/product_tshirt.png" alt="Purchased Product" class="ragers-prod-img" onerror="this.src='<?php echo BASE_URL; ?>/assets/bag_mini.png';">
-        
-        <div style="display: flex; justify-content: center; gap: 25px; margin-top: 25px;">
-            <i data-lucide="chevron-left" style="width: 24px; height: 24px; color: #888; cursor: pointer;"></i>
-            <i data-lucide="chevron-right" style="width: 24px; height: 24px; color: #888; cursor: pointer;"></i>
-        </div>
     </div>
 </section>
 
