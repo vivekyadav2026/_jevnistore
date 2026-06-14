@@ -4525,7 +4525,7 @@ body:has(.shop-page-container) .slider-handle::-moz-range-thumb {
     background-color: #000000;
     overflow: hidden;
     white-space: nowrap;
-    padding: 14px 0;
+    padding: 8px 0;
     border-bottom: 1px solid #ffffff;
     width: 100%;
     display: flex;
