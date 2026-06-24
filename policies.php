@@ -16,7 +16,7 @@
                 <div>
                     <h3 style="font-size: 1rem; color: #fff; margin-bottom: 10px; font-weight: 600; text-transform: uppercase;">2. Privacy Policy</h3>
                     <p>
-                        Your privacy is extremely important to us. We only collect the necessary information required to process your order securely. We do not sell or share your personal details with third-party advertising networks.
+                        Your privacy is extremely important to us at <strong>JEVANI ENTERPRISES</strong>. We only collect the necessary information required to process your order securely. Please read our complete <a href="privacy_policy.php" style="color: var(--text-primary); text-decoration: underline;">Privacy Policy here</a>.
                     </p>
                 </div>
 

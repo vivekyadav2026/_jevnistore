@@ -103,6 +103,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['save_settings'])) {
                 <label style="display:block; margin-bottom:5px; font-size:12px; color:#888; text-transform: uppercase; letter-spacing: 0.5px;">WhatsApp Number</label>
                 <input type="text" name="settings[contact_whatsapp]" class="form-control" value="<?php echo htmlspecialchars(getSetting('contact_whatsapp')); ?>" style="margin-bottom:0;" placeholder="e.g. 1234567890">
             </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px; font-size:12px; color:#888; text-transform: uppercase; letter-spacing: 0.5px;">Contact Address (Legal Address)</label>
+                <textarea name="settings[contact_address]" class="form-control" rows="4" style="margin-bottom:0; font-family: inherit;"><?php echo htmlspecialchars(getSetting('contact_address')); ?></textarea>
+            </div>
         </div>
 
         <!-- Homepage Hero Banner Card -->

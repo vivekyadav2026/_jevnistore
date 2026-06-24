@@ -177,12 +177,13 @@
 
             <!-- Column 3: Support -->
             <div>
-                <div class="footer-col-title">Support</div>
+                <div class="footer-col-title">Support & Policy</div>
                 <div class="footer-links">
                     <a href="<?php echo BASE_URL; ?>/customer/index.php">Track My Order</a>
                     <a href="<?php echo BASE_URL; ?>/exchange_policy.php">Returns & Exchanges</a>
                     <a href="<?php echo BASE_URL; ?>/policies.php">Shipping Policy</a>
-                    <a href="<?php echo BASE_URL; ?>/contact.php">Contact Us</a>
+                    <a href="<?php echo BASE_URL; ?>/privacy_policy.php">Privacy Policy</a>
+                    <a href="<?php echo BASE_URL; ?>/terms_of_service.php">Terms of Service</a>
                 </div>
             </div>
 
@@ -190,10 +191,10 @@
             <div>
                 <div class="footer-col-title">Company</div>
                 <div class="footer-links">
-                    <a href="<?php echo BASE_URL; ?>/about.php">About Jevani</a>
+                    <a href="<?php echo BASE_URL; ?>/about.php">About Us</a>
+                    <a href="<?php echo BASE_URL; ?>/contact.php">Contact Us</a>
                     <a href="<?php echo BASE_URL; ?>/reviews.php">Customer Reviews</a>
                     <a href="<?php echo BASE_URL; ?>/partner_with_us.php">Partner With Us</a>
-                    <a href="<?php echo BASE_URL; ?>/terms_of_service.php">Terms of Service</a>
                 </div>
             </div>
 
@@ -225,7 +226,7 @@
                     INDIA (INR ₹) <i data-lucide="chevron-up" style="width: 14px; height: 14px;"></i>
                 </div>
                 <div>
-                    &copy; <?php echo date('Y'); ?> JEVANI STUDIOS. ALL RIGHTS RESERVED.
+                    &copy; <?php echo date('Y'); ?> JEVANI ENTERPRISES. ALL RIGHTS RESERVED.
                 </div>
             </div>
         </div>

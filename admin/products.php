@@ -344,7 +344,7 @@ if (isset($_GET['delete_gallery_image_id'])) {
                         <td>'.$price_html.'</td>
                         <td>'.$p['stock'].'</td>
                         <td style="white-space: nowrap;">
-                            <button class="btn btn-outline" onclick=\'openEditModal('.$p_json.', '.$gallery_json.')\' style="padding: 5px 10px; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 5px; cursor: pointer; border-color: #555; margin-right: 10px;">
+                            <button class="btn btn-outline" onclick="openEditModal(' . htmlspecialchars($p_json, ENT_QUOTES, 'UTF-8') . ', ' . htmlspecialchars($gallery_json, ENT_QUOTES, 'UTF-8') . ')" style="padding: 5px 10px; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 5px; cursor: pointer; border-color: #555; margin-right: 10px;">
                                 <i data-lucide="edit-3" style="width: 14px; height: 14px;"></i> Edit
                             </button>
                             <a href="?delete='.$p['id'].'" style="color: #ff4444; text-decoration: none; display: inline-flex; align-items: center; padding: 5px;" onclick="return confirm(\'Are you sure you want to delete this product?\')" title="Delete Product">

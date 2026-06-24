@@ -19,11 +19,19 @@
                     <h4 style="font-size: 0.85rem; letter-spacing: 2px; color: var(--text-secondary); margin-bottom: 5px;">EMAIL</h4>
                     <p style="font-size: 1.1rem;"><?php echo htmlspecialchars(getSetting('contact_email', 'support@jevanistore.com')); ?></p>
                 </div>
+
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="font-size: 0.85rem; letter-spacing: 2px; color: var(--text-secondary); margin-bottom: 5px;">PHONE / MOBILE</h4>
+                    <p style="font-size: 1.1rem;"><?php echo htmlspecialchars(getSetting('contact_phone', '+91 98712 34567')); ?></p>
+                </div>
                 
                 <div style="margin-bottom: 2rem;">
                     <h4 style="font-size: 0.85rem; letter-spacing: 2px; color: var(--text-secondary); margin-bottom: 5px;">HEADQUARTERS</h4>
-                    <p style="font-size: 1.1rem; line-height: 1.5;">
-                        <?php echo nl2br(htmlspecialchars(getSetting('contact_address', "123 Industrial Sector 4\nMumbai, Maharashtra 400001\nIndia"))); ?>
+                    <p style="font-size: 1.05rem; line-height: 1.6; font-family: monospace;">
+                        <?php 
+                        $default_address = "JEVANI ENTERPRISES\nFloor No.: G/F\nBuilding No./Flat No.: A-881\nRoad/Street: G.D Colony\nLocality/Sub Locality: Mayur Vihar Phase 3\nCity/Town/Village: New Delhi\nDistrict: East Delhi\nState: Delhi\nPIN Code: 110096\nIndia";
+                        echo nl2br(htmlspecialchars(getSetting('contact_address', $default_address))); 
+                        ?>
                     </p>
                 </div>
             </div>

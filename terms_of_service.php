@@ -9,7 +9,7 @@
                 <div>
                     <h3 style="font-size: 1rem; color: #fff; margin-bottom: 10px; font-weight: 600; text-transform: uppercase;">1. Overview</h3>
                     <p>
-                        This website is operated by JEVANI. Throughout the site, the terms “we”, “us” and “our” refer to JEVANI. By visiting our site and/ or purchasing something from us, you engage in our “Service” and agree to be bound by the following terms and conditions.
+                        This website is operated by <strong>JEVANI ENTERPRISES</strong>. Throughout the site, the terms “we”, “us” and “our” refer to <strong>JEVANI ENTERPRISES</strong>. By visiting our site and/ or purchasing something from us, you engage in our “Service” and agree to be bound by the following terms and conditions.
                     </p>
                 </div>
 

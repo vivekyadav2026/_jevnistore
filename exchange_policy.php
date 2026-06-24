@@ -7,7 +7,7 @@
             
             <div style="color: var(--text-secondary); line-height: 1.8; font-size: 0.95rem; display: flex; flex-direction: column; gap: 2rem;">
                 <p>
-                    At JEVANI, we strive to ensure that you are fully satisfied with your purchase. We offer a hassle-free exchange policy within **7 days** of delivery.
+                    At <strong>JEVANI ENTERPRISES</strong>, we strive to ensure that you are fully satisfied with your purchase. We offer a hassle-free exchange policy within **7 days** of delivery.
                 </p>
                 
                 <div>
