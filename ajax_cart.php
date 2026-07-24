@@ -17,23 +17,28 @@ if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {
         $cart_total += $item_total;
         $image = $item['image'] ? BASE_URL . '/assets/' . htmlspecialchars($item['image']) : '/assets/product_hoodie.png';
         
+        $real_product_id = $item['product_id'] ?? $id;
+        $variant_tag = !empty($item['variant']) ? '<p style="font-size: 0.7rem; color: #888888; text-transform: uppercase; margin-top:2px;">Model: '.htmlspecialchars($item['variant']).'</p>' : '';
+        
         $html .= '
         <div class="cart-item">
-            <a href="'.BASE_URL.'/product.php?id='.$id.'" style="display: block; flex-shrink: 0; color: inherit; text-decoration: none;">
+            <a href="'.BASE_URL.'/product.php?id='.$real_product_id.'" style="display: block; flex-shrink: 0; color: inherit; text-decoration: none;">
                 <img src="'.$image.'" alt="'.htmlspecialchars($item['name']).'" class="cart-item-img">
             </a>
             <div class="cart-item-info">
                 <div>
-                    <a href="'.BASE_URL.'/product.php?id='.$id.'" style="color: inherit; text-decoration: none; display: inline-block;">
+                    <a href="'.BASE_URL.'/product.php?id='.$real_product_id.'" style="color: inherit; text-decoration: none; display: inline-block;">
                         <h4 class="cart-item-title">'.htmlspecialchars($item['name']).'</h4>
                     </a>
-                    <p style="font-size: 0.8rem; color: #555555;">QTY: '.$item['quantity'].'</p>
+                    '.$variant_tag.'
+                    <p style="font-size: 0.8rem; color: #555555; margin-top: 4px;">QTY: '.$item['quantity'].'</p>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: flex-end;">
                     <p class="cart-item-price">₹'.number_format($item['price'], 2).'</p>
                     <form action="'.BASE_URL.'/cart_action.php" method="POST" class="ajax-remove-form" style="display:inline;">
                         <input type="hidden" name="action" value="remove">
-                        <input type="hidden" name="product_id" value="'.$id.'">
+                        <input type="hidden" name="cart_key" value="'.$id.'">
+                        <input type="hidden" name="product_id" value="'.$real_product_id.'">
                         <input type="hidden" name="ajax" value="1">
                         <button type="submit" style="background:none;border:none;color:#555555;cursor:pointer;font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;text-decoration:underline;">Remove</button>
                     </form>

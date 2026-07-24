@@ -188,4 +188,220 @@ function getSetting($key, $default = '') {
     
     return isset($settings_cache[$key]) ? $settings_cache[$key] : $default;
 }
+
+/**
+ * Get Shiprocket JWT Authentication Token.
+ */
+function getShiprocketToken() {
+    $email = getSetting('shiprocket_email');
+    $password = getSetting('shiprocket_password');
+
+    if (empty($email) || empty($password)) {
+        return null;
+    }
+
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    // Return cached token if valid
+    if (isset($_SESSION['shiprocket_token']) && isset($_SESSION['shiprocket_token_expiry']) && $_SESSION['shiprocket_token_expiry'] > time()) {
+        return $_SESSION['shiprocket_token'];
+    }
+
+    $ch = curl_init('https://apiv2.shiprocket.in/v2/authorized/auth/login');
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+        'email' => $email,
+        'password' => $password
+    ]));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+    
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($httpCode === 200) {
+        $data = json_decode($response, true);
+        if (isset($data['token'])) {
+            $_SESSION['shiprocket_token'] = $data['token'];
+            // Token is usually valid for 10 days; cache it for 9 days to be safe
+            $_SESSION['shiprocket_token_expiry'] = time() + (9 * 24 * 60 * 60);
+            return $data['token'];
+        }
+    }
+
+    return null;
+}
+
+/**
+ * Automatically Push an Order to Shiprocket Panel.
+ */
+function pushOrderToShiprocket($order_id) {
+    global $conn;
+
+    // Fetch order details
+    $stmt = $conn->prepare("SELECT o.*, u.name as user_name, u.email as user_email, u.phone as user_phone FROM orders o JOIN users u ON o.user_id = u.id WHERE o.id = ?");
+    $stmt->bind_param("i", $order_id);
+    $stmt->execute();
+    $order = $stmt->get_result()->fetch_assoc();
+
+    if (!$order) {
+        return ['status' => 'error', 'message' => 'Order not found in database.'];
+    }
+
+    // Get order items (including variant column)
+    $item_stmt = $conn->prepare("SELECT oi.*, p.name as prod_name FROM order_items oi JOIN products p ON oi.product_id = p.id WHERE oi.order_id = ?");
+    $item_stmt->bind_param("i", $order_id);
+    $item_stmt->execute();
+    $items_res = $item_stmt->get_result();
+    
+    $order_items = [];
+    while ($item = $items_res->fetch_assoc()) {
+        $variant_suffix = !empty($item['variant']) ? ' (' . $item['variant'] . ')' : '';
+        $sku_suffix = !empty($item['variant']) ? '_' . strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', $item['variant']), 0, 8)) : '';
+        
+        $order_items[] = [
+            'name' => $item['prod_name'] . $variant_suffix,
+            'sku' => 'PROD_' . $item['product_id'] . $sku_suffix,
+            'units' => (int)$item['quantity'],
+            'selling_price' => (float)$item['price']
+        ];
+    }
+
+    if (empty($order_items)) {
+        return ['status' => 'error', 'message' => 'Order has no items.'];
+    }
+
+    // Parse Address
+    $address = $order['shipping_address'];
+    $pincode = '';
+    $state = '';
+    $city = '';
+    $address1 = '';
+    $address2 = '';
+
+    if (preg_match('/(\d{6})/', $address, $matches)) {
+        $pincode = $matches[1];
+    }
+    
+    $clean_addr = preg_replace('/-\s*\d{6}/', '', $address);
+    $clean_addr = preg_replace('/\((Home|Work)\)/i', '', $clean_addr);
+    $parts = array_map('trim', explode(',', $clean_addr));
+    
+    if (count($parts) >= 1) $state = array_pop($parts);
+    if (count($parts) >= 1) $city = array_pop($parts);
+    if (count($parts) >= 1) $address2 = array_pop($parts);
+    $address1 = implode(', ', $parts);
+
+    if (empty($address1)) {
+        $address1 = $address2;
+        $address2 = '';
+    }
+    if (empty($address1)) {
+        $address1 = $clean_addr;
+    }
+
+    $token = getShiprocketToken();
+    if (!$token) {
+        return ['status' => 'error', 'message' => 'Failed to authenticate with Shiprocket API. Check API credentials in admin settings.'];
+    }
+
+    $payment_method = ($order['payment_method'] === 'cod') ? 'COD' : 'Prepaid';
+
+    $payload = [
+        'order_id' => 'JEVNI_' . $order['id'],
+        'order_date' => date('Y-m-d H:i', strtotime($order['created_at'])),
+        'pickup_location' => getSetting('shiprocket_pickup_location', 'Primary'),
+        'billing_customer_name' => $order['user_name'],
+        'billing_last_name' => '',
+        'billing_address' => $address1,
+        'billing_address_2' => $address2,
+        'billing_city' => $city,
+        'billing_pincode' => $pincode,
+        'billing_state' => $state,
+        'billing_country' => 'India',
+        'billing_email' => $order['user_email'],
+        'billing_phone' => $order['user_phone'] ?: '9999999999',
+        'shipping_is_billing' => true,
+        'order_items' => $order_items,
+        'payment_method' => $payment_method,
+        'sub_total' => (float)$order['total_amount'],
+        'length' => (int)getSetting('shiprocket_default_length', '10'),
+        'width' => (int)getSetting('shiprocket_default_width', '10'),
+        'height' => (int)getSetting('shiprocket_default_height', '10'),
+        'weight' => (float)getSetting('shiprocket_default_weight', '0.5')
+    ];
+
+    $ch = curl_init('https://apiv2.shiprocket.in/v2/authorized/orders/create/adhoc');
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Content-Type: application/json',
+        'Authorization: Bearer ' . $token
+    ]);
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($httpCode === 200 || $httpCode === 201) {
+        $resData = json_decode($response, true);
+        if (isset($resData['order_id']) && isset($resData['shipment_id'])) {
+            $ship_order_id = $resData['order_id'];
+            $shipment_id = $resData['shipment_id'];
+
+            $upd = $conn->prepare("UPDATE orders SET shiprocket_order_id = ?, shiprocket_shipment_id = ? WHERE id = ?");
+            $upd->bind_param("ssi", $ship_order_id, $shipment_id, $order_id);
+            $upd->execute();
+
+            return [
+                'status' => 'success',
+                'shiprocket_order_id' => $ship_order_id,
+                'shiprocket_shipment_id' => $shipment_id
+            ];
+        }
+    }
+
+    $errMsg = 'API Error (HTTP ' . $httpCode . ')';
+    if ($response) {
+        $resData = json_decode($response, true);
+        if (isset($resData['message'])) {
+            $errMsg = $resData['message'];
+        } elseif (isset($resData['errors'])) {
+            $errMsg = json_encode($resData['errors']);
+        }
+    }
+
+    return ['status' => 'error', 'message' => $errMsg];
+}
+
+/**
+ * Fetch Live Shipment Tracking Info from Shiprocket
+ */
+function getShiprocketTrackingInfo($shipment_id) {
+    $token = getShiprocketToken();
+    if (!$token) return null;
+    
+    $curl = curl_init();
+    curl_setopt_array($curl, [
+        CURLOPT_URL => "https://apiv2.shiprocket.in/v1/external/courier/track/shipment/" . (int)$shipment_id,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HTTPHEADER => [
+            "Content-Type: application/json",
+            "Authorization: Bearer " . $token
+        ]
+    ]);
+    $response = curl_exec($curl);
+    $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    curl_close($curl);
+    
+    if ($httpCode === 200 && $response) {
+        return json_decode($response, true);
+    }
+    
+    return null;
+}
 ?>

@@ -46,7 +46,7 @@ $items = $item_stmt->get_result();
     
     <div style="border-bottom: 1px solid #333; padding-bottom: 20px; margin-bottom: 20px;">
         <h4 style="margin: 0 0 10px 0; color: var(--accent); font-size: 0.9rem; letter-spacing: 1px; text-transform: uppercase;">Order Info</h4>
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px;">
             <div>
                 <span style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Payment Method</span>
                 <p style="margin: 5px 0 0 0; font-weight: 600;"><?php echo strtoupper($order['payment_method']); ?></p>
@@ -58,6 +58,20 @@ $items = $item_stmt->get_result();
             <div>
                 <span style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Order Status</span>
                 <p style="margin: 5px 0 0 0; font-weight: 600; color: #16a34a;"><?php echo strtoupper($order['status']); ?></p>
+            </div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding-top: 10px; border-top: 1px solid #222;">
+            <div>
+                <span style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Shiprocket Order ID</span>
+                <p style="margin: 5px 0 0 0; font-weight: 600; color: <?php echo $order['shiprocket_order_id'] ? '#3b82f6' : '#ef4444'; ?>;">
+                    <?php echo $order['shiprocket_order_id'] ?: 'Not Synced'; ?>
+                </p>
+            </div>
+            <div>
+                <span style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Shiprocket Shipment ID</span>
+                <p style="margin: 5px 0 0 0; font-weight: 600; color: <?php echo $order['shiprocket_shipment_id'] ? '#10b981' : '#ef4444'; ?>;">
+                    <?php echo $order['shiprocket_shipment_id'] ?: 'Not Synced'; ?>
+                </p>
             </div>
         </div>
     </div>
@@ -83,7 +97,12 @@ $items = $item_stmt->get_result();
                 <tr style="border-bottom: 1px solid #222;">
                     <td style="padding: 10px; display: flex; align-items: center; gap: 10px;">
                         <img src="<?php echo $p_image; ?>" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;">
-                        <span><?php echo htmlspecialchars($item['prod_name']); ?></span>
+                        <span>
+                            <?php echo htmlspecialchars($item['prod_name']); ?>
+                            <?php if (!empty($item['variant'])): ?>
+                                <br><span style="font-size: 11px; color: #888; text-transform: uppercase; font-weight: 500;">Model: <?php echo htmlspecialchars($item['variant']); ?></span>
+                            <?php endif; ?>
+                        </span>
                     </td>
                     <td style="padding: 10px; text-align: right;">₹<?php echo number_format($item['price']); ?></td>
                     <td style="padding: 10px; text-align: center;"><?php echo $item['quantity']; ?></td>

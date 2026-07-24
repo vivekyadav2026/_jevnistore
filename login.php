@@ -57,6 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sign In | Jevani Store</title>
     <meta name="description" content="Sign in to your Jevani Store account.">
+    <link rel="icon" type="image/png" href="<?php echo htmlspecialchars(getSetting('site_logo') ? BASE_URL . '/assets/' . getSetting('site_logo') : BASE_URL . '/assets/logo.png'); ?>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
@@ -382,6 +383,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </style>
     <!-- Disable Inspect Element & Mobile Zoom Gestures -->
     <script>
+        /*
         // Disable context menu (right click)
         document.addEventListener('contextmenu', e => e.preventDefault());
 
@@ -404,6 +406,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 return false;
             }
         });
+        */
 
         // Disable pinch zoom on iOS / Safari
         document.addEventListener('gesturestart', function(e) {

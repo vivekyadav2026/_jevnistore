@@ -25,8 +25,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_product'])) {
         compressAndSaveImage($_FILES['image2']['tmp_name'], '../assets/' . $image2);
     }
 
-    $stmt = $conn->prepare("INSERT INTO products (category_id, name, description, price, compare_at_price, stock, is_waitlist, image, image2) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("issddiiss", $category_id, $name, $description, $price, $compare_at_price, $stock, $is_waitlist, $image, $image2);
+    $has_variants = isset($_POST['has_variants']) ? 1 : 0;
+    $variant_name = $_POST['variant_name'] ?? '';
+    $variants_list = $_POST['variants_list'] ?? '';
+
+    $stmt = $conn->prepare("INSERT INTO products (category_id, name, description, price, compare_at_price, stock, is_waitlist, image, image2, has_variants, variant_name, variants_list) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("issddiisssis", $category_id, $name, $description, $price, $compare_at_price, $stock, $is_waitlist, $image, $image2, $has_variants, $variant_name, $variants_list);
     $stmt->execute();
     $product_id = $conn->insert_id;
 
@@ -96,8 +100,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['edit_product'])) {
         $conn->query("INSERT INTO product_images (product_id, image_path, sort_order) VALUES ($product_id, '$image2', 1)");
     }
     
-    $stmt = $conn->prepare("UPDATE products SET category_id = ?, name = ?, description = ?, price = ?, compare_at_price = ?, stock = ?, is_waitlist = ?, image = ?, image2 = ? WHERE id = ?");
-    $stmt->bind_param("issddiissi", $category_id, $name, $description, $price, $compare_at_price, $stock, $is_waitlist, $image, $image2, $product_id);
+    $has_variants = isset($_POST['has_variants']) ? 1 : 0;
+    $variant_name = $_POST['variant_name'] ?? '';
+    $variants_list = $_POST['variants_list'] ?? '';
+
+    $stmt = $conn->prepare("UPDATE products SET category_id = ?, name = ?, description = ?, price = ?, compare_at_price = ?, stock = ?, is_waitlist = ?, image = ?, image2 = ?, has_variants = ?, variant_name = ?, variants_list = ? WHERE id = ?");
+    $stmt->bind_param("issddiisssisi", $category_id, $name, $description, $price, $compare_at_price, $stock, $is_waitlist, $image, $image2, $has_variants, $variant_name, $variants_list, $product_id);
     $stmt->execute();
     
     // Handle multiple new gallery images
@@ -184,6 +192,21 @@ if (isset($_GET['delete_gallery_image_id'])) {
                 <input type="checkbox" name="is_waitlist" id="add-is-waitlist" value="1">
                 <label for="add-is-waitlist" style="font-size: 13px; color: #888; cursor: pointer;">Waitlist Only (Product is in manufacturing / coming soon)</label>
             </div>
+            <div style="margin-top: 15px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+                <input type="checkbox" name="has_variants" id="add-has-variants" value="1" onchange="toggleVariantInputs('add')">
+                <label for="add-has-variants" style="font-size: 13px; color: #888; cursor: pointer;">Enable Product Options / Variants (e.g., Mobile Models, Sizes)</label>
+            </div>
+            
+            <div id="add-variants-container" style="display: none; border-left: 2px solid var(--accent); padding-left: 15px; margin-bottom: 15px;">
+                <div style="margin-bottom: 10px;">
+                    <label style="display:block; margin-bottom:5px; font-size: 12px; color: #888;">Variant Type Name (e.g. "Mobile Model", "Size", "Color")</label>
+                    <input type="text" name="variant_name" id="add-variant-name" class="form-control" placeholder="Mobile Model" style="margin-bottom: 0;">
+                </div>
+                <div>
+                    <label style="display:block; margin-bottom:5px; font-size: 12px; color: #888;">Options List (Comma-separated, e.g. "iPhone 13, iPhone 14 Pro, Samsung S24")</label>
+                    <textarea name="variants_list" id="add-variants-list" class="form-control" placeholder="iPhone 13, iPhone 14, Samsung S24" rows="2" style="margin-bottom: 0;"></textarea>
+                </div>
+            </div>
             <textarea name="description" id="add-description" class="form-control" placeholder="Description" rows="4"></textarea>
             
             <div style="margin-top: 15px;">
@@ -253,6 +276,21 @@ if (isset($_GET['delete_gallery_image_id'])) {
             <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
                 <input type="checkbox" name="is_waitlist" id="edit-is-waitlist" value="1">
                 <label for="edit-is-waitlist" style="font-size: 13px; color: #888; cursor: pointer;">Waitlist Only (Product is in manufacturing / coming soon)</label>
+            </div>
+            <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+                <input type="checkbox" name="has_variants" id="edit-has-variants" value="1" onchange="toggleVariantInputs('edit')">
+                <label for="edit-has-variants" style="font-size: 13px; color: #888; cursor: pointer;">Enable Product Options / Variants (e.g., Mobile Models, Sizes)</label>
+            </div>
+            
+            <div id="edit-variants-container" style="display: none; border-left: 2px solid var(--accent); padding-left: 15px; margin-bottom: 15px;">
+                <div style="margin-bottom: 10px;">
+                    <label style="display:block; margin-bottom:5px; font-size: 12px; color: #888;">Variant Type Name (e.g. "Mobile Model", "Size", "Color")</label>
+                    <input type="text" name="variant_name" id="edit-variant-name" class="form-control" placeholder="Mobile Model" style="margin-bottom: 0;">
+                </div>
+                <div>
+                    <label style="display:block; margin-bottom:5px; font-size: 12px; color: #888;">Options List (Comma-separated, e.g. "iPhone 13, iPhone 14 Pro, Samsung S24")</label>
+                    <textarea name="variants_list" id="edit-variants-list" class="form-control" placeholder="iPhone 13, iPhone 14, Samsung S24" rows="2" style="margin-bottom: 0;"></textarea>
+                </div>
             </div>
             
             <div style="margin-bottom: 15px;">
@@ -337,12 +375,17 @@ if (isset($_GET['delete_gallery_image_id'])) {
                         ';
                     }
                     
+                    $stock_html = $p['stock'];
+                    if ($p['stock'] <= 0) {
+                        $stock_html = '0<br><span style="background:#ef4444; color:white; font-size:0.6rem; font-weight:700; padding:2px 6px; border-radius:3px; text-transform:uppercase; display:inline-block; margin-top:4px; letter-spacing:0.5px;">OUT OF STOCK</span>';
+                    }
+                    
                     echo '<tr>
                         <td><img src="'.$img.'" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; border: 1px solid #222;"></td>
                         <td>'.htmlspecialchars($p['name']).'</td>
                         <td>'.htmlspecialchars($p['cat_name']).'</td>
                         <td>'.$price_html.'</td>
-                        <td>'.$p['stock'].'</td>
+                        <td>'.$stock_html.'</td>
                         <td style="white-space: nowrap;">
                             <button class="btn btn-outline" onclick="openEditModal(' . htmlspecialchars($p_json, ENT_QUOTES, 'UTF-8') . ', ' . htmlspecialchars($gallery_json, ENT_QUOTES, 'UTF-8') . ')" style="padding: 5px 10px; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 5px; cursor: pointer; border-color: #555; margin-right: 10px;">
                                 <i data-lucide="edit-3" style="width: 14px; height: 14px;"></i> Edit
@@ -570,6 +613,10 @@ function openEditModal(product, gallery) {
     document.getElementById('edit-compare-at-price').value = product.compare_at_price || '';
     document.getElementById('edit-stock').value = product.stock;
     document.getElementById('edit-is-waitlist').checked = product.is_waitlist == 1;
+    document.getElementById('edit-has-variants').checked = product.has_variants == 1;
+    document.getElementById('edit-variant-name').value = product.variant_name || '';
+    document.getElementById('edit-variants-list').value = product.variants_list || '';
+    toggleVariantInputs('edit');
     document.getElementById('edit-description').value = product.description || '';
     if (editDescEditor) {
         editDescEditor.setData(product.description || '');
@@ -644,6 +691,10 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+function toggleVariantInputs(mode) {
+    const isChecked = document.getElementById(mode + '-has-variants').checked;
+    document.getElementById(mode + '-variants-container').style.display = isChecked ? 'block' : 'none';
+}
 </script>
 
 <?php require_once 'includes/footer.php'; ?>

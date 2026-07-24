@@ -124,11 +124,30 @@ $_SESSION['recently_viewed'] = array_slice($_SESSION['recently_viewed'], 0, 5);
                 <?php if (isset($product['is_waitlist']) && $product['is_waitlist'] == 1): ?>
                     <button type="button" class="btn-add-cart" style="background: transparent; color: white; border: 1px solid white; cursor: pointer;" onclick="openWaitlistModal()">JOIN WAITING LIST</button>
                     <p style="margin-top: 15px; font-size: 0.85rem; color: #888;">This product is currently in manufacturing. Join the waitlist to be notified.</p>
+                <?php elseif ($product['stock'] <= 0): ?>
+                    <button type="button" class="btn-add-cart" style="background: #e5e7eb; color: #9ca3af; border: 1px solid #d1d5db; cursor: not-allowed; text-transform: uppercase;" disabled>OUT OF STOCK</button>
+                    <p style="margin-top: 15px; font-size: 0.85rem; color: #ef4444; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">This item is currently out of stock.</p>
                 <?php else: ?>
                     <form action="<?php echo BASE_URL; ?>/cart_action.php" method="POST" id="add-to-cart-form" class="ajax-cart-form">
                         <input type="hidden" name="action" value="add">
                         <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
                         <input type="hidden" name="size" id="selected-size" value="Standard">
+
+                        <?php if (isset($product['has_variants']) && $product['has_variants'] == 1 && !empty($product['variants_list'])): ?>
+                            <div style="margin-bottom: 20px;">
+                                <label style="display:block; margin-bottom:8px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#1a1a1a;">
+                                    Select <?php echo htmlspecialchars($product['variant_name'] ?: 'Option'); ?>
+                                </label>
+                                <select name="variant" required style="width: 100%; padding: 12px; border: 1.5px solid #1a1a1a; background: transparent; font-family: inherit; font-size: 0.8rem; font-weight: 600; outline: none; border-radius: 4px; color: #1a1a1a; cursor: pointer;">
+                                    <?php 
+                                    $options = array_map('trim', explode(',', $product['variants_list']));
+                                    foreach ($options as $opt) {
+                                        echo '<option value="' . htmlspecialchars($opt) . '" style="background:#fff; color:#000;">' . htmlspecialchars($opt) . '</option>';
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                        <?php endif; ?>
 
                         <!-- Quantity & Buttons -->
                         <div class="detail-actions">

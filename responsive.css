@@ -523,6 +523,7 @@ html { scroll-behavior: smooth; }
 
     /* Footer */
     .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+    .footer-brand { grid-column: span 1 !important; }
     .footer { padding: 3rem 0 2rem; }
     .footer-bottom { flex-direction: column; gap: 10px; text-align: center; }
 

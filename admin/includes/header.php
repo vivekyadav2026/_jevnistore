@@ -10,6 +10,7 @@ requireAdmin();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Admin Panel | GENRAGE.</title>
+    <link rel="icon" type="image/png" href="<?php echo htmlspecialchars(getSetting('site_logo') ? BASE_URL . '/assets/' . getSetting('site_logo') : BASE_URL . '/assets/logo.png'); ?>">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/styles.css">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -271,6 +272,7 @@ requireAdmin();
     </style>
     <!-- Disable Inspect Element & Mobile Zoom Gestures -->
     <script>
+        /*
         // Disable context menu (right click)
         document.addEventListener('contextmenu', e => e.preventDefault());
 
@@ -293,6 +295,7 @@ requireAdmin();
                 return false;
             }
         });
+        */
 
         // Disable pinch zoom on iOS / Safari
         document.addEventListener('gesturestart', function(e) {

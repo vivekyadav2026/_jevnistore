@@ -9,6 +9,7 @@ require_once __DIR__ . '/functions.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title><?php echo htmlspecialchars(getSetting('site_title', 'Jevani Store | Modern Edgy Clothing')); ?></title>
     <meta name="description" content="<?php echo htmlspecialchars(getSetting('site_description', 'Shop the latest streetwear. Baggy pants, hoodies, and cyberpunk fashion.')); ?>">
+    <link rel="icon" type="image/png" href="<?php echo htmlspecialchars(getSetting('site_logo') ? BASE_URL . '/assets/' . getSetting('site_logo') : BASE_URL . '/assets/logo.png'); ?>">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/styles.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/responsive.css?v=<?php echo time(); ?>">
     <!-- Google Fonts -->
@@ -155,6 +156,7 @@ require_once __DIR__ . '/functions.php';
     </style>
     <!-- Disable Inspect Element & Mobile Zoom Gestures -->
     <script>
+        /*
         // Disable context menu (right click)
         document.addEventListener('contextmenu', e => e.preventDefault());
 
@@ -177,6 +179,7 @@ require_once __DIR__ . '/functions.php';
                 return false;
             }
         });
+        */
 
         // Disable pinch zoom on iOS / Safari
         document.addEventListener('gesturestart', function(e) {

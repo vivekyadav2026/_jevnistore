@@ -325,21 +325,26 @@ require_once 'includes/header.php';
             <div class="new-arrivals-grid" style="grid-template-columns: repeat(2, 1fr); gap: 40px 30px;">
                 <?php foreach ($_SESSION['cart'] as $id => $item): 
                     $img = $item['image'] ? BASE_URL . '/assets/' . htmlspecialchars($item['image']) : '/assets/product_pants.png';
+                    $real_product_id = $item['product_id'] ?? $id;
                 ?>
                     <div class="product-card-min" style="position: relative;">
                         <!-- Product Image inside white border box -->
-                        <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $id; ?>" class="product-img-box">
+                        <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $real_product_id; ?>" class="product-img-box">
                             <img src="<?php echo $img; ?>" alt="<?php echo htmlspecialchars($item['name']); ?>">
                         </a>
                         
                         <!-- Title & Single Price -->
                         <div class="product-min-title"><?php echo htmlspecialchars($item['name']); ?></div>
-                        <div class="product-min-price">₹<?php echo number_format($item['price']); ?></div>
+                        <?php if (!empty($item['variant'])): ?>
+                            <div style="font-size: 0.65rem; color: #888; margin-top: 4px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">Model: <?php echo htmlspecialchars($item['variant']); ?></div>
+                        <?php endif; ?>
+                        <div class="product-min-price" style="margin-top: 6px;">₹<?php echo number_format($item['price']); ?></div>
                         
                         <!-- Stepper -->
-                        <form action="<?php echo BASE_URL; ?>/cart_action.php" method="POST" style="margin-bottom: 12px;">
+                        <form action="<?php echo BASE_URL; ?>/cart_action.php" method="POST" style="margin-bottom: 12px; margin-top: 10px;">
                             <input type="hidden" name="action" value="update">
-                            <input type="hidden" name="product_id" value="<?php echo $id; ?>">
+                            <input type="hidden" name="cart_key" value="<?php echo $id; ?>">
+                            <input type="hidden" name="product_id" value="<?php echo $real_product_id; ?>">
                             <div class="cart-qty-stepper">
                                 <button type="button" class="qty-btn" onclick="const i = this.nextElementSibling; i.value = Math.max(1, parseInt(i.value) - 1); i.form.submit();">-</button>
                                 <input type="number" name="quantity" class="qty-input" value="<?php echo $item['quantity']; ?>" min="1" readonly>
@@ -351,11 +356,12 @@ require_once 'includes/header.php';
                         <div style="font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; color: #1a1a1a;">
                             Total: ₹<?php echo number_format($item['price'] * $item['quantity']); ?>
                         </div>
-
+ 
                         <!-- Remove Link (matching wishlist style) -->
                         <form action="<?php echo BASE_URL; ?>/cart_action.php" method="POST">
                             <input type="hidden" name="action" value="remove">
-                            <input type="hidden" name="product_id" value="<?php echo $id; ?>">
+                            <input type="hidden" name="cart_key" value="<?php echo $id; ?>">
+                            <input type="hidden" name="product_id" value="<?php echo $real_product_id; ?>">
                             <button type="submit" class="wishlist-remove-link" style="background: none; border: none; font-size: 0.55rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #555555; cursor: pointer; border-bottom: 1px solid rgba(0, 0, 0, 0.2); padding-bottom: 1px; display: inline-block;">REMOVE</button>
                         </form>
                     </div>

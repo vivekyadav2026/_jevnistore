@@ -12,11 +12,21 @@ $selected_category = isset($_GET['category']) && is_numeric($_GET['category']) ?
 $min_price = isset($_GET['min_price']) && is_numeric($_GET['min_price']) ? intval($_GET['min_price']) : 0;
 $max_price = isset($_GET['max_price']) && is_numeric($_GET['max_price']) ? intval($_GET['max_price']) : $max_p_limit;
 $in_stock_only = isset($_GET['in_stock']) && $_GET['in_stock'] == '1' ? true : false;
+$sort = $_GET['sort'] ?? 'created_at-desc';
+$search = isset($_GET['search']) ? trim($_GET['search']) : '';
 
 // 1. Build Query
 $query = "SELECT * FROM products WHERE 1=1";
 $params = [];
 $types = "";
+
+if (!empty($search)) {
+    $query .= " AND (name LIKE ? OR description LIKE ?)";
+    $search_term = "%" . $search . "%";
+    $params[] = $search_term;
+    $params[] = $search_term;
+    $types .= "ss";
+}
 
 if ($selected_category !== null) {
     $query .= " AND category_id = ?";
@@ -33,7 +43,21 @@ if ($in_stock_only) {
     $query .= " AND stock > 0";
 }
 
-$query .= " ORDER BY created_at DESC";
+// Whitelist and map sorting options to order by clauses
+$allowed_sorts = ['created_at-desc', 'price-asc', 'price-desc', 'name-asc'];
+if (!in_array($sort, $allowed_sorts)) {
+    $sort = 'created_at-desc';
+}
+$order_by = "created_at DESC";
+if ($sort === 'price-asc') {
+    $order_by = "price ASC";
+} elseif ($sort === 'price-desc') {
+    $order_by = "price DESC";
+} elseif ($sort === 'name-asc') {
+    $order_by = "name ASC";
+}
+
+$query .= " ORDER BY " . $order_by;
 
 $stmt = $conn->prepare($query);
 if (!empty($params)) {
@@ -59,14 +83,22 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
             $heart_color = $in_wish ? '#ef4444' : '#1a1a1a';
             $wish_class = $in_wish ? 'in-wishlist' : '';
             ?>
-            <div class="product-card-min">
-                <div class="product-img-box">
+            <div class="product-card-min" style="position: relative;">
+                <div class="product-img-box" style="position: relative;">
                     <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $product['id']; ?>">
                         <img src="<?php echo $image; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
                     </a>
+                    <?php if ($product['stock'] <= 0 && (!isset($product['is_waitlist']) || $product['is_waitlist'] == 0)): ?>
+                        <div style="position: absolute; top: 10px; left: 10px; background: #ef4444; color: white; font-size: 0.55rem; font-weight: 700; padding: 3px 8px; text-transform: uppercase; letter-spacing: 1px; z-index: 2; border-radius: 2px;">OUT OF STOCK</div>
+                    <?php endif; ?>
+                    
                     <?php if (isset($product['is_waitlist']) && $product['is_waitlist'] == 1): ?>
                         <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $product['id']; ?>" class="add-btn-overlay" aria-label="Join Waitlist" style="display:flex; align-items:center; justify-content:center; text-decoration:none;">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:20px;height:20px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        </a>
+                    <?php elseif ($product['stock'] <= 0): ?>
+                        <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $product['id']; ?>" class="add-btn-overlay" aria-label="Out of Stock" style="display:flex; align-items:center; justify-content:center; text-decoration:none; opacity: 0.7;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:20px;height:20px;"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
                         </a>
                     <?php else: ?>
                         <form action="<?php echo BASE_URL; ?>/cart_action.php" method="POST" class="ajax-cart-form">
@@ -97,23 +129,61 @@ $total_products_count = $cnt_res ? $cnt_res->fetch_assoc()['cnt'] : 0;
 require_once 'includes/header.php';
 ?>
 
-<div class="shop-page-container">
-    <!-- Shop Hero Banner -->
-    <div style="width: 100%; overflow: hidden; background: #000;">
-        <img src="<?php echo BASE_URL; ?>/assets/hero_banner_bags.png" alt="Shop Collection" style="width: 100%; height: auto; max-height: 350px; object-fit: cover; display: block;">
-    </div>
+<style>
+.shop-header-row.hide-desktop {
+    display: none !important;
+}
+@media (max-width: 1024px) {
+    .shop-header-row.hide-desktop {
+        display: flex !important;
+    }
+}
+/* iOS-Style Toggle Switch */
+.switch-slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .3s;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+input:checked + .switch-slider {
+    background-color: #1a1a1a !important;
+}
+input:checked + .switch-slider:before {
+    transform: translateX(22px);
+}
+/* Smooth Transitions for Collapsible Filters */
+.filter-group-content {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
+}
+.filter-group-content.open {
+    max-height: 500px;
+    opacity: 1;
+}
+</style>
 
-    <div style="text-align: center; padding: 40px 20px 0 20px; background: transparent;">
-        <h1 style="font-family: var(--font-primary); font-size: 1.8rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #1a1a1a; margin: 0;">THE COLLECTION</h1>
+<div class="shop-page-container">
+    <!-- Styled Text Hero Banner -->
+    <div class="shop-hero-text-banner" style="background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%); padding: 60px 24px; text-align: center; border-bottom: 1.5px solid #222; margin-bottom: 10px;">
+        <h1 style="font-family: var(--font-primary); font-size: 2rem; font-weight: 700; letter-spacing: 5px; text-transform: uppercase; color: #ffffff; margin: 0 0 8px 0; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">THE COLLECTION</h1>
+        <p style="font-family: var(--font-secondary); font-size: 0.75rem; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; color: #888888; margin: 0;">Elevate Your Lifestyle. Curated Premium Accessories.</p>
     </div>
 
     <!-- Main Editorial Shop Section -->
     <section class="section shop-editorial-bg" style="padding-top: 3rem; padding-bottom: 8rem; background: var(--bg-primary);">
         <div class="container">
             <!-- Mobile Filter Toggle -->
-            <div class="shop-header-row hide-desktop" style="margin-bottom: 20px; display: none;">
-                <button class="mobile-filter-btn" onclick="toggleMobileFilter()">
-                    <i data-lucide="sliders-horizontal" style="width: 16px; height: 16px;"></i> FILTERS
+            <div class="shop-header-row hide-desktop" style="margin-bottom: 30px; display: flex; justify-content: center; align-items: center; width: 100%;">
+                <button class="mobile-filter-btn" onclick="toggleMobileFilter()" style="display: inline-flex !important; align-items: center; justify-content: center; gap: 10px; background: #ffffff !important; color: #1a1a1a !important; border: 1.5px solid #1a1a1a !important; padding: 10px 32px !important; font-family: inherit; font-weight: 700; font-size: 0.8rem !important; letter-spacing: 1.5px; text-transform: uppercase; border-radius: 99px !important; cursor: pointer; width: auto !important; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                    <i data-lucide="sliders-horizontal" style="width: 16px; height: 16px; stroke-width: 2.5;"></i> Sort & Filter
                 </button>
             </div>
             
@@ -128,13 +198,46 @@ require_once 'includes/header.php';
                         <button class="filter-drawer-close" style="color: var(--text-primary);" onclick="toggleMobileFilter()"><i data-lucide="x"></i></button>
                     </div>
                     
+                    <!-- Sort By Filter Group -->
+                    <div class="filter-group-ref">
+                        <div class="filter-group-header" onclick="toggleFilterSection('sort')">
+                            <span>SORT BY</span>
+                            <i data-lucide="chevron-up" id="filter-chevron-sort" style="transform: rotate(180deg); transition: transform 0.3s;"></i>
+                        </div>
+                        <div class="filter-group-content" id="filter-content-sort">
+                            <ul class="filter-list-ref">
+                                <li>
+                                    <a href="#" class="filter-link-ref filter-sort-link <?php echo $sort === 'created_at-desc' ? 'active' : ''; ?>" data-sort="created_at-desc" onclick="selectSort(event, 'created_at-desc')">
+                                        Newest Arrivals
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" class="filter-link-ref filter-sort-link <?php echo $sort === 'price-asc' ? 'active' : ''; ?>" data-sort="price-asc" onclick="selectSort(event, 'price-asc')">
+                                        Price: Low to High
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" class="filter-link-ref filter-sort-link <?php echo $sort === 'price-desc' ? 'active' : ''; ?>" data-sort="price-desc" onclick="selectSort(event, 'price-desc')">
+                                        Price: High to Low
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" class="filter-link-ref filter-sort-link <?php echo $sort === 'name-asc' ? 'active' : ''; ?>" data-sort="name-asc" onclick="selectSort(event, 'name-asc')">
+                                        Alphabetically: A-Z
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="filter-group-divider"></div>
+                    </div>
+
                     <!-- Category Filter Group -->
                     <div class="filter-group-ref">
                         <div class="filter-group-header" onclick="toggleFilterSection('cat')">
                             <span>CATEGORY</span>
                             <i data-lucide="chevron-up" id="filter-chevron-cat" style="transform: rotate(180deg); transition: transform 0.3s;"></i>
                         </div>
-                        <div class="filter-group-content" id="filter-content-cat" style="display: none;">
+                        <div class="filter-group-content" id="filter-content-cat">
                             <ul class="filter-list-ref">
                                 <li>
                                     <a href="shop.php" class="filter-link-ref <?php echo $selected_category === null ? 'active' : ''; ?>" data-id="" onclick="selectCategory(event, '')">
@@ -158,6 +261,24 @@ require_once 'includes/header.php';
                         </div>
                         <div class="filter-group-divider"></div>
                     </div>
+
+                    <!-- Availability Filter Group -->
+                    <div class="filter-group-ref">
+                        <div class="filter-group-header" onclick="toggleFilterSection('stock')">
+                            <span>AVAILABILITY</span>
+                            <i data-lucide="chevron-up" id="filter-chevron-stock" style="transform: rotate(180deg); transition: transform 0.3s;"></i>
+                        </div>
+                        <div class="filter-group-content" id="filter-content-stock">
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 0;">
+                                <span style="font-size: 0.8rem; font-weight: 600; color: var(--text-primary); letter-spacing: 0.5px;">IN STOCK ONLY</span>
+                                <label class="switch-container" style="position: relative; display: inline-block; width: 44px; height: 22px; flex-shrink: 0;">
+                                    <input type="checkbox" id="in-stock-toggle" <?php echo $in_stock_only ? 'checked' : ''; ?> onchange="applyStockFilter()" style="opacity: 0; width: 0; height: 0;">
+                                    <span class="switch-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #e5e7eb; transition: .3s; border-radius: 34px;"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="filter-group-divider"></div>
+                    </div>
                     
                     <!-- Price Filter Group -->
                     <div class="filter-group-ref">
@@ -165,7 +286,7 @@ require_once 'includes/header.php';
                             <span>PRICE</span>
                             <i data-lucide="chevron-up" id="filter-chevron-price" style="transform: rotate(180deg); transition: transform 0.3s;"></i>
                         </div>
-                        <div class="filter-group-content" id="filter-content-price" style="display: none;">
+                        <div class="filter-group-content" id="filter-content-price">
                             <div class="price-slider-wrapper">
                                 <div class="price-slider-container">
                                     <input type="range" min="0" max="<?php echo $max_p_limit; ?>" value="<?php echo $min_price; ?>" class="slider-handle min-slider" id="min-price-slider" oninput="updatePriceInputs()">
@@ -191,7 +312,19 @@ require_once 'includes/header.php';
                 </aside>
                 
                 <!-- Product Grid Container -->
-                <div>
+                <div style="flex: 1;">
+                    <?php if (!empty($search)): ?>
+                        <div style="display: flex; align-items: center; justify-content: space-between; background: #ffffff; border: 1.5px solid #1a1a1a; padding: 12px 20px; border-radius: 4px; margin-bottom: 24px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #1a1a1a;">
+                            <div>
+                                SEARCH RESULTS FOR: <strong style="color: #ef4444;">"<?php echo htmlspecialchars($search); ?>"</strong>
+                                <span style="color: #666; font-size: 0.65rem; margin-left: 8px; font-weight: 500;">(<?php echo $result->num_rows; ?> ITEMS FOUND)</span>
+                            </div>
+                            <a href="shop.php" style="color: #ef4444; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; font-size: 0.7rem;">
+                                CLEAR SEARCH <i data-lucide="x" style="width: 14px; height: 14px; stroke-width: 3;"></i>
+                            </a>
+                        </div>
+                    <?php endif; ?>
+                    
                     <div class="shop-grid" id="all-apparel">
                         <?php
                         if ($result->num_rows > 0) {
@@ -209,26 +342,34 @@ require_once 'includes/header.php';
                                 $heart_color = $in_wish ? '#ef4444' : '#1a1a1a';
                                 $wish_class = $in_wish ? 'in-wishlist' : '';
                                 ?>
-                                <div class="product-card-min">
-                                    <div class="product-img-box">
-                                        <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $product['id']; ?>">
-                                            <img src="<?php echo $image; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
-                                        </a>
-                                        <?php if (isset($product['is_waitlist']) && $product['is_waitlist'] == 1): ?>
-                                            <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $product['id']; ?>" class="add-btn-overlay" aria-label="Join Waitlist" style="display:flex; align-items:center; justify-content:center; text-decoration:none;">
-                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:20px;height:20px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                            </a>
-                                        <?php else: ?>
-                                            <form action="<?php echo BASE_URL; ?>/cart_action.php" method="POST" class="ajax-cart-form">
-                                                <input type="hidden" name="action" value="add">
-                                                <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
-                                                <input type="hidden" name="quantity" value="1">
-                                                <button type="submit" class="add-btn-overlay" aria-label="Add to Bag">
-                                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5v14"/></svg>
-                                                </button>
-                                            </form>
-                                        <?php endif; ?>
-                                    </div>
+                                <div class="product-card-min" style="position: relative;">
+                                     <div class="product-img-box" style="position: relative;">
+                                         <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $product['id']; ?>">
+                                             <img src="<?php echo $image; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
+                                         </a>
+                                         <?php if ($product['stock'] <= 0 && (!isset($product['is_waitlist']) || $product['is_waitlist'] == 0)): ?>
+                                             <div style="position: absolute; top: 10px; left: 10px; background: #ef4444; color: white; font-size: 0.55rem; font-weight: 700; padding: 3px 8px; text-transform: uppercase; letter-spacing: 1px; z-index: 2; border-radius: 2px;">OUT OF STOCK</div>
+                                         <?php endif; ?>
+                                         
+                                         <?php if (isset($product['is_waitlist']) && $product['is_waitlist'] == 1): ?>
+                                             <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $product['id']; ?>" class="add-btn-overlay" aria-label="Join Waitlist" style="display:flex; align-items:center; justify-content:center; text-decoration:none;">
+                                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:20px;height:20px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                             </a>
+                                         <?php elseif ($product['stock'] <= 0): ?>
+                                             <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $product['id']; ?>" class="add-btn-overlay" aria-label="Out of Stock" style="display:flex; align-items:center; justify-content:center; text-decoration:none; opacity: 0.7;">
+                                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:20px;height:20px;"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+                                             </a>
+                                         <?php else: ?>
+                                             <form action="<?php echo BASE_URL; ?>/cart_action.php" method="POST" class="ajax-cart-form">
+                                                 <input type="hidden" name="action" value="add">
+                                                 <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
+                                                 <input type="hidden" name="quantity" value="1">
+                                                 <button type="submit" class="add-btn-overlay" aria-label="Add to Bag">
+                                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5v14"/></svg>
+                                                 </button>
+                                             </form>
+                                         <?php endif; ?>
+                                     </div>
                                     <div class="product-min-title"><?php echo htmlspecialchars($product['name']); ?></div>
                                     <div class="product-min-price">₹<?php echo number_format($product['price']); ?></div>
                                 </div>
@@ -276,18 +417,18 @@ require_once 'includes/header.php';
         const content = document.getElementById('filter-content-' + section);
         const chevron = document.getElementById('filter-chevron-' + section);
         
-        if (content.style.display === 'none') {
-            content.style.display = 'block';
+        content.classList.toggle('open');
+        
+        if (content.classList.contains('open')) {
             chevron.style.transform = 'rotate(0deg)';
         } else {
-            content.style.display = 'none';
             chevron.style.transform = 'rotate(180deg)';
         }
     }
 
     function selectCategory(e, catId) {
         e.preventDefault();
-        document.querySelectorAll('.filter-link-ref').forEach(link => link.classList.remove('active'));
+        document.querySelectorAll('.filter-link-ref:not(.filter-sort-link)').forEach(link => link.classList.remove('active'));
         e.currentTarget.classList.add('active');
         updateFilters();
     }
@@ -343,20 +484,36 @@ require_once 'includes/header.php';
         track.style.width = (maxPercent - minPercent) + '%';
     }
 
+    function selectSort(e, sortVal) {
+        e.preventDefault();
+        document.querySelectorAll('.filter-sort-link').forEach(link => link.classList.remove('active'));
+        e.currentTarget.classList.add('active');
+        updateFilters();
+    }
+
     function updateFilters() {
         clearTimeout(filterTimeout);
         filterTimeout = setTimeout(() => {
-            const activeLink = document.querySelector('.filter-link-ref.active');
+            const activeLink = document.querySelector('.filter-link-ref:not(.filter-sort-link).active');
             const categoryId = activeLink ? activeLink.dataset.id : '';
+            
+            const activeSort = document.querySelector('.filter-sort-link.active');
+            const sortVal = activeSort ? activeSort.dataset.sort : 'created_at-desc';
+            
             const minPrice = document.getElementById('min-price-slider').value;
             const maxPrice = document.getElementById('max-price-slider').value;
-            const inStock = '0';
+            const inStock = document.getElementById('in-stock-toggle').checked ? '1' : '0';
             
             // Build query parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const searchVal = urlParams.get('search') || '';
+
             const params = new URLSearchParams();
+            if (searchVal) params.append('search', searchVal);
             if (categoryId) params.append('category', categoryId);
             if (parseInt(minPrice) > 0) params.append('min_price', minPrice);
             if (parseInt(maxPrice) < <?php echo $max_p_limit; ?>) params.append('max_price', maxPrice);
+            if (sortVal && sortVal !== 'created_at-desc') params.append('sort', sortVal);
             if (inStock === '1') params.append('in_stock', '1');
             
             // Update browser history URL
@@ -377,6 +534,19 @@ require_once 'includes/header.php';
                     grid.innerHTML = html;
                     grid.style.opacity = '1';
                     lucide.createIcons();
+                    
+                    // Close mobile filter drawer
+                    const drawer = document.getElementById('shop-filter-drawer');
+                    const overlay = document.getElementById('mobile-filter-overlay');
+                    if (drawer && drawer.classList.contains('open')) {
+                        drawer.classList.remove('open');
+                    }
+                    if (drawer && drawer.classList.contains('active')) {
+                        drawer.classList.remove('active');
+                    }
+                    if (overlay && overlay.classList.contains('open')) {
+                        overlay.classList.remove('open');
+                    }
                 })
                 .catch(err => {
                     grid.style.opacity = '1';

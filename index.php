@@ -518,14 +518,22 @@
         while ($product = $na_result->fetch_assoc()) {
             $image = $product['image'] ? BASE_URL . '/assets/' . htmlspecialchars($product['image']) : BASE_URL . '/assets/bag_shoulder.png';
             ?>
-            <div class="product-card-min">
-                <div class="product-img-box">
+            <div class="product-card-min" style="position: relative;">
+                <div class="product-img-box" style="position: relative;">
                     <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $product['id']; ?>">
                         <img src="<?php echo $image; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
                     </a>
+                    <?php if ($product['stock'] <= 0 && (!isset($product['is_waitlist']) || $product['is_waitlist'] == 0)): ?>
+                        <div style="position: absolute; top: 10px; left: 10px; background: #ef4444; color: white; font-size: 0.55rem; font-weight: 700; padding: 3px 8px; text-transform: uppercase; letter-spacing: 1px; z-index: 2; border-radius: 2px;">OUT OF STOCK</div>
+                    <?php endif; ?>
+                    
                     <?php if (isset($product['is_waitlist']) && $product['is_waitlist'] == 1): ?>
                         <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $product['id']; ?>" class="add-btn-overlay" aria-label="Join Waitlist" style="display:flex; align-items:center; justify-content:center; text-decoration:none;">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:20px;height:20px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        </a>
+                    <?php elseif ($product['stock'] <= 0): ?>
+                        <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $product['id']; ?>" class="add-btn-overlay" aria-label="Out of Stock" style="display:flex; align-items:center; justify-content:center; text-decoration:none; opacity: 0.7;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:20px;height:20px;"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
                         </a>
                     <?php else: ?>
                         <form action="<?php echo BASE_URL; ?>/cart_action.php" method="POST" class="ajax-cart-form">
@@ -658,58 +666,37 @@
                     <!-- Slide 1 -->
                     <div class="video-slide">
                         <video loop muted playsinline autoplay>
-                            <source src="<?php echo BASE_URL; ?>/assets/campaign.mp4#t=0,10" type="video/mp4">
+                            <source src="<?php echo BASE_URL; ?>/assets/instagram/insta1.mp4" type="video/mp4">
                         </video>
-                        <div class="video-duration">00:10</div>
+                        <div class="video-duration">00:15</div>
                     </div>
                     <!-- Slide 2 -->
                     <div class="video-slide active">
                         <video loop muted playsinline autoplay>
-                            <source src="<?php echo BASE_URL; ?>/assets/y2k_video.mp4#t=5,12" type="video/mp4">
+                            <source src="<?php echo BASE_URL; ?>/assets/instagram/insta2.mp4" type="video/mp4">
                         </video>
-                        <div class="video-duration">00:07</div>
+                        <div class="video-duration">00:15</div>
                     </div>
                     <!-- Slide 3 -->
                     <div class="video-slide">
                         <video loop muted playsinline autoplay>
-                            <source src="<?php echo BASE_URL; ?>/assets/campaign.mp4#t=15,25" type="video/mp4">
+                            <source src="<?php echo BASE_URL; ?>/assets/instagram/insta3.mp4" type="video/mp4">
                         </video>
-                        <div class="video-duration">00:10</div>
+                        <div class="video-duration">00:15</div>
                     </div>
                     <!-- Slide 4 -->
                     <div class="video-slide">
                         <video loop muted playsinline autoplay>
-                            <source src="<?php echo BASE_URL; ?>/assets/y2k_video.mp4#t=12,19" type="video/mp4">
+                            <source src="<?php echo BASE_URL; ?>/assets/instagram/insta4.mp4" type="video/mp4">
                         </video>
-                        <div class="video-duration">00:07</div>
+                        <div class="video-duration">00:15</div>
                     </div>
                     <!-- Slide 5 -->
                     <div class="video-slide">
                         <video loop muted playsinline autoplay>
-                            <source src="<?php echo BASE_URL; ?>/assets/campaign.mp4#t=30,40" type="video/mp4">
+                            <source src="<?php echo BASE_URL; ?>/assets/instagram/insta5.mp4" type="video/mp4">
                         </video>
-                        <div class="video-duration">00:10</div>
-                    </div>
-                    <!-- Slide 6 -->
-                    <div class="video-slide">
-                        <video loop muted playsinline autoplay>
-                            <source src="<?php echo BASE_URL; ?>/assets/y2k_video.mp4#t=20,27" type="video/mp4">
-                        </video>
-                        <div class="video-duration">00:07</div>
-                    </div>
-                    <!-- Slide 7 -->
-                    <div class="video-slide">
-                        <video loop muted playsinline autoplay>
-                            <source src="<?php echo BASE_URL; ?>/assets/campaign.mp4#t=45,55" type="video/mp4">
-                        </video>
-                        <div class="video-duration">00:10</div>
-                    </div>
-                    <!-- Slide 8 -->
-                    <div class="video-slide">
-                        <video loop muted playsinline autoplay>
-                            <source src="<?php echo BASE_URL; ?>/assets/y2k_video.mp4#t=0,7" type="video/mp4">
-                        </video>
-                        <div class="video-duration">00:07</div>
+                        <div class="video-duration">00:15</div>
                     </div>
                 </div>
 
@@ -900,8 +887,10 @@
 <section class="lookbook-section">
     <div class="lookbook-container">
         <div class="lookbook-images">
-            <img src="<?php echo BASE_URL; ?>/assets/model_with_bag.png" alt="Model with Bag" class="lookbook-main-img" onerror="this.src='<?php echo BASE_URL; ?>/assets/hero_mobile.jpg';">
-            <img src="<?php echo BASE_URL; ?>/assets/bag_tote.png" alt="Signature Bag" class="lookbook-sub-img">
+            <video autoplay loop muted playsinline class="lookbook-main-img" onerror="this.src='<?php echo BASE_URL; ?>/assets/hero_mobile.jpg';">
+                <source src="<?php echo BASE_URL; ?>/assets/VID-20260709-WA0040~3.mp4" type="video/mp4">
+            </video>
+            <img src="<?php echo BASE_URL; ?>/assets/bags.png" alt="Signature Bag" class="lookbook-sub-img">
         </div>
         <div class="lookbook-text-area">
             <h2 class="lookbook-title">SIGNATURE BAG</h2>
@@ -919,12 +908,11 @@
 
 <!-- 7. Let Ragers Speak -->
 <section class="ragers-section">
-    <div class="ragers-video-container">
-        <!-- Assuming y2k_video.mp4 is the background video -->
+    <!-- <div class="ragers-video-container">
         <video autoplay loop muted playsinline>
             <source src="<?php echo BASE_URL; ?>/assets/y2k_video.mp4" type="video/mp4">
         </video>
-    </div>
+    </div> -->
     
     <div class="ragers-content">
         <h2 class="ragers-title">Let JEVANI speak for itself</h2>

@@ -4,13 +4,14 @@ require_once 'includes/header.php';
 $order_id = isset($_GET['order_id']) ? (int)$_GET['order_id'] : 0;
 $method = $_GET['method'] ?? 'cod';
 
-if ($method == 'razorpay' && isset($_SESSION['pending_order_id']) && $_SESSION['pending_order_id'] == $order_id) {
-    // Simulate successful razorpay payment
-    $stmt = $conn->prepare("UPDATE orders SET payment_status = 'paid', payment_id = 'rzp_mock_12345' WHERE id = ?");
-    $stmt->bind_param("i", $order_id);
-    $stmt->execute();
-    unset($_SESSION['cart']);
-    unset($_SESSION['pending_order_id']);
+// Verify the order exists in our system
+$order_check = $conn->prepare("SELECT id FROM orders WHERE id = ?");
+$order_check->bind_param("i", $order_id);
+$order_check->execute();
+$order_exists = $order_check->get_result()->num_rows > 0;
+
+if (!$order_exists) {
+    redirect(BASE_URL . '/index.php');
 }
 ?>
 

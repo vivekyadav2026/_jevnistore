@@ -171,7 +171,7 @@
                     <a href="<?php echo BASE_URL; ?>/shop.php?category=totes">Signature Totes</a>
                     <a href="<?php echo BASE_URL; ?>/shop.php?category=crossbody">Crossbody Bags</a>
                     <a href="<?php echo BASE_URL; ?>/shop.php?category=accessories">Accessories</a>
-                    <a href="<?php echo BASE_URL; ?>/lookbook.php">The Lookbook</a>
+                    <a href="<?php echo BASE_URL; ?>/track_order.php">Track Order</a>
                 </div>
             </div>
 
@@ -232,64 +232,87 @@
         </div>
     </footer>
 
-    <!-- Mobile Navigation Drawer -->
+     <!-- Mobile Navigation Drawer -->
+    <style>
+    .mobile-nav-panel {
+        max-width: 100% !important;
+        width: 100vw !important;
+        background: #ffffff !important;
+    }
+    .mobile-menu-item {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+        font-size: 1.15rem !important;
+        font-weight: 500 !important;
+        color: #1a1a1a !important;
+        text-decoration: none !important;
+        padding: 16px 0 !important;
+        border-bottom: 1px solid #f3f4f6 !important;
+        transition: opacity 0.2s ease !important;
+        display: block !important;
+        text-transform: none !important;
+        letter-spacing: normal !important;
+    }
+    .mobile-menu-item:hover {
+        opacity: 0.7 !important;
+    }
+    .mobile-menu-item:last-child {
+        border-bottom: none !important;
+    }
+    </style>
+    
     <div class="mobile-nav-drawer" id="mobile-nav-drawer">
         <div class="mobile-nav-backdrop" onclick="closeMobileNav()"></div>
         <div class="mobile-nav-panel">
-            <div class="mobile-nav-header">
-                <button class="mobile-nav-close" onclick="closeMobileNav()">
-                    <i data-lucide="x"></i>
+            <?php
+            $site_logo = getSetting('site_logo') ?: 'logo.png'; 
+            ?>
+            <div class="mobile-nav-header" style="display: flex; justify-content: space-between; align-items: center; padding: 24px 24px 10px 24px; border: none;">
+                <img src="<?php echo BASE_URL; ?>/assets/<?php echo htmlspecialchars($site_logo); ?>" alt="Jevani Store" style="height: 32px; width: auto;" onerror="this.src='<?php echo BASE_URL; ?>/assets/logoOD.png';">
+                <button class="mobile-nav-close" onclick="closeMobileNav()" style="background: none; border: none; cursor: pointer; display: flex; align-items: center; padding: 0;">
+                    <i data-lucide="x" style="width: 24px; height: 24px; color: #1a1a1a;"></i>
                 </button>
             </div>
-            <?php
-            $current_page = basename($_SERVER['PHP_SELF']);
-            $category = isset($_GET['category']) ? $_GET['category'] : null;
-            ?>
-            <div class="mobile-nav-links">
-                <a href="<?php echo BASE_URL; ?>/shop.php" class="<?php echo ($current_page == 'shop.php' && $category === null) ? 'active' : ''; ?>">ALL BAGS</a>
-                <!-- <a href="<?php echo BASE_URL; ?>/shop.php?category=1" class="<?php echo ($current_page == 'shop.php' && strval($category) === '1') ? 'active' : ''; ?>">SHOULDER BAGS</a> -->
-                <!-- <a href="<?php echo BASE_URL; ?>/shop.php?category=2" class="<?php echo ($current_page == 'shop.php' && strval($category) === '2') ? 'active' : ''; ?>">TOTES</a> -->
-                <a href="<?php echo BASE_URL; ?>/wishlist.php" class="<?php echo ($current_page == 'wishlist.php') ? 'active' : ''; ?>">WISHLIST</a>
-                <a href="<?php echo BASE_URL; ?>/lookbook.php" class="<?php echo ($current_page == 'lookbook.php') ? 'active' : ''; ?>">LOOKBOOK</a>
-                <a href="<?php echo BASE_URL; ?>/about.php" class="<?php echo ($current_page == 'about.php') ? 'active' : ''; ?>">ABOUT</a>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px 24px 5px 24px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                <span style="font-size: 0.72rem; font-weight: 700; color: #999999; letter-spacing: 1px; text-transform: uppercase;">SHOP</span>
+                <a href="<?php echo BASE_URL; ?>/shop.php" style="font-size: 0.75rem; font-weight: 700; color: #e60067; text-decoration: none; letter-spacing: 0.5px;">Browse all</a>
+            </div>
 
+            <div class="mobile-nav-links" style="padding: 10px 24px; display: flex; flex-direction: column; flex: 1;">
+                <a href="<?php echo BASE_URL; ?>/index.php" class="mobile-menu-item">Home</a>
+                <a href="<?php echo BASE_URL; ?>/shop.php" class="mobile-menu-item">Catalog</a>
+                <a href="<?php echo isLoggedIn() ? BASE_URL . '/customer/index.php' : BASE_URL . '/login.php'; ?>" class="mobile-menu-item">My Orders</a>
+                <a href="<?php echo BASE_URL; ?>/track_order.php" class="mobile-menu-item">Track Order</a>
+                <a href="<?php echo BASE_URL; ?>/about.php" class="mobile-menu-item">Contact Us</a>
                 
                 <!-- Spacer pushing login and currency to bottom -->
-                <div class="mobile-nav-bottom-section">
+                <div class="mobile-nav-bottom-section" style="margin-top: auto; padding: 24px 0 10px 0; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #f3f4f6; background: #ffffff;">
+                    <div class="currency-selector-pill" style="display: flex; align-items: center; gap: 8px; background: #f3f4f6; border-radius: 99px; padding: 10px 16px; cursor: pointer; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 0.8rem; font-weight: 600; color: #1a1a1a;">
+                        <svg class="flag-icon" width="16" height="11" viewBox="0 0 900 600" style="border-radius: 2px;">
+                            <rect width="900" height="200" fill="#FF9933"/>
+                            <rect y="200" width="900" height="200" fill="#FFFFFF"/>
+                            <rect y="400" width="900" height="200" fill="#128807"/>
+                            <circle cx="450" cy="300" r="80" fill="none" stroke="#000080" stroke-width="10"/>
+                            <circle cx="450" cy="300" r="15" fill="#000080"/>
+                            <circle cx="450" cy="300" r="80" fill="none" stroke="#000080" stroke-width="8"/>
+                            <line x1="450" y1="220" x2="450" y2="380" stroke="#000080" stroke-width="6"/>
+                            <line x1="370" y1="300" x2="530" y2="300" stroke="#000080" stroke-width="6"/>
+                            <line x1="393" y1="243" x2="507" y2="357" stroke="#000080" stroke-width="6"/>
+                            <line x1="393" y1="357" x2="507" y2="243" stroke="#000080" stroke-width="6"/>
+                        </svg>
+                        <span>India <span style="color: #666; font-weight: 500;">INR</span></span>
+                        <i data-lucide="chevron-down" style="width: 14px; height: 14px; color: #666;"></i>
+                    </div>
+                    
                     <?php if(isLoggedIn()): ?>
-                        <a href="<?php echo isAdmin() ? BASE_URL . '/admin/index.php' : BASE_URL . '/customer/index.php'; ?>">
-                            <i data-lucide="user" class="login-icon"></i>
-                            <span>My Account</span>
-                        </a>
-                        <a href="<?php echo BASE_URL; ?>/logout.php">
-                            <i data-lucide="log-out" class="login-icon"></i>
-                            <span>Logout</span>
+                        <a href="<?php echo BASE_URL; ?>/logout.php" style="display: inline-flex; align-items: center; gap: 8px; background: #e60067; color: #ffffff; border-radius: 99px; padding: 10px 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 0.8rem; font-weight: 700; text-decoration: none; text-transform: uppercase; letter-spacing: 0.5px;">
+                            <i data-lucide="log-out" style="width: 14px; height: 14px;"></i> Logout
                         </a>
                     <?php else: ?>
-                        <a href="<?php echo BASE_URL; ?>/login.php">
-                            <i data-lucide="user" class="login-icon"></i>
-                            <span>Login</span>
+                        <a href="<?php echo BASE_URL; ?>/login.php" style="display: inline-flex; align-items: center; gap: 8px; background: #e60067; color: #ffffff; border-radius: 99px; padding: 10px 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 0.8rem; font-weight: 700; text-decoration: none; letter-spacing: 0.5px; box-shadow: 0 4px 10px rgba(230,0,103,0.2);">
+                            <i data-lucide="user" style="width: 14px; height: 14px;"></i> Sign in
                         </a>
                     <?php endif; ?>
-                    
-                    <div class="currency-selector">
-                        <div class="currency-left">
-                            <svg class="flag-icon" width="20" height="14" viewBox="0 0 900 600">
-                                <rect width="900" height="200" fill="#FF9933"/>
-                                <rect y="200" width="900" height="200" fill="#FFFFFF"/>
-                                <rect y="400" width="900" height="200" fill="#128807"/>
-                                <circle cx="450" cy="300" r="80" fill="none" stroke="#000080" stroke-width="10"/>
-                                <circle cx="450" cy="300" r="15" fill="#000080"/>
-                                <circle cx="450" cy="300" r="80" fill="none" stroke="#000080" stroke-width="8"/>
-                                <line x1="450" y1="220" x2="450" y2="380" stroke="#000080" stroke-width="6"/>
-                                <line x1="370" y1="300" x2="530" y2="300" stroke="#000080" stroke-width="6"/>
-                                <line x1="393" y1="243" x2="507" y2="357" stroke="#000080" stroke-width="6"/>
-                                <line x1="393" y1="357" x2="507" y2="243" stroke="#000080" stroke-width="6"/>
-                            </svg>
-                            <span>INR ₹</span>
-                        </div>
-                        <i data-lucide="chevron-down" class="currency-chevron"></i>
-                    </div>
                 </div>
             </div>
         </div>
@@ -1167,7 +1190,64 @@
                 .then(res => res.json())
                 .then(resData => {
                     if (resData.status === 'success') {
-                        window.location.href = 'order_success.php?order_id=' + resData.order_id + '&method=' + resData.payment_method;
+                        if (resData.payment_method === 'razorpay') {
+                            // Launch Razorpay Checkout Modal
+                            chkPlaceOrderBtn.innerHTML = 'Opening Payment Gateway...';
+                            var options = {
+                                "key": resData.razorpay_key,
+                                "amount": resData.amount,
+                                "currency": "INR",
+                                "name": "JEVANI STORE",
+                                "description": "Order #" + resData.order_id,
+                                "order_id": resData.razorpay_order_id,
+                                "handler": function (response) {
+                                    chkPlaceOrderBtn.innerHTML = 'Verifying Payment...';
+                                    const payData = new FormData();
+                                    payData.append('razorpay_payment_id', response.razorpay_payment_id);
+                                    payData.append('razorpay_order_id', response.razorpay_order_id);
+                                    payData.append('razorpay_signature', response.razorpay_signature);
+                                    payData.append('order_id', resData.order_id);
+                                    
+                                    fetch('<?php echo BASE_URL; ?>/ajax_verify_payment.php', {
+                                        method: 'POST',
+                                        body: payData
+                                    })
+                                    .then(vRes => vRes.json())
+                                    .then(vData => {
+                                        if (vData.status === 'success') {
+                                            window.location.href = 'order_success.php?order_id=' + resData.order_id + '&method=razorpay';
+                                        } else {
+                                            alert(vData.message || 'Payment verification failed. Please contact support.');
+                                            chkPlaceOrderBtn.disabled = false;
+                                            chkPlaceOrderBtn.innerHTML = 'Place Order';
+                                        }
+                                    })
+                                    .catch(err => {
+                                        alert('Connection error verifying payment. Please do not close this window and contact support.');
+                                        chkPlaceOrderBtn.disabled = false;
+                                        chkPlaceOrderBtn.innerHTML = 'Place Order';
+                                    });
+                                },
+                                "prefill": {
+                                    "name": chkNameInput.value.trim(),
+                                    "email": chkEmailInput.value.trim()
+                                },
+                                "theme": {
+                                    "color": "#000000"
+                                },
+                                "modal": {
+                                    "ondismiss": function() {
+                                        alert('Payment checkout window closed.');
+                                        chkPlaceOrderBtn.disabled = false;
+                                        chkPlaceOrderBtn.innerHTML = 'Place Order';
+                                    }
+                                }
+                            };
+                            var rzp = new Razorpay(options);
+                            rzp.open();
+                        } else {
+                            window.location.href = 'order_success.php?order_id=' + resData.order_id + '&method=' + resData.payment_method;
+                        }
                     } else {
                         alert(resData.message || 'Failed to place order. Please try again.');
                         chkPlaceOrderBtn.disabled = false;
@@ -1255,5 +1335,6 @@
             }
         })();
     </script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </body>
 </html>

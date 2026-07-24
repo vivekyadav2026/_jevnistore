@@ -152,10 +152,62 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['save_settings'])) {
                 <textarea name="settings[brand_story_text]" class="form-control" rows="5" required style="margin-bottom:0; font-family: inherit;"><?php echo htmlspecialchars(getSetting('brand_story_text')); ?></textarea>
             </div>
         </div>
+
+        <!-- Razorpay Configuration Card -->
+        <div style="background: #111; padding: 25px; border-radius: 8px; border: 1px solid #333; color: white;">
+            <h4 style="margin-top: 0; text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem; border-bottom: 1px solid #222; padding-bottom: 10px; margin-bottom: 20px; color: var(--accent);">
+                Razorpay Integration
+            </h4>
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px; font-size:12px; color:#888; text-transform: uppercase; letter-spacing: 0.5px;">Razorpay Key ID</label>
+                <input type="text" name="settings[razorpay_key_id]" class="form-control" value="<?php echo htmlspecialchars(getSetting('razorpay_key_id')); ?>" placeholder="rzp_test_..." style="margin-bottom:0;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px; font-size:12px; color:#888; text-transform: uppercase; letter-spacing: 0.5px;">Razorpay Key Secret</label>
+                <input type="password" name="settings[razorpay_key_secret]" class="form-control" value="<?php echo htmlspecialchars(getSetting('razorpay_key_secret')); ?>" placeholder="Secret Key" style="margin-bottom:0;">
+            </div>
+        </div>
+
+        <!-- Shiprocket Configuration Card -->
+        <div style="background: #111; padding: 25px; border-radius: 8px; border: 1px solid #333; color: white;">
+            <h4 style="margin-top: 0; text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem; border-bottom: 1px solid #222; padding-bottom: 10px; margin-bottom: 20px; color: var(--accent);">
+                Shiprocket Integration
+            </h4>
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px; font-size:12px; color:#888; text-transform: uppercase; letter-spacing: 0.5px;">Shiprocket Login Email</label>
+                <input type="email" name="settings[shiprocket_email]" class="form-control" value="<?php echo htmlspecialchars(getSetting('shiprocket_email')); ?>" placeholder="email@domain.com" style="margin-bottom:0;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px; font-size:12px; color:#888; text-transform: uppercase; letter-spacing: 0.5px;">Shiprocket Password</label>
+                <input type="password" name="settings[shiprocket_password]" class="form-control" value="<?php echo htmlspecialchars(getSetting('shiprocket_password')); ?>" placeholder="Password" style="margin-bottom:0;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px; font-size:12px; color:#888; text-transform: uppercase; letter-spacing: 0.5px;">Pickup Location Name</label>
+                <input type="text" name="settings[shiprocket_pickup_location]" class="form-control" value="<?php echo htmlspecialchars(getSetting('shiprocket_pickup_location', 'Primary')); ?>" style="margin-bottom:0;">
+            </div>
+            <div style="margin-bottom: 15px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+                <div>
+                    <label style="display:block; margin-bottom:5px; font-size:11px; color:#888;">Weight (kg)</label>
+                    <input type="text" name="settings[shiprocket_default_weight]" class="form-control" value="<?php echo htmlspecialchars(getSetting('shiprocket_default_weight', '0.5')); ?>" style="margin-bottom:0;">
+                </div>
+                <div>
+                    <label style="display:block; margin-bottom:5px; font-size:11px; color:#888;">Length (cm)</label>
+                    <input type="text" name="settings[shiprocket_default_length]" class="form-control" value="<?php echo htmlspecialchars(getSetting('shiprocket_default_length', '10')); ?>" style="margin-bottom:0;">
+                </div>
+                <div>
+                    <label style="display:block; margin-bottom:5px; font-size:11px; color:#888;">Width (cm)</label>
+                    <input type="text" name="settings[shiprocket_default_width]" class="form-control" value="<?php echo htmlspecialchars(getSetting('shiprocket_default_width', '10')); ?>" style="margin-bottom:0;">
+                </div>
+                <div>
+                    <label style="display:block; margin-bottom:5px; font-size:11px; color:#888;">Height (cm)</label>
+                    <input type="text" name="settings[shiprocket_default_height]" class="form-control" value="<?php echo htmlspecialchars(getSetting('shiprocket_default_height', '10')); ?>" style="margin-bottom:0;">
+                </div>
+            </div>
+        </div>
         
     </div>
 
-    <button type="submit" name="save_settings" class="btn" style="padding: 15px 40px; font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 600;">
+    <button type="submit" name="save_settings" class="btn" style="padding: 15px 40px; font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 600; cursor: pointer; display: block; margin-top: 20px;">
         Save Settings
     </button>
 </form>

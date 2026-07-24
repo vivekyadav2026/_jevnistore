@@ -11,6 +11,18 @@ if (isset($_GET['status']) && isset($_GET['id'])) {
     setFlash('Order #' . $id . ' status updated to ' . ucfirst($status) . '.', 'success');
     redirect('orders.php');
 }
+
+// Handle manual Shiprocket push
+if (isset($_GET['action']) && $_GET['action'] === 'push_shiprocket' && isset($_GET['id'])) {
+    $id = (int)$_GET['id'];
+    $res = pushOrderToShiprocket($id);
+    if ($res['status'] === 'success') {
+        setFlash('Order #' . $id . ' successfully pushed to Shiprocket. Shipment ID: ' . $res['shiprocket_shipment_id'], 'success');
+    } else {
+        setFlash('Failed to push Order #' . $id . ' to Shiprocket: ' . $res['message'], 'error');
+    }
+    redirect('orders.php');
+}
 ?>
 
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
@@ -35,14 +47,32 @@ if (isset($_GET['status']) && isset($_GET['id'])) {
             $orders = $conn->query("SELECT o.*, u.name as user_name FROM orders o JOIN users u ON o.user_id = u.id ORDER BY o.id DESC");
             if ($orders->num_rows > 0) {
                 while ($o = $orders->fetch_assoc()) {
+                    $shiprocket_badge = '';
+                    $push_btn = '';
+                    if ($o['shiprocket_order_id']) {
+                        $shiprocket_badge = '<br><span style="display:inline-block; font-size:10px; color:#10b981; border:1px solid #10b981; padding:2px 5px; border-radius:3px; margin-top:5px; font-weight: 500;">SHIPROCKET: #' . $o['shiprocket_order_id'] . '</span>';
+                    } else {
+                        $shiprocket_badge = '<br><span style="display:inline-block; font-size:10px; color:#ef4444; border:1px solid #ef4444; padding:2px 5px; border-radius:3px; margin-top:5px; font-weight: 500;">SHIPROCKET: PENDING</span>';
+                        // Only allow push for COD or Paid orders
+                        if ($o['payment_method'] === 'cod' || $o['payment_status'] === 'paid') {
+                            $push_btn = '<a href="?action=push_shiprocket&id='.$o['id'].'" style="background: var(--accent); color: black; border: none; padding: 5px 10px; border-radius:4px; font-size: 0.75rem; text-decoration: none; font-weight: bold; margin-right: 10px; display: inline-flex; align-items: center;" title="Push to Shiprocket">Push</a>';
+                        }
+                    }
+
                     echo '<tr>
                         <td>#'.$o['id'].'</td>
                         <td>'.htmlspecialchars($o['user_name']).'</td>
                         <td>₹'.number_format($o['total_amount'], 2).'</td>
-                        <td>'.strtoupper($o['payment_method']).' - '.ucfirst($o['payment_status']).'</td>
+                        <td>
+                            '.strtoupper($o['payment_method']).' - '.ucfirst($o['payment_status']).'
+                            '.$shiprocket_badge.'
+                        </td>
                         <td><span style="padding: 3px 8px; border-radius: 12px; font-size:0.8rem; background: #222;">'.ucfirst($o['status']).'</span></td>
                         <td>'.date('M d, Y', strtotime($o['created_at'])).'</td>
                         <td style="white-space: nowrap;">
+                            <!-- Shiprocket Manual Push -->
+                            '.$push_btn.'
+
                             <!-- Edit Status -->
                             <select onchange="window.location.href=\'?id='.$o['id'].'&status=\'+this.value" style="background:#222; color:white; border:none; padding:6px 10px; border-radius:4px; font-size: 0.85rem; margin-right: 15px; cursor: pointer;">
                                 <option value="pending" '.($o['status']=='pending'?'selected':'').'>Pending</option>

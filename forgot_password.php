@@ -116,6 +116,7 @@ unset($_SESSION['_dev_reset_link']);
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Forgot Password | Jevani Store</title>
     <meta name="description" content="Reset your Jevani Store account password.">
+    <link rel="icon" type="image/png" href="<?php echo htmlspecialchars(getSetting('site_logo') ? BASE_URL . '/assets/' . getSetting('site_logo') : BASE_URL . '/assets/logo.png'); ?>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
@@ -487,6 +488,7 @@ unset($_SESSION['_dev_reset_link']);
     </style>
     <!-- Disable Inspect Element & Mobile Zoom Gestures -->
     <script>
+        /*
         // Disable context menu (right click)
         document.addEventListener('contextmenu', e => e.preventDefault());
 
@@ -509,6 +511,7 @@ unset($_SESSION['_dev_reset_link']);
                 return false;
             }
         });
+        */
 
         // Disable pinch zoom on iOS / Safari
         document.addEventListener('gesturestart', function(e) {
