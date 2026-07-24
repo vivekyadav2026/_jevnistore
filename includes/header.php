@@ -314,6 +314,9 @@ require_once __DIR__ . '/functions.php';
                 <button class="icon-btn header-search-icon" aria-label="Search" onclick="document.getElementById('header-search-bar').classList.toggle('active'); document.getElementById('search-input').focus();" style="color: var(--text-primary); background: transparent; border: none; cursor: pointer;">
                     <i data-lucide="search" style="width: 20px; height: 20px;"></i>
                 </button>
+                <a href="<?php echo isLoggedIn() ? (isAdmin() ? BASE_URL . '/admin/index.php' : BASE_URL . '/customer/index.php') : BASE_URL . '/login.php'; ?>" class="icon-btn header-user-icon" aria-label="Account" style="color: var(--text-primary); background: transparent; border: none; cursor: pointer; display: flex; align-items: center;">
+                    <i data-lucide="user" style="width: 20px; height: 20px;"></i>
+                </a>
                 <button class="icon-btn header-cart-icon" id="cart-toggle-btn" aria-label="Cart" onclick="document.getElementById('cart-overlay').classList.add('active'); document.getElementById('cart-panel').classList.add('active'); document.body.classList.add('cart-open');" style="position: relative; color: var(--text-primary); background: transparent; border: none; cursor: pointer;">
                     <i data-lucide="shopping-bag" style="width: 20px; height: 20px;"></i>
                     <span class="cart-count" id="cart-count" style="position: absolute; top: -5px; right: -8px; font-size: 0.65rem; background: transparent; color: var(--text-primary); border: none; width: auto; height: auto; display: flex; align-items: center; justify-content: center;"><?php echo isset($_SESSION['cart']) ? count($_SESSION['cart']) : '0'; ?></span>

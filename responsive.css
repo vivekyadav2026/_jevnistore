@@ -387,9 +387,8 @@ html { scroll-behavior: smooth; }
         justify-self: center;
     }
     .header-icons { display: flex; gap: 15px; }
-    
-    /* Hide specific icons on mobile header to match screenshot */
-    .header-user-icon, .header-wishlist-icon { display: none !important; }
+    /* Mobile header icons */
+    .header-user-icon { display: flex !important; }
 
     /* Hero */
     .hero { height: 75vh; min-height: 600px; max-height: 800px; }

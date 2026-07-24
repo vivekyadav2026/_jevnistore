@@ -186,7 +186,24 @@ function getSetting($key, $default = '') {
         }
     }
     
-    return isset($settings_cache[$key]) ? $settings_cache[$key] : $default;
+    $val = isset($settings_cache[$key]) ? trim($settings_cache[$key]) : '';
+    if ($val !== '') {
+        return $val;
+    }
+
+    if ($default !== '') {
+        return $default;
+    }
+
+    // Fallback constants
+    if ($key === 'razorpay_key_id' && defined('RAZORPAY_KEY_ID')) {
+        return RAZORPAY_KEY_ID;
+    }
+    if ($key === 'razorpay_key_secret' && defined('RAZORPAY_KEY_SECRET')) {
+        return RAZORPAY_KEY_SECRET;
+    }
+    
+    return $default;
 }
 
 /**
