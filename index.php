@@ -528,13 +528,13 @@
                     $sale_pct = $has_sale ? round((($product['compare_at_price'] - $product['price']) / $product['compare_at_price']) * 100) : 0;
                     ?>
                     
-                    <div style="position: absolute; top: 10px; left: 10px; display: flex; flex-direction: column; gap: 5px; z-index: 2;">
+                    <div style="position: absolute; top: 8px; left: 8px; display: flex; flex-direction: row; flex-wrap: wrap; gap: 4px; z-index: 2; max-width: 90%;">
                         <?php if ($product['stock'] <= 0 && (!isset($product['is_waitlist']) || $product['is_waitlist'] == 0)): ?>
-                            <div style="background: #ef4444; color: white; font-size: 0.55rem; font-weight: 700; padding: 3px 8px; text-transform: uppercase; letter-spacing: 1px; border-radius: 2px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">OUT OF STOCK</div>
+                            <div style="background: #ef4444; color: white; font-size: 0.5rem; font-weight: 700; padding: 2px 5px; text-transform: uppercase; letter-spacing: 0.5px; border-radius: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); white-space: nowrap;">OUT OF STOCK</div>
                         <?php endif; ?>
                         
                         <?php if ($has_sale): ?>
-                            <div style="background: #10b981; color: white; font-size: 0.55rem; font-weight: 700; padding: 3px 8px; text-transform: uppercase; letter-spacing: 1px; border-radius: 2px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">SALE -<?php echo $sale_pct; ?>%</div>
+                            <div style="background: #10b981; color: white; font-size: 0.5rem; font-weight: 700; padding: 2px 5px; text-transform: uppercase; letter-spacing: 0.5px; border-radius: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); white-space: nowrap;">SALE -<?php echo $sale_pct; ?>%</div>
                         <?php endif; ?>
                     </div>
                     
