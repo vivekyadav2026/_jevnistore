@@ -663,41 +663,19 @@
                 </button>
                 
                 <div class="video-slides-wrapper" id="video-slides-wrapper">
-                    <!-- Slide 1 -->
-                    <div class="video-slide">
-                        <video loop muted playsinline autoplay>
-                            <source src="<?php echo BASE_URL; ?>/assets/instagram/insta1.mp4" type="video/mp4">
-                        </video>
-                        <div class="video-duration">00:15</div>
-                    </div>
-                    <!-- Slide 2 -->
-                    <div class="video-slide active">
-                        <video loop muted playsinline autoplay>
-                            <source src="<?php echo BASE_URL; ?>/assets/instagram/insta2.mp4" type="video/mp4">
-                        </video>
-                        <div class="video-duration">00:15</div>
-                    </div>
-                    <!-- Slide 3 -->
-                    <div class="video-slide">
-                        <video loop muted playsinline autoplay>
-                            <source src="<?php echo BASE_URL; ?>/assets/instagram/insta3.mp4" type="video/mp4">
-                        </video>
-                        <div class="video-duration">00:15</div>
-                    </div>
-                    <!-- Slide 4 -->
-                    <div class="video-slide">
-                        <video loop muted playsinline autoplay>
-                            <source src="<?php echo BASE_URL; ?>/assets/instagram/insta4.mp4" type="video/mp4">
-                        </video>
-                        <div class="video-duration">00:15</div>
-                    </div>
-                    <!-- Slide 5 -->
-                    <div class="video-slide">
-                        <video loop muted playsinline autoplay>
-                            <source src="<?php echo BASE_URL; ?>/assets/instagram/insta5.mp4" type="video/mp4">
-                        </video>
-                        <div class="video-duration">00:15</div>
-                    </div>
+                    <?php 
+                    for ($v = 1; $v <= 5; $v++):
+                        $video_file = getSetting("homepage_video_$v", "insta$v.mp4");
+                        $video_src = (strpos($video_file, 'http') === 0) ? $video_file : BASE_URL . '/assets/instagram/' . $video_file;
+                        $is_active = ($v === 2) ? 'active' : '';
+                    ?>
+                        <div class="video-slide <?php echo $is_active; ?>">
+                            <video loop muted playsinline autoplay>
+                                <source src="<?php echo htmlspecialchars($video_src); ?>" type="video/mp4">
+                            </video>
+                            <div class="video-duration">00:15</div>
+                        </div>
+                    <?php endfor; ?>
                 </div>
 
                 <button type="button" class="video-slider-nav next" onclick="moveVideoSlide(1, true)" aria-label="Next Video">

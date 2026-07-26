@@ -1,4 +1,15 @@
 <?php
+/**
+ * ============================================================================
+ * PRODUCTS MANAGEMENT (admin/products.php)
+ * ============================================================================
+ * Comprehensive product catalog controller supporting:
+ * - Product creation, updates, and soft/hard deletions.
+ * - Single/Multiple image upload with automated compression.
+ * - Dynamic product variants (models, sizes, colors).
+ * - Rich HTML description editing via CKEditor integration.
+ * - SQL LIMIT & OFFSET pagination.
+ */
 require_once 'includes/header.php';
 
 // Handle Add Product
@@ -170,11 +181,11 @@ if (isset($_GET['delete_gallery_image_id'])) {
 </div>
 
 <!-- Add Modal -->
-<div id="add-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.85); z-index:100; padding: 40px 20px; overflow-y: auto;">
-    <div style="background:#111; max-width: 600px; margin: 0 auto; padding: 30px; border-radius: 8px; border: 1px solid #333; color: white;">
-        <div style="display:flex; justify-content:space-between; margin-bottom: 20px; border-bottom: 1px solid #222; padding-bottom: 10px;">
-            <h4 style="margin:0; font-size:1.1rem; text-transform:uppercase; letter-spacing:1px;">Add Product</h4>
-            <button onclick="closeAddModal()" style="background:none; border:none; color:white; cursor:pointer;"><i data-lucide="x"></i></button>
+<div id="add-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px); z-index:100; padding: 40px 20px; overflow-y: auto;">
+    <div style="background:#1e293b; max-width: 650px; margin: 0 auto; padding: 30px; border-radius: 12px; border: 1px solid #334155; color: #f8fafc; box-shadow: 0 20px 50px rgba(0,0,0,0.5);">
+        <div style="display:flex; justify-content:space-between; margin-bottom: 24px; border-bottom: 1px solid #334155; padding-bottom: 14px;">
+            <h4 style="margin:0; font-size:1.1rem; text-transform:uppercase; letter-spacing:1px; color: #38bdf8; font-weight: 700;">Add Product</h4>
+            <button onclick="closeAddModal()" style="background:none; border:none; color:#94a3b8; cursor:pointer;"><i data-lucide="x"></i></button>
         </div>
         <form method="POST" enctype="multipart/form-data">
             <input type="text" name="name" class="form-control" placeholder="Product Name" required>
@@ -190,65 +201,71 @@ if (isset($_GET['delete_gallery_image_id'])) {
             <input type="number" name="stock" class="form-control" placeholder="Stock Quantity" required>
             <div style="margin-top: 15px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
                 <input type="checkbox" name="is_waitlist" id="add-is-waitlist" value="1">
-                <label for="add-is-waitlist" style="font-size: 13px; color: #888; cursor: pointer;">Waitlist Only (Product is in manufacturing / coming soon)</label>
+                <label for="add-is-waitlist" style="font-size: 13px; color: #cbd5e1; cursor: pointer;">Waitlist Only (Product is in manufacturing / coming soon)</label>
             </div>
             <div style="margin-top: 15px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
                 <input type="checkbox" name="has_variants" id="add-has-variants" value="1" onchange="toggleVariantInputs('add')">
-                <label for="add-has-variants" style="font-size: 13px; color: #888; cursor: pointer;">Enable Product Options / Variants (e.g., Mobile Models, Sizes)</label>
+                <label for="add-has-variants" style="font-size: 13px; color: #cbd5e1; cursor: pointer; font-weight: 600;">Enable Product Options / Variants (e.g. Color, Size, Mobile Model)</label>
             </div>
             
-            <div id="add-variants-container" style="display: none; border-left: 2px solid var(--accent); padding-left: 15px; margin-bottom: 15px;">
+            <div id="add-variants-container" style="display: none; border-left: 3px solid #38bdf8; padding-left: 15px; margin-bottom: 15px; background: rgba(56, 189, 248, 0.05); padding-top: 12px; padding-bottom: 12px; border-radius: 0 8px 8px 0;">
                 <div style="margin-bottom: 10px;">
-                    <label style="display:block; margin-bottom:5px; font-size: 12px; color: #888;">Variant Type Name (e.g. "Mobile Model", "Size", "Color")</label>
-                    <input type="text" name="variant_name" id="add-variant-name" class="form-control" placeholder="Mobile Model" style="margin-bottom: 0;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                        <label style="font-size: 12px; color: #94a3b8; font-weight:700; text-transform:uppercase;">Variant Type Name</label>
+                        <div style="display: flex; gap: 6px;">
+                            <button type="button" onclick="setVariantPreset('add', 'Color', 'Black, Red, Blue, Green, White')" style="background: #334155; color: #38bdf8; border: 1px solid #475569; border-radius: 4px; padding: 2px 8px; font-size: 10px; cursor: pointer; font-weight: 600;">+ Color Preset</button>
+                            <button type="button" onclick="setVariantPreset('add', 'Mobile Model', 'iPhone 13, iPhone 14, iPhone 15, iPhone 15 Pro, Samsung S24')" style="background: #334155; color: #38bdf8; border: 1px solid #475569; border-radius: 4px; padding: 2px 8px; font-size: 10px; cursor: pointer; font-weight: 600;">+ Mobile Model Preset</button>
+                        </div>
+                    </div>
+                    <input type="text" name="variant_name" id="add-variant-name" class="form-control" placeholder="e.g. Color, Size, Mobile Model" style="margin-bottom: 0;">
                 </div>
                 <div>
-                    <label style="display:block; margin-bottom:5px; font-size: 12px; color: #888;">Options List (Comma-separated, e.g. "iPhone 13, iPhone 14 Pro, Samsung S24")</label>
-                    <textarea name="variants_list" id="add-variants-list" class="form-control" placeholder="iPhone 13, iPhone 14, Samsung S24" rows="2" style="margin-bottom: 0;"></textarea>
+                    <label style="display:block; margin-bottom:5px; font-size: 12px; color: #94a3b8; font-weight:700; text-transform:uppercase;">Options List (Comma-separated)</label>
+                    <textarea name="variants_list" id="add-variants-list" class="form-control" placeholder="e.g. Black, Red, Blue, Green, Beige" rows="2" style="margin-bottom: 0;"></textarea>
                 </div>
             </div>
             <textarea name="description" id="add-description" class="form-control" placeholder="Description" rows="4"></textarea>
             
             <div style="margin-top: 15px;">
-                <label style="display:block; margin-bottom:5px; font-size: 13px; color: #888;">Primary Image (Front) - Max 200KB compressed</label>
+                <label style="display:block; margin-bottom:5px; font-size: 13px; color: #cbd5e1; font-weight: 600;">Primary Image (Front) - Max 200KB compressed</label>
                 <input type="file" name="image" id="add-image" class="form-control" accept="image/*" required>
                 <div id="add-image-preview" style="margin-top: 5px; display: none;"></div>
             </div>
             
             <div style="margin-top: 15px;">
-                <label style="display:block; margin-bottom:5px; font-size: 13px; color: #888;">Secondary Image (Hover / Flip) - Max 200KB compressed</label>
+                <label style="display:block; margin-bottom:5px; font-size: 13px; color: #cbd5e1; font-weight: 600;">Secondary Image (Hover / Flip) - Max 200KB compressed</label>
                 <input type="file" name="image2" id="add-image2" class="form-control" accept="image/*">
                 <div id="add-image2-preview" style="margin-top: 5px; display: none;"></div>
             </div>
             
             <div style="margin-top: 15px;">
-                <label style="display:block; margin-bottom:5px; font-size: 13px; color: #888;">Additional Gallery Images - Max 200KB compressed each</label>
+                <label style="display:block; margin-bottom:5px; font-size: 13px; color: #cbd5e1; font-weight: 600;">Additional Gallery Images - Max 200KB compressed each</label>
                 <input type="file" name="gallery[]" id="add-gallery" class="form-control" accept="image/*" multiple>
                 <div id="add-gallery-preview" style="margin-top: 5px; display: flex; gap: 10px; flex-wrap: wrap;"></div>
             </div>
             
-            <button type="submit" name="add_product" class="btn btn-block" style="margin-top: 25px; padding: 12px;">Save Product</button>
+            <button type="submit" name="add_product" class="btn btn-block" style="margin-top: 25px; padding: 12px; font-size: 0.95rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Save Product</button>
         </form>
     </div>
 </div>
 
 <!-- Edit Modal -->
-<div id="edit-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.85); z-index:100; padding: 40px 20px; overflow-y: auto;">
-    <div style="background:#111; max-width: 600px; margin: 0 auto; padding: 30px; border-radius: 8px; border: 1px solid #333; color: white;">
-        <div style="display:flex; justify-content:space-between; margin-bottom: 20px; border-bottom: 1px solid #222; padding-bottom: 10px;">
-            <h4 style="margin:0; font-size:1.1rem; text-transform:uppercase; letter-spacing:1px;">Edit Product</h4>
-            <button onclick="closeEditModal()" style="background:none; border:none; color:white; cursor:pointer;"><i data-lucide="x"></i></button>
+<div id="edit-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px); z-index:100; padding: 40px 20px; overflow-y: auto;">
+    <div style="background:#1e293b; max-width: 650px; margin: 0 auto; padding: 30px; border-radius: 12px; border: 1px solid #334155; color: #f8fafc; box-shadow: 0 20px 50px rgba(0,0,0,0.5);">
+        <div style="display:flex; justify-content:space-between; margin-bottom: 24px; border-bottom: 1px solid #334155; padding-bottom: 14px;">
+            <h4 style="margin:0; font-size:1.1rem; text-transform:uppercase; letter-spacing:1px; color: #38bdf8; font-weight: 700;">Edit Product</h4>
+            <button onclick="closeEditModal()" style="background:none; border:none; color:#94a3b8; cursor:pointer;"><i data-lucide="x"></i></button>
         </div>
         <form method="POST" enctype="multipart/form-data">
             <input type="hidden" name="product_id" id="edit-product-id">
             
             <div style="margin-bottom: 15px;">
-                <label style="display:block; margin-bottom:5px; font-size:13px; color:#888;">Product Name</label>
+                <label style="display:block; margin-bottom:5px; font-size:13px; color:#cbd5e1; font-weight: 600;">Product Name</label>
                 <input type="text" name="name" id="edit-name" class="form-control" required>
             </div>
             
             <div style="margin-bottom: 15px;">
-                <label style="display:block; margin-bottom:5px; font-size:13px; color:#888;">Category</label>
+                <label style="display:block; margin-bottom:5px; font-size:13px; color:#cbd5e1; font-weight: 600;">Category</label>
                 <select name="category_id" id="edit-category-id" class="form-control" required>
                     <option value="">Select Category</option>
                     <?php
@@ -259,78 +276,84 @@ if (isset($_GET['delete_gallery_image_id'])) {
             </div>
             
             <div style="margin-bottom: 15px;">
-                <label style="display:block; margin-bottom:5px; font-size:13px; color:#888;">Price (₹)</label>
+                <label style="display:block; margin-bottom:5px; font-size:13px; color:#cbd5e1; font-weight: 600;">Price (₹)</label>
                 <input type="number" step="0.01" name="price" id="edit-price" class="form-control" required>
             </div>
             
             <div style="margin-bottom: 15px;">
-                <label style="display:block; margin-bottom:5px; font-size:13px; color:#888;">Compare-At Price (Original Price, optional)</label>
+                <label style="display:block; margin-bottom:5px; font-size:13px; color:#cbd5e1; font-weight: 600;">Compare-At Price (Original Price, optional)</label>
                 <input type="number" step="0.01" name="compare_at_price" id="edit-compare-at-price" class="form-control">
             </div>
             
             <div style="margin-bottom: 15px;">
-                <label style="display:block; margin-bottom:5px; font-size:13px; color:#888;">Stock</label>
+                <label style="display:block; margin-bottom:5px; font-size:13px; color:#cbd5e1; font-weight: 600;">Stock</label>
                 <input type="number" name="stock" id="edit-stock" class="form-control" required>
             </div>
             
             <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
                 <input type="checkbox" name="is_waitlist" id="edit-is-waitlist" value="1">
-                <label for="edit-is-waitlist" style="font-size: 13px; color: #888; cursor: pointer;">Waitlist Only (Product is in manufacturing / coming soon)</label>
+                <label for="edit-is-waitlist" style="font-size: 13px; color: #cbd5e1; cursor: pointer;">Waitlist Only (Product is in manufacturing / coming soon)</label>
             </div>
             <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
                 <input type="checkbox" name="has_variants" id="edit-has-variants" value="1" onchange="toggleVariantInputs('edit')">
-                <label for="edit-has-variants" style="font-size: 13px; color: #888; cursor: pointer;">Enable Product Options / Variants (e.g., Mobile Models, Sizes)</label>
+                <label for="edit-has-variants" style="font-size: 13px; color: #cbd5e1; cursor: pointer; font-weight: 600;">Enable Product Options / Variants (e.g. Color, Size, Mobile Model)</label>
             </div>
             
-            <div id="edit-variants-container" style="display: none; border-left: 2px solid var(--accent); padding-left: 15px; margin-bottom: 15px;">
+            <div id="edit-variants-container" style="display: none; border-left: 3px solid #38bdf8; padding-left: 15px; margin-bottom: 15px; background: rgba(56, 189, 248, 0.05); padding-top: 12px; padding-bottom: 12px; border-radius: 0 8px 8px 0;">
                 <div style="margin-bottom: 10px;">
-                    <label style="display:block; margin-bottom:5px; font-size: 12px; color: #888;">Variant Type Name (e.g. "Mobile Model", "Size", "Color")</label>
-                    <input type="text" name="variant_name" id="edit-variant-name" class="form-control" placeholder="Mobile Model" style="margin-bottom: 0;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                        <label style="font-size: 12px; color: #94a3b8; font-weight:700; text-transform:uppercase;">Variant Type Name</label>
+                        <div style="display: flex; gap: 6px;">
+                            <button type="button" onclick="setVariantPreset('edit', 'Color', 'Black, Red, Blue, Green, White')" style="background: #334155; color: #38bdf8; border: 1px solid #475569; border-radius: 4px; padding: 2px 8px; font-size: 10px; cursor: pointer; font-weight: 600;">+ Color Preset</button>
+                            <button type="button" onclick="setVariantPreset('edit', 'Mobile Model', 'iPhone 13, iPhone 14, iPhone 15, iPhone 15 Pro, Samsung S24')" style="background: #334155; color: #38bdf8; border: 1px solid #475569; border-radius: 4px; padding: 2px 8px; font-size: 10px; cursor: pointer; font-weight: 600;">+ Mobile Model Preset</button>
+                        </div>
+                    </div>
+                    <input type="text" name="variant_name" id="edit-variant-name" class="form-control" placeholder="e.g. Color, Size, Mobile Model" style="margin-bottom: 0;">
                 </div>
                 <div>
-                    <label style="display:block; margin-bottom:5px; font-size: 12px; color: #888;">Options List (Comma-separated, e.g. "iPhone 13, iPhone 14 Pro, Samsung S24")</label>
-                    <textarea name="variants_list" id="edit-variants-list" class="form-control" placeholder="iPhone 13, iPhone 14, Samsung S24" rows="2" style="margin-bottom: 0;"></textarea>
+                    <label style="display:block; margin-bottom:5px; font-size: 12px; color: #94a3b8; font-weight:700; text-transform:uppercase;">Options List (Comma-separated)</label>
+                    <textarea name="variants_list" id="edit-variants-list" class="form-control" placeholder="e.g. Black, Red, Blue, Green, Beige" rows="2" style="margin-bottom: 0;"></textarea>
                 </div>
             </div>
             
             <div style="margin-bottom: 15px;">
-                <label style="display:block; margin-bottom:5px; font-size:13px; color:#888;">Description</label>
+                <label style="display:block; margin-bottom:5px; font-size:13px; color:#cbd5e1; font-weight: 600;">Description</label>
                 <textarea name="description" id="edit-description" class="form-control" rows="4"></textarea>
             </div>
             
             <!-- Image uploads + previews -->
-            <div style="margin-top: 20px; border-top: 1px solid #222; padding-top: 15px;">
-                <label style="display:block; margin-bottom:5px; font-size: 13px; color: #888;">Primary Image (Upload to Replace)</label>
+            <div style="margin-top: 20px; border-top: 1px solid #334155; padding-top: 15px;">
+                <label style="display:block; margin-bottom:5px; font-size: 13px; color: #cbd5e1; font-weight: 600;">Primary Image (Upload to Replace)</label>
                 <input type="file" name="image" id="edit-image" class="form-control" accept="image/*">
                 <div id="edit-image-current" style="margin-top: 5px;"></div>
                 <div id="edit-image-preview" style="margin-top: 5px; display: none;"></div>
             </div>
             
             <div style="margin-top: 20px;">
-                <label style="display:block; margin-bottom:5px; font-size: 13px; color: #888;">Secondary Image (Upload to Replace)</label>
+                <label style="display:block; margin-bottom:5px; font-size: 13px; color: #cbd5e1; font-weight: 600;">Secondary Image (Upload to Replace)</label>
                 <input type="file" name="image2" id="edit-image2" class="form-control" accept="image/*">
                 <div id="edit-image2-current" style="margin-top: 5px;"></div>
                 <div id="edit-image2-preview" style="margin-top: 5px; display: none;"></div>
             </div>
             
             <div style="margin-top: 20px;">
-                <label style="display:block; margin-bottom:5px; font-size: 13px; color: #888;">Upload Additional Gallery Images</label>
+                <label style="display:block; margin-bottom:5px; font-size: 13px; color: #cbd5e1; font-weight: 600;">Upload Additional Gallery Images</label>
                 <input type="file" name="gallery[]" id="edit-gallery" class="form-control" accept="image/*" multiple>
                 <div id="edit-gallery-preview" style="margin-top: 5px; display: flex; gap: 10px; flex-wrap: wrap;"></div>
             </div>
             
             <!-- Current Additional Gallery Images -->
-            <div style="margin-top: 20px; border-top: 1px solid #222; padding-top: 15px;">
-                <label style="display:block; margin-bottom:10px; font-size: 13px; color: #888;">Current Additional Gallery Images (Click Trash to Remove)</label>
+            <div style="margin-top: 20px; border-top: 1px solid #334155; padding-top: 15px;">
+                <label style="display:block; margin-bottom:10px; font-size: 13px; color: #cbd5e1; font-weight: 600;">Current Additional Gallery Images (Click Trash to Remove)</label>
                 <div id="edit-gallery-current" style="display:flex; gap:10px; flex-wrap:wrap;"></div>
             </div>
             
-            <button type="submit" name="edit_product" class="btn btn-block" style="margin-top: 25px; padding: 12px;">Update Product</button>
+            <button type="submit" name="edit_product" class="btn btn-block" style="margin-top: 25px; padding: 12px; font-size: 0.95rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Update Product</button>
         </form>
     </div>
 </div>
 
-<div style="background: #111; padding: 20px; border-radius: 8px; border: 1px solid #333; overflow-x: auto;">
+<div style="background: var(--bg-secondary); padding: 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); overflow-x: auto;">
     <table class="table" style="margin-top: 0;">
         <thead>
             <tr>
@@ -344,8 +367,17 @@ if (isset($_GET['delete_gallery_image_id'])) {
         </thead>
         <tbody>
             <?php
-            $prods = $conn->query("SELECT p.*, c.name as cat_name FROM products p LEFT JOIN categories c ON p.category_id = c.id ORDER BY p.id DESC");
-            if ($prods->num_rows > 0) {
+            // Pagination calculation
+            $per_page = 10;
+            $page = isset($_GET['page']) && (int)$_GET['page'] > 0 ? (int)$_GET['page'] : 1;
+            $total_res = $conn->query("SELECT COUNT(*) AS total FROM products");
+            $total_items = $total_res ? (int)$total_res->fetch_assoc()['total'] : 0;
+            $total_pages = ceil($total_items / $per_page);
+            if ($page > $total_pages && $total_pages > 0) $page = $total_pages;
+            $offset = ($page - 1) * $per_page;
+
+            $prods = $conn->query("SELECT p.*, c.name as cat_name FROM products p LEFT JOIN categories c ON p.category_id = c.id ORDER BY p.id DESC LIMIT $per_page OFFSET $offset");
+            if ($prods && $prods->num_rows > 0) {
                 while ($p = $prods->fetch_assoc()) {
                     $img = $p['image'] ? BASE_URL . '/assets/' . htmlspecialchars($p['image']) : '/assets/product_pants.png';
                     
@@ -402,6 +434,7 @@ if (isset($_GET['delete_gallery_image_id'])) {
             ?>
         </tbody>
     </table>
+    <?php renderPagination($page, $total_pages, $total_items, $per_page, 'products.php'); ?>
 </div>
 
 <style>
@@ -694,6 +727,13 @@ window.addEventListener('DOMContentLoaded', () => {
 function toggleVariantInputs(mode) {
     const isChecked = document.getElementById(mode + '-has-variants').checked;
     document.getElementById(mode + '-variants-container').style.display = isChecked ? 'block' : 'none';
+}
+
+function setVariantPreset(mode, name, list) {
+    document.getElementById(mode + '-has-variants').checked = true;
+    toggleVariantInputs(mode);
+    document.getElementById(mode + '-variant-name').value = name;
+    document.getElementById(mode + '-variants-list').value = list;
 }
 </script>
 

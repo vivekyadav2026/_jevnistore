@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../../includes/db.php';
 require_once __DIR__ . '/../../includes/functions.php';
+require_once __DIR__ . '/pagination.php';
 
 requireAdmin();
 ?>
@@ -17,30 +18,31 @@ requireAdmin();
         html, body {
             touch-action: pan-x pan-y;
         }
-        /* ── Admin Dark Theme Variable Overrides ── */
+        /* ── Admin Slate & Cyan Theme Variable Overrides ── */
         :root {
-            --bg-primary:    #0d0d0d;
-            --bg-secondary:  #161616;
-            --text-primary:  #f0f0f0;
-            --text-secondary: #888888;
-            --border-color:  rgba(255,255,255,0.08);
-            --accent:        #a78bfa;
+            --bg-primary:    #0f172a;
+            --bg-secondary:  #1e293b;
+            --text-primary:  #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-color:  rgba(255,255,255,0.1);
+            --accent:        #38bdf8;
+            --accent-hover:  #0284c7;
         }
 
         body {
-            background: #0d0d0d;
-            color: #f0f0f0;
+            background: #0f172a;
+            color: #f8fafc;
         }
 
         .admin-layout {
             display: flex;
             min-height: 100vh;
-            background: #0d0d0d;
+            background: #0f172a;
         }
         .admin-sidebar {
             width: 250px;
-            background: #111111;
-            border-right: 1px solid rgba(255,255,255,0.07);
+            background: #1e293b;
+            border-right: 1px solid rgba(255,255,255,0.08);
             padding: 2rem 1rem;
         }
         .admin-sidebar .logo {
@@ -54,7 +56,7 @@ requireAdmin();
             align-items: center;
             gap: 10px;
             padding: 10px 15px;
-            color: #888;
+            color: #94a3b8;
             text-decoration: none;
             border-radius: 6px;
             margin-bottom: 5px;
@@ -63,15 +65,15 @@ requireAdmin();
             letter-spacing: 0.3px;
         }
         .admin-nav a:hover, .admin-nav a.active {
-            background: rgba(255,255,255,0.06);
-            color: #f0f0f0;
+            background: rgba(56, 189, 248, 0.12);
+            color: #38bdf8;
             font-weight: 600;
         }
         .admin-main {
             flex: 1;
             padding: 2rem;
             overflow-y: auto;
-            background: #0d0d0d;
+            background: #0f172a;
         }
         .admin-header {
             display: flex;
@@ -80,7 +82,7 @@ requireAdmin();
             margin-bottom: 2rem;
             padding-bottom: 1rem;
             border-bottom: 1px solid rgba(255,255,255,0.08);
-            color: #f0f0f0;
+            color: #f8fafc;
         }
 
         /* ── Tables ── */
@@ -88,14 +90,14 @@ requireAdmin();
             width: 100%;
             border-collapse: collapse;
             margin-top: 1rem;
-            color: #e0e0e0;
+            color: #f1f5f9;
         }
         .table th {
             padding: 12px 15px;
             border-bottom: 1px solid rgba(255,255,255,0.1);
             text-align: left;
-            background: #1a1a1a;
-            color: #aaaaaa;
+            background: #1e293b;
+            color: #94a3b8;
             font-weight: 600;
             text-transform: uppercase;
             font-size: 0.8rem;
@@ -105,37 +107,110 @@ requireAdmin();
             padding: 12px 15px;
             border-bottom: 1px solid rgba(255,255,255,0.06);
             text-align: left;
-            color: #e0e0e0;
+            color: #f1f5f9;
             vertical-align: middle;
         }
         .table tr:hover td {
-            background: rgba(255,255,255,0.03);
+            background: rgba(56, 189, 248, 0.04);
         }
 
-        /* ── Form Controls ── */
+        /* ── Form Controls & Inputs ── */
+        .form-control, input, select, textarea {
+            color: #f8fafc !important;
+        }
         .form-control {
             width: 100%;
-            padding: 10px 12px;
-            background: #1e1e1e;
-            border: 1px solid rgba(255,255,255,0.12);
-            color: #f0f0f0;
+            padding: 12px 14px;
+            background: #0f172a !important;
+            border: 1px solid #334155 !important;
+            color: #f8fafc !important;
             margin-bottom: 15px;
-            border-radius: 6px;
+            border-radius: 8px;
             font-family: inherit;
-            font-size: 0.9rem;
-            transition: border-color 0.2s;
+            font-size: 0.92rem;
+            transition: all 0.2s ease;
         }
         .form-control:focus {
             outline: none;
-            border-color: #a78bfa;
-            background: #222;
+            border-color: #38bdf8 !important;
+            background: #1e293b !important;
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
         }
-        .form-control::placeholder {
-            color: #555;
+        .form-control::placeholder, input::placeholder, textarea::placeholder {
+            color: #94a3b8 !important;
+            opacity: 1 !important;
         }
-        select.form-control option {
-            background: #1e1e1e;
-            color: #f0f0f0;
+        select.form-control option, select option {
+            background: #0f172a !important;
+            color: #f8fafc !important;
+        }
+
+        /* Labels in forms */
+        label {
+            color: #cbd5e1 !important;
+            font-weight: 500;
+        }
+
+        /* File Input text styling */
+        input[type="file"]::file-selector-button {
+            background: #334155;
+            color: #f8fafc;
+            border: 1px solid #475569;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-right: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        input[type="file"]::file-selector-button:hover {
+            background: #475569;
+            color: #ffffff;
+        }
+
+        /* ── Buttons (admin overrides) ── */
+        .btn {
+            background: #38bdf8;
+            color: #0f172a;
+            border-color: #38bdf8;
+            font-weight: 600;
+        }
+        .btn:hover {
+            background: #0284c7;
+            color: #ffffff;
+            border-color: #0284c7;
+        }
+        .btn-outline {
+            background: transparent;
+            color: #38bdf8;
+            border-color: rgba(56, 189, 248, 0.4);
+        }
+        .btn-outline:hover {
+            border-color: #38bdf8;
+            background: rgba(56, 189, 248, 0.1);
+            color: #38bdf8;
+        }
+
+        /* ── CKEditor Visibility Fixes ── */
+        .ck.ck-editor__editable_inline, 
+        .ck.ck-editor__editable_inline * {
+            color: #111111 !important;
+        }
+        .ck.ck-editor__editable_inline {
+            background-color: #ffffff !important;
+            min-height: 250px !important;
+        }
+        .ck.ck-toolbar {
+            background-color: #f8f9fa !important;
+            border-color: #ddd !important;
+        }
+        .ck.ck-toolbar .ck-button, .ck.ck-toolbar .ck-button * {
+            color: #333333 !important;
+        }
+        .ck.ck-dropdown__panel, .ck.ck-dropdown__panel * {
+            background: #ffffff !important;
+            color: #333333 !important;
         }
 
         /* ── Buttons (admin overrides) ── */
@@ -367,6 +442,7 @@ requireAdmin();
             <a href="orders.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'orders.php' ? 'active' : ''; ?>"><i data-lucide="shopping-cart"></i> Orders</a>
             <a href="users.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'users.php' ? 'active' : ''; ?>"><i data-lucide="users"></i> Customers</a>
             <a href="waitlist.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'waitlist.php' ? 'active' : ''; ?>"><i data-lucide="list"></i> Waitlist</a>
+            <a href="videos.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'videos.php' ? 'active' : ''; ?>"><i data-lucide="video"></i> Video Reels</a>
             <a href="settings.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'settings.php' ? 'active' : ''; ?>"><i data-lucide="settings"></i> Settings</a>
             <a href="<?php echo BASE_URL; ?>/logout.php" style="margin-top: auto; color: #ff4444;"><i data-lucide="log-out"></i> Logout</a>
         </nav>

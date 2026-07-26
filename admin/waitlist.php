@@ -1,4 +1,11 @@
 <?php
+/**
+ * ============================================================================
+ * WAITLIST REQUESTS (admin/waitlist.php)
+ * ============================================================================
+ * Displays pre-order & out-of-stock product waitlist requests from customers,
+ * including product details, user contact details, and pagination.
+ */
 require_once 'includes/header.php';
 
 // Handle delete
@@ -9,11 +16,21 @@ if (isset($_GET['delete'])) {
     redirect('waitlist.php');
 }
 
+// Pagination calculation
+$per_page = 10;
+$page = isset($_GET['page']) && (int)$_GET['page'] > 0 ? (int)$_GET['page'] : 1;
+$total_res = $conn->query("SELECT COUNT(*) AS total FROM waitlists");
+$total_items = $total_res ? (int)$total_res->fetch_assoc()['total'] : 0;
+$total_pages = ceil($total_items / $per_page);
+if ($page > $total_pages && $total_pages > 0) $page = $total_pages;
+$offset = ($page - 1) * $per_page;
+
 $query = "
     SELECT w.*, p.name as product_name 
     FROM waitlists w 
     JOIN products p ON w.product_id = p.id 
     ORDER BY w.created_at DESC
+    LIMIT $per_page OFFSET $offset
 ";
 $result = $conn->query($query);
 ?>
@@ -22,7 +39,7 @@ $result = $conn->query($query);
     <h3 style="margin: 0;">Waitlist Requests</h3>
 </div>
 
-<div style="background: #111; padding: 20px; border-radius: 8px; border: 1px solid #333; overflow-x: auto;">
+<div style="background: var(--bg-secondary); padding: 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); overflow-x: auto;">
     <table class="table" style="margin-top: 0;">
         <thead>
             <tr>
@@ -57,6 +74,7 @@ $result = $conn->query($query);
             <?php endif; ?>
         </tbody>
     </table>
+    <?php renderPagination($page, $total_pages, $total_items, $per_page, 'waitlist.php'); ?>
 </div>
 
 <?php require_once 'includes/footer.php'; ?>

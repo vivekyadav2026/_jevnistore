@@ -1,4 +1,11 @@
 <?php
+/**
+ * ============================================================================
+ * USER MANAGEMENT (admin/users.php)
+ * ============================================================================
+ * Manages registered store accounts, admin role toggling (with self-lockout
+ * protection), customer account deletions, and paginated user listings.
+ */
 require_once 'includes/header.php';
 
 $current_admin_id = $_SESSION['user_id'] ?? 0;
@@ -58,7 +65,7 @@ unset($_SESSION['error_msg']);
     </div>
 <?php endif; ?>
 
-<div style="background: #111; padding: 20px; border-radius: 8px; border: 1px solid #333; overflow-x: auto;">
+<div style="background: var(--bg-secondary); padding: 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); overflow-x: auto;">
     <table class="table" style="margin-top: 0;">
         <thead>
             <tr>
@@ -73,8 +80,17 @@ unset($_SESSION['error_msg']);
         </thead>
         <tbody>
             <?php
-            $users = $conn->query("SELECT * FROM users ORDER BY id DESC");
-            if ($users->num_rows > 0) {
+            // Pagination calculation
+            $per_page = 10;
+            $page = isset($_GET['page']) && (int)$_GET['page'] > 0 ? (int)$_GET['page'] : 1;
+            $total_res = $conn->query("SELECT COUNT(*) AS total FROM users");
+            $total_items = $total_res ? (int)$total_res->fetch_assoc()['total'] : 0;
+            $total_pages = ceil($total_items / $per_page);
+            if ($page > $total_pages && $total_pages > 0) $page = $total_pages;
+            $offset = ($page - 1) * $per_page;
+
+            $users = $conn->query("SELECT * FROM users ORDER BY id DESC LIMIT $per_page OFFSET $offset");
+            if ($users && $users->num_rows > 0) {
                 while ($u = $users->fetch_assoc()) {
                     $is_self = $u['id'] === $current_admin_id;
                     $role_badge = $u['role'] === 'admin' ? '<span style="color:#eab308; background:rgba(234,179,8,0.15); padding: 3px 8px; border-radius: 12px; font-size: 0.75rem; font-weight:600; text-transform:uppercase;">Admin</span>' : '<span style="color:#38bdf8; background:rgba(56,189,248,0.15); padding: 3px 8px; border-radius: 12px; font-size: 0.75rem; font-weight:600; text-transform:uppercase;">Customer</span>';
@@ -114,6 +130,7 @@ unset($_SESSION['error_msg']);
             ?>
         </tbody>
     </table>
+    <?php renderPagination($page, $total_pages, $total_items, $per_page, 'users.php'); ?>
 </div>
 
 <?php require_once 'includes/footer.php'; ?>

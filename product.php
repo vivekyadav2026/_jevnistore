@@ -134,19 +134,123 @@ $_SESSION['recently_viewed'] = array_slice($_SESSION['recently_viewed'], 0, 5);
                         <input type="hidden" name="size" id="selected-size" value="Standard">
 
                         <?php if (isset($product['has_variants']) && $product['has_variants'] == 1 && !empty($product['variants_list'])): ?>
-                            <div style="margin-bottom: 20px;">
-                                <label style="display:block; margin-bottom:8px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#1a1a1a;">
-                                    Select <?php echo htmlspecialchars($product['variant_name'] ?: 'Option'); ?>
+                            <div style="margin-bottom: 24px;">
+                                <label style="display:block; margin-bottom:10px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#1a1a1a;">
+                                    Select <?php echo htmlspecialchars($product['variant_name'] ?: 'Option'); ?>: <span id="selected-variant-label" style="font-weight: 500; color: #555;"></span>
                                 </label>
-                                <select name="variant" required style="width: 100%; padding: 12px; border: 1.5px solid #1a1a1a; background: transparent; font-family: inherit; font-size: 0.8rem; font-weight: 600; outline: none; border-radius: 4px; color: #1a1a1a; cursor: pointer;">
+                                <input type="hidden" name="variant" id="selected-variant-input" value="" required>
+                                
+                                <div style="display: flex; gap: 10px; flex-wrap: wrap;" id="variant-pills-container">
                                     <?php 
                                     $options = array_map('trim', explode(',', $product['variants_list']));
-                                    foreach ($options as $opt) {
-                                        echo '<option value="' . htmlspecialchars($opt) . '" style="background:#fff; color:#000;">' . htmlspecialchars($opt) . '</option>';
-                                    }
+                                    $is_color_variant = stripos($product['variant_name'], 'color') !== false;
+                                    
+                                    // Known color map helper
+                                    $color_map = [
+                                        'black' => '#000000', 'white' => '#ffffff', 'red' => '#ef4444',
+                                        'blue' => '#3b82f6', 'green' => '#22c55e', 'yellow' => '#eab308',
+                                        'purple' => '#a855f7', 'pink' => '#ec4899', 'grey' => '#64748b',
+                                        'gray' => '#64748b', 'navy' => '#1e3a8a', 'gold' => '#d97706',
+                                        'silver' => '#cbd5e1', 'beige' => '#f5f5dc', 'brown' => '#78350f'
+                                    ];
+                                    
+                                    foreach ($options as $idx => $opt):
+                                        $lower_opt = strtolower($opt);
+                                        $hex = $color_map[$lower_opt] ?? null;
                                     ?>
-                                </select>
+                                        <?php if ($is_color_variant && $hex): ?>
+                                            <button type="button" class="variant-swatch-btn <?php echo $idx === 0 ? 'active' : ''; ?>" 
+                                                    data-value="<?php echo htmlspecialchars($opt); ?>"
+                                                    title="<?php echo htmlspecialchars($opt); ?>"
+                                                    onclick="selectVariant(this, '<?php echo htmlspecialchars($opt, ENT_QUOTES); ?>', <?php echo $idx; ?>)"
+                                                    style="width: 34px; height: 34px; border-radius: 50%; background-color: <?php echo $hex; ?>; border: 2px solid <?php echo $lower_opt === 'white' ? '#ccc' : $hex; ?>; cursor: pointer; position: relative; transition: all 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                                            </button>
+                                        <?php else: ?>
+                                            <button type="button" class="variant-pill-btn <?php echo $idx === 0 ? 'active' : ''; ?>" 
+                                                    data-value="<?php echo htmlspecialchars($opt); ?>"
+                                                    onclick="selectVariant(this, '<?php echo htmlspecialchars($opt, ENT_QUOTES); ?>', <?php echo $idx; ?>)"
+                                                    style="padding: 10px 18px; border: 1.5px solid #1a1a1a; background: <?php echo $idx === 0 ? '#1a1a1a' : 'transparent'; ?>; color: <?php echo $idx === 0 ? '#fff' : '#1a1a1a'; ?>; font-family: inherit; font-size: 0.78rem; font-weight: 700; cursor: pointer; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.2s;">
+                                                <?php echo htmlspecialchars($opt); ?>
+                                            </button>
+                                        <?php endif; ?>
+                                    <?php endforeach; ?>
+                                </div>
                             </div>
+                            
+                            <style>
+                            .variant-swatch-btn.active {
+                                outline: 2px solid #000000;
+                                outline-offset: 3px;
+                                transform: scale(1.1);
+                            }
+                            .variant-pill-btn.active {
+                                background: #000000 !important;
+                                color: #ffffff !important;
+                            }
+                            .variant-pill-btn:hover:not(.active) {
+                                background: rgba(0,0,0,0.05);
+                            }
+                            </style>
+                            
+                            <script>
+                            function selectVariant(btn, val, index) {
+                                document.getElementById('selected-variant-input').value = val;
+                                const lbl = document.getElementById('selected-variant-label');
+                                if (lbl) lbl.textContent = val;
+                                
+                                const container = document.getElementById('variant-pills-container');
+                                if (container) {
+                                    container.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+                                }
+                                btn.classList.add('active');
+
+                                // Apply dynamic CSS color filter fallback to visually demonstrate color changes on image
+                                const mainImg = document.getElementById('main-product-image');
+                                if (mainImg) {
+                                    const lowerVal = val.toLowerCase();
+                                    let filterVal = 'none';
+                                    
+                                    if (lowerVal === 'red') {
+                                        filterVal = 'sepia(1) hue-rotate(-50deg) saturate(4) opacity(0.9)';
+                                    } else if (lowerVal === 'blue') {
+                                        filterVal = 'sepia(1) hue-rotate(180deg) saturate(3) opacity(0.9)';
+                                    } else if (lowerVal === 'green') {
+                                        filterVal = 'sepia(1) hue-rotate(80deg) saturate(3) opacity(0.9)';
+                                    } else if (lowerVal === 'white') {
+                                        filterVal = 'brightness(1.35) contrast(0.85) grayscale(1)';
+                                    } else if (lowerVal === 'beige') {
+                                        filterVal = 'sepia(0.6) saturate(1.8) brightness(1.1)';
+                                    } else if (lowerVal === 'black') {
+                                        filterVal = 'brightness(0.75) contrast(1.3) grayscale(1)';
+                                    }
+                                    
+                                    mainImg.style.transition = 'filter 0.4s ease, transform 0.3s ease';
+                                    mainImg.style.filter = filterVal;
+                                }
+
+                                // If gallery thumbnails exist, switch main image corresponding to selected color index
+                                if (typeof index !== 'undefined') {
+                                    const thumbs = document.querySelectorAll('.thumb-item');
+                                    if (thumbs.length > 0) {
+                                        const targetIndex = index % thumbs.length;
+                                        const targetThumb = thumbs[targetIndex];
+                                        if (targetThumb) {
+                                            const img = targetThumb.querySelector('img');
+                                            if (img) {
+                                                changeMainImage(targetThumb, img.src, targetIndex);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            // Auto select first option on load
+                            document.addEventListener('DOMContentLoaded', () => {
+                                const firstBtn = document.querySelector('#variant-pills-container button');
+                                if (firstBtn) {
+                                    selectVariant(firstBtn, firstBtn.getAttribute('data-value'), 0);
+                                }
+                            });
+                            </script>
                         <?php endif; ?>
 
                         <!-- Quantity & Buttons -->

@@ -1,4 +1,11 @@
 <?php
+/**
+ * ============================================================================
+ * ORDERS MANAGEMENT (admin/orders.php)
+ * ============================================================================
+ * Handles customer order processing, status state updates, Shiprocket API
+ * manual shipment pushes, order item details modal, and SQL pagination.
+ */
 require_once 'includes/header.php';
 
 // Handle Order Status Update
@@ -29,7 +36,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'push_shiprocket' && isset($_G
     <h3 style="margin: 0;">Manage Orders</h3>
 </div>
 
-<div style="background: #111; padding: 20px; border-radius: 8px; border: 1px solid #333; overflow-x: auto;">
+<div style="background: var(--bg-secondary); padding: 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); overflow-x: auto;">
     <table class="table" style="margin-top: 0;">
         <thead>
             <tr>
@@ -44,8 +51,17 @@ if (isset($_GET['action']) && $_GET['action'] === 'push_shiprocket' && isset($_G
         </thead>
         <tbody>
             <?php
-            $orders = $conn->query("SELECT o.*, u.name as user_name FROM orders o JOIN users u ON o.user_id = u.id ORDER BY o.id DESC");
-            if ($orders->num_rows > 0) {
+            // Pagination calculation
+            $per_page = 10;
+            $page = isset($_GET['page']) && (int)$_GET['page'] > 0 ? (int)$_GET['page'] : 1;
+            $total_res = $conn->query("SELECT COUNT(*) AS total FROM orders");
+            $total_items = $total_res ? (int)$total_res->fetch_assoc()['total'] : 0;
+            $total_pages = ceil($total_items / $per_page);
+            if ($page > $total_pages && $total_pages > 0) $page = $total_pages;
+            $offset = ($page - 1) * $per_page;
+
+            $orders = $conn->query("SELECT o.*, u.name as user_name FROM orders o JOIN users u ON o.user_id = u.id ORDER BY o.id DESC LIMIT $per_page OFFSET $offset");
+            if ($orders && $orders->num_rows > 0) {
                 while ($o = $orders->fetch_assoc()) {
                     $shiprocket_badge = '';
                     $push_btn = '';
@@ -94,11 +110,12 @@ if (isset($_GET['action']) && $_GET['action'] === 'push_shiprocket' && isset($_G
             ?>
         </tbody>
     </table>
+    <?php renderPagination($page, $total_pages, $total_items, $per_page, 'orders.php'); ?>
 </div>
 
 <!-- Order Details Modal -->
 <div id="view-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.85); z-index:100; padding: 40px 20px; overflow-y: auto;">
-    <div style="background:#111; max-width: 700px; margin: 0 auto; padding: 30px; border-radius: 8px; border: 1px solid #333; color: white;">
+    <div style="background:var(--bg-secondary); max-width: 700px; margin: 0 auto; padding: 30px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); color: white;">
         <div style="display:flex; justify-content:space-between; margin-bottom: 20px; border-bottom: 1px solid #222; padding-bottom: 10px;">
             <h4 style="margin:0; font-size:1.1rem; text-transform:uppercase; letter-spacing:1px; color: var(--accent);">Order Details</h4>
             <button onclick="closeViewModal()" style="background:none; border:none; color:white; cursor:pointer;"><i data-lucide="x"></i></button>

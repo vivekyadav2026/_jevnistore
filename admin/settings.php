@@ -1,4 +1,11 @@
 <?php
+/**
+ * ============================================================================
+ * SITE SETTINGS & CONFIGURATION (admin/settings.php)
+ * ============================================================================
+ * Manages store configuration parameters: SEO metadata, site logo, contact info,
+ * hero banner text/images, brand story, Razorpay, and Shiprocket API keys.
+ */
 require_once 'includes/header.php';
 
 // Handle Settings Update
@@ -36,6 +43,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['save_settings'])) {
         }
     }
     
+    // Handle Video Files Uploads (video1, video2, video3, video4, video5)
+    for ($v = 1; $v <= 5; $v++) {
+        $video_key = "homepage_video_$v";
+        if (isset($_FILES[$video_key]) && $_FILES[$video_key]['error'] == 0) {
+            $ext = strtolower(pathinfo($_FILES[$video_key]['name'], PATHINFO_EXTENSION));
+            if (in_array($ext, ['mp4', 'webm', 'mov', 'ogg'])) {
+                $filename = 'insta_' . $v . '_' . uniqid() . '.' . $ext;
+                if (move_uploaded_file($_FILES[$video_key]['tmp_name'], '../assets/instagram/' . $filename)) {
+                    $check_stmt = $conn->query("SELECT `key` FROM settings WHERE `key` = '$video_key'");
+                    if ($check_stmt && $check_stmt->num_rows > 0) {
+                        $stmt = $conn->prepare("UPDATE settings SET value = ? WHERE `key` = ?");
+                        $stmt->bind_param("ss", $filename, $video_key);
+                        $stmt->execute();
+                    } else {
+                        $stmt = $conn->prepare("INSERT INTO settings (`key`, `value`) VALUES (?, ?)");
+                        $stmt->bind_param("ss", $video_key, $filename);
+                        $stmt->execute();
+                    }
+                }
+            }
+        }
+    }
+
     setFlash('Settings updated successfully.', 'success');
     redirect('settings.php');
 }
@@ -50,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['save_settings'])) {
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem; margin-bottom: 3rem;">
         
         <!-- General / SEO Configuration Card -->
-        <div style="background: #111; padding: 25px; border-radius: 8px; border: 1px solid #333; color: white;">
+        <div style="background: var(--bg-secondary); padding: 25px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); color: white;">
             <h4 style="margin-top: 0; text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem; border-bottom: 1px solid #222; padding-bottom: 10px; margin-bottom: 20px; color: var(--accent);">
                 General & SEO
             </h4>
@@ -79,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['save_settings'])) {
         </div>
 
         <!-- Contact & Social Details Card -->
-        <div style="background: #111; padding: 25px; border-radius: 8px; border: 1px solid #333; color: white;">
+        <div style="background: var(--bg-secondary); padding: 25px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); color: white;">
             <h4 style="margin-top: 0; text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem; border-bottom: 1px solid #222; padding-bottom: 10px; margin-bottom: 20px; color: var(--accent);">
                 Contact & Social Links
             </h4>
@@ -110,7 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['save_settings'])) {
         </div>
 
         <!-- Homepage Hero Banner Card -->
-        <div style="background: #111; padding: 25px; border-radius: 8px; border: 1px solid #333; color: white;">
+        <div style="background: var(--bg-secondary); padding: 25px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); color: white;">
             <h4 style="margin-top: 0; text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem; border-bottom: 1px solid #222; padding-bottom: 10px; margin-bottom: 20px; color: var(--accent);">
                 Homepage Hero Banner
             </h4>
@@ -139,22 +169,43 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['save_settings'])) {
         </div>
 
         <!-- Brand Story Card -->
-        <div style="background: #111; padding: 25px; border-radius: 8px; border: 1px solid #333; color: white;">
+        <div style="background: var(--bg-secondary); padding: 25px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); color: white;">
             <h4 style="margin-top: 0; text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem; border-bottom: 1px solid #222; padding-bottom: 10px; margin-bottom: 20px; color: var(--accent);">
                 Brand Story
             </h4>
             <div style="margin-bottom: 15px;">
-                <label style="display:block; margin-bottom:5px; font-size:12px; color:#888; text-transform: uppercase; letter-spacing: 0.5px;">Story Heading</label>
+                <label style="display:block; margin-bottom:5px; font-size:12px; color:#cbd5e1; text-transform: uppercase; letter-spacing: 0.5px;">Story Heading</label>
                 <input type="text" name="settings[brand_story_title]" class="form-control" value="<?php echo htmlspecialchars(getSetting('brand_story_title')); ?>" required style="margin-bottom:0;">
             </div>
             <div style="margin-bottom: 15px;">
-                <label style="display:block; margin-bottom:5px; font-size:12px; color:#888; text-transform: uppercase; letter-spacing: 0.5px;">Story Body Text</label>
+                <label style="display:block; margin-bottom:5px; font-size:12px; color:#cbd5e1; text-transform: uppercase; letter-spacing: 0.5px;">Story Body Text</label>
                 <textarea name="settings[brand_story_text]" class="form-control" rows="5" required style="margin-bottom:0; font-family: inherit;"><?php echo htmlspecialchars(getSetting('brand_story_text')); ?></textarea>
             </div>
         </div>
 
+        <!-- Homepage Mobile Video Reel Section Card -->
+        <div style="background: var(--bg-secondary); padding: 25px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); color: white;">
+            <h4 style="margin-top: 0; text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem; border-bottom: 1px solid #222; padding-bottom: 10px; margin-bottom: 20px; color: var(--accent);">
+                Homepage Video Reels / Carousel
+            </h4>
+            <p style="font-size: 0.8rem; color: #cbd5e1; margin-bottom: 15px;">Upload or update MP4 video reels displayed in the homepage mobile slider:</p>
+            
+            <?php for ($v = 1; $v <= 5; $v++): 
+                $video_val = getSetting("homepage_video_$v", "insta$v.mp4");
+                $video_url = (strpos($video_val, 'http') === 0) ? $video_val : BASE_URL . '/assets/instagram/' . $video_val;
+            ?>
+                <div style="margin-bottom: 15px; border-bottom: 1px dashed #334155; padding-bottom: 12px;">
+                    <label style="display:block; margin-bottom:5px; font-size:12px; color:#38bdf8; font-weight:700; text-transform: uppercase;">Video Reel #<?php echo $v; ?></label>
+                    <input type="file" name="homepage_video_<?php echo $v; ?>" class="form-control" accept="video/mp4,video/webm,video/mov" style="margin-bottom:5px;">
+                    <div style="display:flex; align-items:center; gap: 10px;">
+                        <span style="font-size:11px; color:#94a3b8;">Current Video: <strong><?php echo htmlspecialchars($video_val); ?></strong></span>
+                    </div>
+                </div>
+            <?php endfor; ?>
+        </div>
+
         <!-- Razorpay Configuration Card -->
-        <div style="background: #111; padding: 25px; border-radius: 8px; border: 1px solid #333; color: white;">
+        <div style="background: var(--bg-secondary); padding: 25px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); color: white;">
             <h4 style="margin-top: 0; text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem; border-bottom: 1px solid #222; padding-bottom: 10px; margin-bottom: 20px; color: var(--accent);">
                 Razorpay Integration
             </h4>
@@ -169,7 +220,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['save_settings'])) {
         </div>
 
         <!-- Shiprocket Configuration Card -->
-        <div style="background: #111; padding: 25px; border-radius: 8px; border: 1px solid #333; color: white;">
+        <div style="background: var(--bg-secondary); padding: 25px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); color: white;">
             <h4 style="margin-top: 0; text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem; border-bottom: 1px solid #222; padding-bottom: 10px; margin-bottom: 20px; color: var(--accent);">
                 Shiprocket Integration
             </h4>

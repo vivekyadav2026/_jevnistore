@@ -1,6 +1,13 @@
 <?php
+/**
+ * ============================================================================
+ * CATEGORIES MANAGEMENT (admin/categories.php)
+ * ============================================================================
+ * Allows admin to create, edit, delete, and view product categories with pagination.
+ */
 require_once 'includes/header.php';
 
+// Fetch category for editing if edit query parameter is present
 $edit_cat = null;
 if (isset($_GET['edit'])) {
     $edit_id = (int)$_GET['edit'];
@@ -10,7 +17,7 @@ if (isset($_GET['edit'])) {
     }
 }
 
-// Handle Form Posts
+// Handle Add & Edit Category Form submissions
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['add_category'])) {
         $name = trim($_POST['name'] ?? '');
@@ -34,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
-// Handle Delete Category
+// Handle Category Deletion
 if (isset($_GET['delete'])) {
     $id = (int)$_GET['delete'];
     $conn->query("DELETE FROM categories WHERE id = $id");
@@ -43,14 +50,15 @@ if (isset($_GET['delete'])) {
 }
 ?>
 
+<!-- Section Header -->
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-    <h3 style="margin: 0;">Manage Categories</h3>
+    <h3 style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #f8fafc; letter-spacing: -0.01em;">Manage Categories</h3>
 </div>
 
 <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
-    <!-- Add / Edit Form -->
-    <div style="flex: 1; min-width: 300px; background: #111; padding: 20px; border-radius: 8px; border: 1px solid #333; height: fit-content; color: white;">
-        <h4 style="margin-top: 0; text-transform: uppercase; letter-spacing: 1px; font-size: 0.95rem; border-bottom: 1px solid #222; padding-bottom: 10px; margin-bottom: 20px;">
+    <!-- Add / Edit Category Card Form -->
+    <div style="flex: 1; min-width: 300px; background: var(--bg-secondary); padding: 24px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); height: fit-content; color: #f8fafc;">
+        <h4 style="margin-top: 0; text-transform: uppercase; letter-spacing: 1px; font-size: 0.95rem; font-weight: 700; color: var(--accent); border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px; margin-bottom: 20px;">
             <?php echo $edit_cat ? 'Edit Category' : 'Add New Category'; ?>
         </h4>
         <form method="POST">
@@ -58,12 +66,12 @@ if (isset($_GET['delete'])) {
                 <input type="hidden" name="id" value="<?php echo $edit_cat['id']; ?>">
             <?php endif; ?>
             
-            <div style="margin-bottom: 15px;">
-                <label style="display:block; margin-bottom:5px; font-size:13px; color:#888;">Category Name</label>
-                <input type="text" name="name" class="form-control" placeholder="e.g. Hoodies, Bags" value="<?php echo $edit_cat ? htmlspecialchars($edit_cat['name']) : ''; ?>" required>
+            <div style="margin-bottom: 18px;">
+                <label style="display:block; margin-bottom:6px; font-size:12px; font-weight:600; color:#cbd5e1; text-transform:uppercase; letter-spacing:0.5px;">Category Name</label>
+                <input type="text" name="name" class="form-control" placeholder="e.g. Hoodies, Bags" value="<?php echo $edit_cat ? htmlspecialchars($edit_cat['name']) : ''; ?>" required style="margin-bottom: 0;">
             </div>
             
-            <button type="submit" name="<?php echo $edit_cat ? 'edit_category' : 'add_category'; ?>" class="btn" style="padding: 10px 20px; text-transform: uppercase; letter-spacing: 1px;">
+            <button type="submit" name="<?php echo $edit_cat ? 'edit_category' : 'add_category'; ?>" class="btn" style="padding: 10px 20px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">
                 <?php echo $edit_cat ? 'Update Category' : 'Add Category'; ?>
             </button>
             <?php if ($edit_cat): ?>
@@ -73,7 +81,7 @@ if (isset($_GET['delete'])) {
     </div>
 
     <!-- Category List -->
-    <div style="flex: 2; min-width: 400px; background: #111; padding: 20px; border-radius: 8px; border: 1px solid #333;">
+    <div style="flex: 2; min-width: 400px; background: var(--bg-secondary); padding: 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
         <div class="table-responsive">
             <table class="table" style="margin-top: 0;">
                 <thead>
@@ -85,8 +93,17 @@ if (isset($_GET['delete'])) {
                 </thead>
                 <tbody>
                     <?php
-                    $cats = $conn->query("SELECT * FROM categories ORDER BY id DESC");
-                    if ($cats->num_rows > 0) {
+                    // Pagination calculation
+                    $per_page = 10;
+                    $page = isset($_GET['page']) && (int)$_GET['page'] > 0 ? (int)$_GET['page'] : 1;
+                    $total_res = $conn->query("SELECT COUNT(*) AS total FROM categories");
+                    $total_items = $total_res ? (int)$total_res->fetch_assoc()['total'] : 0;
+                    $total_pages = ceil($total_items / $per_page);
+                    if ($page > $total_pages && $total_pages > 0) $page = $total_pages;
+                    $offset = ($page - 1) * $per_page;
+
+                    $cats = $conn->query("SELECT * FROM categories ORDER BY id DESC LIMIT $per_page OFFSET $offset");
+                    if ($cats && $cats->num_rows > 0) {
                         while ($c = $cats->fetch_assoc()) {
                             echo '<tr>
                                 <td>'.$c['id'].'</td>
@@ -108,6 +125,7 @@ if (isset($_GET['delete'])) {
                 </tbody>
             </table>
         </div>
+        <?php renderPagination($page, $total_pages, $total_items, $per_page, 'categories.php'); ?>
     </div>
 </div>
 
