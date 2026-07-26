@@ -88,9 +88,20 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                     <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $product['id']; ?>">
                         <img src="<?php echo $image; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
                     </a>
-                    <?php if ($product['stock'] <= 0 && (!isset($product['is_waitlist']) || $product['is_waitlist'] == 0)): ?>
-                        <div style="position: absolute; top: 10px; left: 10px; background: #ef4444; color: white; font-size: 0.55rem; font-weight: 700; padding: 3px 8px; text-transform: uppercase; letter-spacing: 1px; z-index: 2; border-radius: 2px;">OUT OF STOCK</div>
-                    <?php endif; ?>
+                    <?php 
+                    $has_sale = (!empty($product['compare_at_price']) && $product['compare_at_price'] > $product['price']);
+                    $sale_pct = $has_sale ? round((($product['compare_at_price'] - $product['price']) / $product['compare_at_price']) * 100) : 0;
+                    ?>
+                    
+                    <div style="position: absolute; top: 10px; left: 10px; display: flex; flex-direction: column; gap: 5px; z-index: 2;">
+                        <?php if ($product['stock'] <= 0 && (!isset($product['is_waitlist']) || $product['is_waitlist'] == 0)): ?>
+                            <div style="background: #ef4444; color: white; font-size: 0.55rem; font-weight: 700; padding: 3px 8px; text-transform: uppercase; letter-spacing: 1px; border-radius: 2px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">OUT OF STOCK</div>
+                        <?php endif; ?>
+                        
+                        <?php if ($has_sale): ?>
+                            <div style="background: #10b981; color: white; font-size: 0.55rem; font-weight: 700; padding: 3px 8px; text-transform: uppercase; letter-spacing: 1px; border-radius: 2px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">SALE -<?php echo $sale_pct; ?>%</div>
+                        <?php endif; ?>
+                    </div>
                     
                     <?php if (isset($product['is_waitlist']) && $product['is_waitlist'] == 1): ?>
                         <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $product['id']; ?>" class="add-btn-overlay" aria-label="Join Waitlist" style="display:flex; align-items:center; justify-content:center; text-decoration:none;">
@@ -347,9 +358,20 @@ input:checked + .switch-slider:before {
                                          <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $product['id']; ?>">
                                              <img src="<?php echo $image; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
                                          </a>
-                                         <?php if ($product['stock'] <= 0 && (!isset($product['is_waitlist']) || $product['is_waitlist'] == 0)): ?>
-                                             <div style="position: absolute; top: 10px; left: 10px; background: #ef4444; color: white; font-size: 0.55rem; font-weight: 700; padding: 3px 8px; text-transform: uppercase; letter-spacing: 1px; z-index: 2; border-radius: 2px;">OUT OF STOCK</div>
-                                         <?php endif; ?>
+                    <?php 
+                    $has_sale = (!empty($product['compare_at_price']) && $product['compare_at_price'] > $product['price']);
+                    $sale_pct = $has_sale ? round((($product['compare_at_price'] - $product['price']) / $product['compare_at_price']) * 100) : 0;
+                    ?>
+                    
+                    <div style="position: absolute; top: 10px; left: 10px; display: flex; flex-direction: column; gap: 5px; z-index: 2;">
+                        <?php if ($product['stock'] <= 0 && (!isset($product['is_waitlist']) || $product['is_waitlist'] == 0)): ?>
+                            <div style="background: #ef4444; color: white; font-size: 0.55rem; font-weight: 700; padding: 3px 8px; text-transform: uppercase; letter-spacing: 1px; border-radius: 2px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">OUT OF STOCK</div>
+                        <?php endif; ?>
+                        
+                        <?php if ($has_sale): ?>
+                            <div style="background: #10b981; color: white; font-size: 0.55rem; font-weight: 700; padding: 3px 8px; text-transform: uppercase; letter-spacing: 1px; border-radius: 2px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">SALE -<?php echo $sale_pct; ?>%</div>
+                        <?php endif; ?>
+                    </div>
                                          
                                          <?php if (isset($product['is_waitlist']) && $product['is_waitlist'] == 1): ?>
                                              <a href="<?php echo BASE_URL; ?>/product.php?id=<?php echo $product['id']; ?>" class="add-btn-overlay" aria-label="Join Waitlist" style="display:flex; align-items:center; justify-content:center; text-decoration:none;">
