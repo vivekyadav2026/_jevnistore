@@ -3268,13 +3268,10 @@ h1, h2, h3, h4, h5, h6 { font-weight: 500; letter-spacing: -0.01em; }
     max-width: 460px;
 }
 .main-image-container {
-    width: 100%;
-    max-width: 460px;
-    height: 400px;
+    max-width: 100%;
+    width: fit-content;
+    margin: 0 auto;
     background: transparent;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     overflow: hidden;
     cursor: zoom-in;
     position: relative;
@@ -3284,10 +3281,13 @@ h1, h2, h3, h4, h5, h6 { font-weight: 500; letter-spacing: -0.01em; }
 }
 .main-image-container img {
     max-width: 100%;
-    max-height: 100%;
+    max-height: 420px;
+    width: auto;
+    height: auto;
     object-fit: contain;
     display: block;
     transition: transform 0.1s ease;
+    border-radius: 16px;
 }
 .zoom-trigger-btn {
     position: absolute;
@@ -4520,13 +4520,10 @@ body:has(.shop-page-container) .slider-handle::-moz-range-thumb {
 }
 
 .main-image-container {
-    width: 100%;
-    max-width: 460px;
-    height: 400px;
+    max-width: 100%;
+    width: fit-content;
+    margin: 0 auto;
     background: transparent;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     overflow: hidden;
     cursor: zoom-in;
     position: relative;
@@ -4536,10 +4533,13 @@ body:has(.shop-page-container) .slider-handle::-moz-range-thumb {
 }
 .main-image-container img {
     max-width: 100%;
-    max-height: 100%;
+    max-height: 420px;
+    width: auto;
+    height: auto;
     object-fit: contain;
     display: block;
     transition: transform 0.1s ease;
+    border-radius: 16px;
 }
 
 .image-slide-item img {
