@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['reorder_id'])) {
         <div>
             <h3 style="margin-top:0; margin-bottom: 2rem; font-size: 1rem; letter-spacing: 2px; text-transform: uppercase; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">MY ORDERS</h3>
             
-            <div class="order-accordion">
+            <div class="order-accordion" >
                 <?php
                 $orders = $conn->prepare("SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC");
                 $orders->bind_param("i", $user_id);

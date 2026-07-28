@@ -7,6 +7,8 @@ if (isLoggedIn()) {
 }
 
 $error = '';
+$step = 'email';
+$email = trim($_POST['email'] ?? $_GET['email'] ?? '');
 
 if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_SERVER['HTTP_REFERER'])) {
     $ref = $_SERVER['HTTP_REFERER'];
@@ -15,510 +17,444 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_SERVER['HTTP_REFERER'])) {
     }
 }
 
+if (!empty($email) && $_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['step']) && $_GET['step'] == 'password') {
+    $step = 'password';
+}
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $email    = trim($_POST['email'] ?? '');
+    $email = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
+    
+    if (!empty($email) && empty($password)) {
+        // Step 1: Check if email exists
+        $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        
+        if ($res->num_rows > 0) {
+            // User exists -> Ask for password
+            $step = 'password';
+        } else {
+            // New user -> Redirect to register with email pre-filled
+            redirect(BASE_URL . '/register.php?email=' . urlencode($email));
+            exit;
+        }
+    } elseif (!empty($email) && !empty($password)) {
+        // Step 2: Authenticate password
+        $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
-    $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $result = $stmt->get_result();
+        if ($result->num_rows > 0) {
+            $user = $result->fetch_assoc();
+            if (password_verify($password, $user['password'])) {
+                $_SESSION['user_id']   = $user['id'];
+                $_SESSION['role']      = $user['role'];
+                $_SESSION['user_name'] = $user['name'];
 
-    if ($result->num_rows > 0) {
-        $user = $result->fetch_assoc();
-        if (password_verify($password, $user['password'])) {
-            $_SESSION['user_id']   = $user['id'];
-            $_SESSION['role']      = $user['role'];
-            $_SESSION['user_name'] = $user['name'];
-
-            if ($user['role'] === 'admin') {
-                redirect(BASE_URL . '/admin/index.php');
-            } else {
-                if (isset($_SESSION['redirect_after_login']) && !empty($_SESSION['redirect_after_login'])) {
-                    $url = $_SESSION['redirect_after_login'];
+                if ($user['role'] === 'admin') {
+                    redirect(BASE_URL . '/admin/index.php');
+                } else {
+                    $url = $_SESSION['redirect_after_login'] ?? BASE_URL . '/customer/index.php';
                     unset($_SESSION['redirect_after_login']);
                     redirect($url);
-                } else {
-                    redirect(BASE_URL . '/customer/index.php');
                 }
+            } else {
+                $error = 'Incorrect password. Please try again.';
+                $step = 'password';
             }
         } else {
-            $error = 'Incorrect email or password.';
+            $error = 'No account found with that email address.';
+            $step = 'email';
         }
-    } else {
-        $error = 'No account found with that email.';
     }
 }
+
+$google_client_id = getSetting('google_client_id', '') ?: '640331052906-q6k3o731j8r19gt1ekp5062t2o955itn.apps.googleusercontent.com';
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sign In | Jevani Store</title>
-    <meta name="description" content="Sign in to your Jevani Store account.">
-    <link rel="icon" type="image/png" href="<?php echo htmlspecialchars(getSetting('site_logo') ? BASE_URL . '/assets/' . getSetting('site_logo') : BASE_URL . '/assets/logo.png'); ?>">
+    <title>Sign In | Nørva Store</title>
+    <meta name="description" content="Sign in or create an account at Nørva Store.">
+    <link rel="icon" type="image/png" href="<?php echo htmlspecialchars(getSetting('site_logo') ? BASE_URL . '/assets/' . getSetting('site_logo') : BASE_URL . '/assets/logo.png'); ?>?v=3">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
-        html, body {
-            touch-action: pan-x pan-y;
-        }
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-        :root {
-            --black: #1a1a1a;
-            --white: #d6d3d1;
-            --gray-50: #ffffff;
-            --gray-100: #f4f4f5;
-            --gray-200: rgba(0, 0, 0, 0.08);
-            --gray-400: #555555;
-            --gray-600: #333333;
-            --gray-900: #1a1a1a;
-            --accent: #1a1a1a;
-            --accent-hover: #333333;
-            --error: #ef4444;
-            --success: #22c55e;
-            --font: 'Inter', sans-serif;
-            --serif: 'Playfair Display', serif;
-        }
-
-        html, body { height: 100%; }
-
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box !important; }
+        
         body {
-            font-family: var(--font);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background-color: #d6d3d1;
-            color: var(--gray-900);
+            color: #1a1a1a;
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
+            padding: 20px 16px;
             -webkit-font-smoothing: antialiased;
+        }
+
+        .auth-card-container {
+            width: 100%;
+            max-width: 440px;
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 40px 32px 32px 32px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+            border: 1.5px solid #1a1a1a;
             position: relative;
         }
 
-        body::before {
-            display: none;
+        @media (max-width: 480px) {
+            .auth-card-container {
+                padding: 32px 20px 24px 20px;
+                border-radius: 20px;
+            }
         }
 
-        /* ── Centered Card Layout ── */
-        .auth-left { display: none !important; }
-        
-        .auth-right {
-            flex: none;
-            width: 100%;
-            max-width: 480px;
-            background: #ffffff;
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            border-radius: 24px;
-            padding: 48px 40px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
-            z-index: 1;
-            margin: 20px;
-        }
-
-        .auth-form-box {
-            width: 100%;
-            max-width: 100%;
-        }
-
-        .auth-form-header { margin-bottom: 32px; text-align: center; }
-
-        .auth-form-eyebrow {
-            font-size: 0.72rem;
-            font-weight: 600;
-            letter-spacing: 2.5px;
-            text-transform: uppercase;
-            color: var(--accent);
-            margin-bottom: 10px;
-        }
-
-        .auth-form-title {
-            font-size: 1.9rem;
-            font-weight: 700;
-            color: var(--gray-900);
-            letter-spacing: -0.03em;
-            line-height: 1.1;
-        }
-
-        .auth-form-subtitle {
-            margin-top: 8px;
-            font-size: 0.9rem;
-            color: var(--gray-400);
-        }
-
-        .auth-alert {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            padding: 14px 16px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            font-size: 0.875rem;
-            line-height: 1.5;
-            animation: alertIn 0.3s ease;
-        }
-
-        @keyframes alertIn {
-            from { opacity: 0; transform: translateY(-8px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-
-        .auth-alert.error  { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: #ef4444; }
-        .auth-alert.success { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); color: #22c55e; }
-        .auth-alert svg { flex-shrink: 0; width: 16px; height: 16px; margin-top: 2px; }
-
-        .form-field { margin-bottom: 16px; }
-
-        .form-field label {
-            display: block;
-            font-size: 0.78rem;
-            font-weight: 600;
-            color: var(--gray-600);
-            margin-bottom: 7px;
-            letter-spacing: 0.3px;
-            text-transform: uppercase;
-        }
-
-        .input-wrapper { position: relative; }
-
-        .input-icon {
-            position: absolute;
-            left: 13px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gray-400);
-            width: 16px;
-            height: 16px;
-            pointer-events: none;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 12px 12px 12px 40px;
-            border: 1.5px solid rgba(0, 0, 0, 0.15);
-            border-radius: 10px;
-            font-size: 0.9rem;
-            font-family: var(--font);
-            color: var(--gray-900);
-            background: #ffffff;
-            transition: all 0.2s;
-            outline: none;
-        }
-
-        .form-input:focus {
-            border-color: var(--accent);
-            background: #ffffff;
-            box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.08);
-        }
-
-        .form-input.has-toggle { padding-right: 42px; }
-
-        .toggle-password {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: var(--gray-400);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            padding: 2px;
-            transition: color 0.2s;
-        }
-
-        .toggle-password:hover { color: var(--gray-900); }
-        .toggle-password svg { width: 16px; height: 16px; }
-
-        .auth-options {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 16px 0 24px;
-        }
-
-        .remember-me {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            color: var(--gray-400);
-        }
-
-        .remember-me input {
-            width: 16px;
-            height: 16px;
-            accent-color: var(--accent);
-            cursor: pointer;
-        }
-
-        .forgot-pwd-link {
-            font-size: 0.85rem;
-            color: var(--gray-400);
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.2s;
-        }
-
-        .forgot-pwd-link:hover { color: var(--accent); text-decoration: underline; }
-
-        .auth-btn {
-            width: 100%;
-            padding: 14px;
-            background: var(--accent);
-            color: #ffffff;
-            border: none;
-            border-radius: 10px;
-            font-size: 0.95rem;
-            font-weight: 700;
-            font-family: var(--font);
-            letter-spacing: 0.5px;
-            cursor: pointer;
-            transition: all 0.25s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .auth-btn:hover {
-            background: var(--accent-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        }
-
-        .auth-btn:active { transform: translateY(0); }
-
-        .auth-form-footer {
-            margin-top: 24px;
+        .auth-logo-header {
             text-align: center;
-            font-size: 0.875rem;
-            color: var(--gray-400);
+            margin-bottom: 24px;
         }
-
-        .auth-form-footer a {
-            color: var(--gray-900);
-            font-weight: 600;
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-
-        .auth-form-footer a:hover { color: var(--accent-hover); }
-
-        /* Responsive */
-        .auth-mobile-logo {
-            display: block;
-            margin-bottom: 32px;
-            text-align: center;
-        }
-        .auth-mobile-logo img {
-            height: 64px;
+        .auth-logo-header img {
+            height: 40px;
             width: auto;
             object-fit: contain;
         }
 
-        @media (max-width: 480px) {
-            .auth-right { padding: 32px 24px; margin: 16px; }
-            .auth-mobile-logo img { height: 50px; }
+        .auth-title {
+            font-size: 1.85rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            letter-spacing: -0.02em;
+            margin-bottom: 4px;
+            text-align: center;
         }
 
-        /* Divider */
-        .auth-divider {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            margin: 28px 0;
-            color: var(--gray-400);
-            font-size: 0.78rem;
+        .auth-subtitle {
+            font-size: 0.88rem;
+            color: #666666;
+            margin-bottom: 24px;
+            font-weight: 400;
+            text-align: center;
         }
 
-        .auth-divider::before, .auth-divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: var(--gray-200);
-        }
-
-        /* Quick login (admin testing) */
-        .quick-login-btn {
-            width: 100%;
-            padding: 13px;
-            background: transparent;
-            border: 1.5px solid var(--gray-200);
+        .auth-alert-error {
+            background: #fef2f2;
+            border: 1.5px solid #ef4444;
+            color: #dc2626;
+            padding: 10px 14px;
             border-radius: 10px;
-            font-size: 0.85rem;
-            font-family: var(--font);
-            font-weight: 500;
-            color: var(--gray-600);
-            cursor: pointer;
-            transition: all 0.2s;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
-            justify-content: center;
             gap: 8px;
         }
 
-        .quick-login-btn:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-            background: rgba(0, 0, 0, 0.04);
+        /* Buttons Stack */
+        .auth-btn-stack {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            margin-bottom: 22px;
+            width: 100%;
+            overflow: hidden;
         }
 
-        .quick-login-btn svg { width: 16px; height: 16px; color: var(--accent); }
-
-        @media (max-width: 900px) {
-            .auth-left { display: none; }
-            .auth-right { padding: 32px 24px; }
-            .auth-mobile-logo { display: block; }
+        /* Force Google GSI button within card */
+        .auth-btn-stack > div,
+        .g_id_signin,
+        .g_id_signin iframe {
+            max-width: 100% !important;
+            width: 100% !important;
         }
 
-        @media (max-width: 480px) {
-            .auth-right { padding: 24px 20px; align-items: flex-start; padding-top: 48px; }
+        .btn-google-continue {
+            width: 100%;
+            padding: 14px 20px;
+            background: #ffffff;
+            color: #1a1a1a;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 14px;
+            font-size: 0.92rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+            position: relative;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+        }
+        .btn-google-continue:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
+        }
+
+        .badge-last-used {
+            position: absolute;
+            bottom: -11px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #f3f4f6;
+            color: #555555;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 10px;
+            border-radius: 99px;
+            border: 1px solid #e5e7eb;
+            text-transform: capitalize;
+            letter-spacing: 0.2px;
+        }
+
+        /* Divider */
+        .auth-divider-or {
+            position: relative;
+            text-align: center;
+            margin: 24px 0 20px 0;
+        }
+        .auth-divider-or::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #e5e7eb;
+        }
+        .auth-divider-or span {
+            position: relative;
+            background: #ffffff;
+            padding: 0 12px;
+            font-size: 0.8rem;
+            color: #888888;
+            font-weight: 500;
+        }
+
+        /* Inline Input Box with Embedded Forward Arrow */
+        .email-input-box-wrapper {
+            position: relative;
+            width: 100%;
+            margin-bottom: 12px;
+        }
+
+        .email-input-field {
+            width: 100%;
+            padding: 14px 50px 14px 18px;
+            border-radius: 14px;
+            border: 2px solid #e60067;
+            font-size: 0.95rem;
+            color: #1a1a1a;
+            background: #ffffff;
+            outline: none;
+            font-family: inherit;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .email-input-field:focus {
+            box-shadow: 0 0 0 4px rgba(230, 0, 103, 0.12);
+        }
+
+        .arrow-submit-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #1a1a1a;
+            color: #ffffff;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        .arrow-submit-btn:hover {
+            background: #000000;
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        /* Password Field */
+        .pwd-input-wrapper {
+            position: relative;
+            width: 100%;
+            margin-bottom: 12px;
+        }
+        .pwd-input-field {
+            width: 100%;
+            padding: 14px 44px 14px 18px;
+            border-radius: 14px;
+            border: 1.5px solid #1a1a1a;
+            font-size: 0.95rem;
+            color: #1a1a1a;
+            background: #ffffff;
+            outline: none;
+        }
+
+        /* Terms & Privacy Links */
+        .auth-terms-text {
+            font-size: 0.75rem;
+            color: #666666;
+            text-align: center;
+            margin-top: 16px;
+            line-height: 1.4;
+        }
+        .auth-terms-text a {
+            color: #1a1a1a;
+            text-decoration: underline;
+            font-weight: 500;
+        }
+
+        .auth-privacy-link {
+            display: block;
+            text-align: center;
+            margin-top: 28px;
+            font-size: 0.85rem;
+            color: #e60067;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .auth-privacy-link:hover {
+            text-decoration: underline;
         }
     </style>
-    <!-- Disable Inspect Element & Mobile Zoom Gestures -->
-    <script>
-        /*
-        // Disable context menu (right click)
-        document.addEventListener('contextmenu', e => e.preventDefault());
-
-        // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U, Ctrl+S
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'F12' || e.keyCode === 123) {
-                e.preventDefault();
-                return false;
-            }
-            if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c' || e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
-                e.preventDefault();
-                return false;
-            }
-            if (e.ctrlKey && (e.key === 'U' || e.key === 'u' || e.keyCode === 85)) {
-                e.preventDefault();
-                return false;
-            }
-            if (e.ctrlKey && (e.key === 'S' || e.key === 's' || e.keyCode === 83)) {
-                e.preventDefault();
-                return false;
-            }
-        });
-        */
-
-        // Disable pinch zoom on iOS / Safari
-        document.addEventListener('gesturestart', function(e) {
-            e.preventDefault();
-        });
-    </script>
 </head>
 <body>
 
-    <!-- Left Branding Panel -->
-    <div class="auth-left">
-        <a href="<?php echo BASE_URL; ?>/index.php" class="auth-logo">
-            <img src="<?php echo BASE_URL; ?>/assets/logo.png" alt="Jevani Store">
-        </a>
-
-        <div class="auth-brand-content">
-            <div class="auth-brand-quote">
-                Carry what<br>
-                <span>defines</span> you.
-            </div>
-            <p class="auth-brand-desc">
-                Premium bags crafted for the modern Indian woman. Every stitch, a statement. Every drop, a story.
-            </p>
-        </div>
-
-        <div class="auth-left-footer">
-            <a href="<?php echo BASE_URL; ?>/index.php">Home</a>
-            <a href="<?php echo BASE_URL; ?>/shop.php">Shop</a>
-            <a href="<?php echo BASE_URL; ?>/about.php">About</a>
-        </div>
-    </div>
-
-    <!-- Right Form Panel -->
-    <div class="auth-right">
-        <div class="auth-form-box">
-            <a href="<?php echo BASE_URL; ?>/index.php" class="auth-mobile-logo">
-                <img src="<?php echo BASE_URL; ?>/assets/logo.png" alt="Jevani Store">
+    <div class="auth-card-container">
+        
+        <!-- Header Logo -->
+        <div class="auth-logo-header">
+            <a href="<?php echo BASE_URL; ?>/index.php">
+                <img src="<?php echo BASE_URL; ?>/assets/<?php echo htmlspecialchars(getSetting('site_logo') ?: 'logo.png'); ?>" alt="Nørva Store" onerror="this.src='<?php echo BASE_URL; ?>/assets/logo.png';">
             </a>
+        </div>
 
-            <div class="auth-form-header">
-                <div class="auth-form-eyebrow">Welcome back</div>
-                <h1 class="auth-form-title">Sign in to your account</h1>
-                <p class="auth-form-subtitle">Don't have one? <a href="<?php echo BASE_URL; ?>/register.php" style="color: var(--accent); font-weight:500;">Create account</a></p>
+        <h1 class="auth-title">Sign in</h1>
+        <p class="auth-subtitle">Sign in or create an account</p>
+
+        <?php if ($error): ?>
+        <div class="auth-alert-error">
+            <i data-lucide="alert-circle" style="width: 16px; height: 16px; flex-shrink: 0;"></i>
+            <span><?php echo htmlspecialchars($error); ?></span>
+        </div>
+        <?php endif; ?>
+
+        <!-- Buttons Stack -->
+        <div class="auth-btn-stack">
+            <!-- Official Google Identity Services Popup & One-Tap Integration -->
+            <div id="g_id_onload"
+                 data-client_id="<?php echo htmlspecialchars($google_client_id); ?>"
+                 data-callback="handleGoogleCredentialResponse"
+                 data-auto_prompt="false">
             </div>
 
-            <?php if ($error): ?>
-            <div class="auth-alert error">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                <?php echo htmlspecialchars($error); ?>
+            <div class="g_id_signin"
+                 data-type="standard"
+                 data-shape="rectangular"
+                 data-theme="outline"
+                 data-text="continue_with"
+                 data-size="large"
+                 data-logo_alignment="left"
+                 data-width="376">
+            </div>
+        </div>
+
+        <div class="auth-divider-or">
+            <span>or</span>
+        </div>
+
+        <!-- Email & Password Form -->
+        <form method="POST" action="" id="login-form">
+            
+            <div class="email-input-box-wrapper">
+                <input type="email" name="email" id="email" placeholder="Email" value="<?php echo htmlspecialchars($email); ?>" required autocomplete="email" class="email-input-field" <?php echo ($step === 'password') ? 'readonly' : ''; ?>>
+                
+                <?php if ($step === 'email'): ?>
+                <button type="submit" class="arrow-submit-btn" aria-label="Continue">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+                <?php endif; ?>
+            </div>
+
+            <?php if ($step === 'email'): ?>
+            <div style="text-align: right; margin-top: 6px; margin-bottom: 14px;">
+                <a href="<?php echo BASE_URL; ?>/forgot_password.php" style="font-size: 0.78rem; color: #e60067; text-decoration: none; font-weight: 600;">Forgot password?</a>
             </div>
             <?php endif; ?>
 
-            <form method="POST" action="" id="login-form">
-                <div class="form-field">
-                    <label for="email">Email Address</label>
-                    <div class="input-wrapper">
-                        <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-                        <input type="email" id="email" name="email" class="form-input" placeholder="you@example.com" value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>" required autocomplete="email">
-                    </div>
-                </div>
-
-                <div class="form-field">
-                    <label for="password">Password</label>
-                    <div class="input-wrapper">
-                        <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                        <input type="password" id="password" name="password" class="form-input has-toggle" placeholder="••••••••" required autocomplete="current-password">
-                        <button type="button" class="toggle-password" onclick="togglePwd('password', this)" tabindex="-1">
-                            <svg id="eye-password" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="forgot-link-row">
-                    <a href="<?php echo BASE_URL; ?>/forgot_password.php" class="forgot-link">Forgot password?</a>
-                </div>
-
-                <button type="submit" class="auth-btn" id="sign-in-btn">
-                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-                    Sign In
-                </button>
-            </form>
-
-
-
-            <div class="auth-form-footer">
-                New to Jevani? <a href="<?php echo BASE_URL; ?>/register.php">Create a free account</a>
+            <?php if ($step === 'password'): ?>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span style="font-size: 0.75rem; color: #666;">Enter password for <?php echo htmlspecialchars($email); ?></span>
+                <a href="<?php echo BASE_URL; ?>/login.php" style="font-size: 0.72rem; color: #e60067; font-weight: 600; text-decoration: none;">Change email</a>
             </div>
+
+            <div class="pwd-input-wrapper">
+                <input type="password" name="password" id="password" placeholder="Password" required class="pwd-input-field" autofocus autocomplete="current-password">
+                <button type="submit" class="arrow-submit-btn" style="background: #e60067;" aria-label="Sign In">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+            </div>
+            
+            <div style="text-align: right; margin-top: 6px; margin-bottom: 14px;">
+                <a href="<?php echo BASE_URL; ?>/forgot_password.php" style="font-size: 0.78rem; color: #e60067; text-decoration: none; font-weight: 600;">Forgot password?</a>
+            </div>
+            <?php endif; ?>
+
+        </form>
+
+        <div class="auth-terms-text">
+            By continuing, you agree to our <a href="<?php echo BASE_URL; ?>/terms_of_service.php">Terms of service</a>
         </div>
+
+        <div style="text-align: center; margin-top: 20px; font-size: 0.88rem; color: #555555;">
+            Don't have an account? <a href="<?php echo BASE_URL; ?>/register.php" style="color: #e60067; font-weight: 700; text-decoration: none;">Create account</a>
+        </div>
+
+        <a href="<?php echo BASE_URL; ?>/privacy_policy.php" class="auth-privacy-link">Privacy policy</a>
+
     </div>
 
     <script>
         lucide.createIcons();
 
-        function togglePwd(fieldId, btn) {
-            const input = document.getElementById(fieldId);
-            const isHidden = input.type === 'password';
-            input.type = isHidden ? 'text' : 'password';
-            btn.innerHTML = isHidden
-                ? '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>'
-                : '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+        function handleGoogleCredentialResponse(response) {
+            const data = new FormData();
+            data.append('credential', response.credential);
+
+            fetch('<?php echo BASE_URL; ?>/google_callback.php', {
+                method: 'POST',
+                body: data
+            })
+            .then(res => res.json())
+            .then(resData => {
+                if (resData.status === 'success') {
+                    window.location.href = resData.redirect;
+                } else {
+                    alert('Google login failed: ' + (resData.message || 'Error'));
+                }
+            })
+            .catch(err => {
+                console.error('Google Auth Network error:', err);
+            });
         }
-
-        // Button loading state on submit
-        document.getElementById('login-form').addEventListener('submit', function() {
-            const btn = document.getElementById('sign-in-btn');
-            btn.innerHTML = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Signing in...';
-            btn.disabled = true;
-        });
     </script>
-
-    <style>
-        @keyframes spin { to { transform: rotate(360deg); } }
-    </style>
 </body>
 </html>
+

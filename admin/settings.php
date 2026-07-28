@@ -219,6 +219,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['save_settings'])) {
             </div>
         </div>
 
+        <!-- Google OAuth Configuration Card -->
+        <div style="background: var(--bg-secondary); padding: 25px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); color: white;">
+            <h4 style="margin-top: 0; text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem; border-bottom: 1px solid #222; padding-bottom: 10px; margin-bottom: 20px; color: var(--accent);">
+                Google Sign-In / OAuth
+            </h4>
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px; font-size:12px; color:#888; text-transform: uppercase; letter-spacing: 0.5px;">Google Client ID</label>
+                <input type="text" name="settings[google_client_id]" class="form-control" value="<?php echo htmlspecialchars(getSetting('google_client_id')); ?>" placeholder="e.g. 12345-abc.apps.googleusercontent.com" style="margin-bottom:0;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px; font-size:12px; color:#888; text-transform: uppercase; letter-spacing: 0.5px;">Google Client Secret</label>
+                <input type="password" name="settings[google_client_secret]" class="form-control" value="<?php echo htmlspecialchars(getSetting('google_client_secret')); ?>" placeholder="Client Secret" style="margin-bottom:0;">
+            </div>
+        </div>
+
         <!-- Shiprocket Configuration Card -->
         <div style="background: var(--bg-secondary); padding: 25px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); color: white;">
             <h4 style="margin-top: 0; text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem; border-bottom: 1px solid #222; padding-bottom: 10px; margin-bottom: 20px; color: var(--accent);">

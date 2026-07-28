@@ -6,574 +6,590 @@ require_once 'includes/db.php';
 require_once 'includes/functions.php';
 require_once 'includes/header.php';
 
-$user_id = $_SESSION['user_id'] ?? 0;
-$order_id = isset($_REQUEST['order_id']) ? (int)$_REQUEST['order_id'] : 0;
-$billing_email = trim($_REQUEST['email'] ?? '');
-$billing_phone = trim($_REQUEST['phone'] ?? '');
+$user_id       = $_SESSION['user_id'] ?? 0;
+$order_id      = isset($_REQUEST['order_id']) ? (int)$_REQUEST['order_id'] : 0;
+$billing_email = strtolower(trim($_REQUEST['email'] ?? ''));
 
-$order = null;
-$error = '';
-$tracking_info = null;
+$order         = null;
+$order_items   = [];
+$error         = '';
 $recent_orders = [];
 
-// Fetch user's recent orders if logged in
+// ── 1. Fetch user's recent orders (if logged in) ──────────────────────────
 if ($user_id > 0) {
-    $o_stmt = $conn->prepare("SELECT id, total_amount, status, created_at FROM orders WHERE user_id = ? ORDER BY id DESC LIMIT 5");
+    $o_stmt = $conn->prepare(
+        "SELECT id, total_amount, status, created_at
+         FROM orders
+         WHERE user_id = ?
+         ORDER BY id DESC
+         LIMIT 5"
+    );
     $o_stmt->bind_param("i", $user_id);
     $o_stmt->execute();
     $o_res = $o_stmt->get_result();
-    while ($o_row = $o_res->fetch_assoc()) {
-        $recent_orders[] = $o_row;
+    while ($row = $o_res->fetch_assoc()) {
+        $recent_orders[] = $row;
     }
 }
 
-// Order lookup request
-if ($order_id > 0) {
-    // If user is logged in, check if the order belongs to them to skip verification
+// ── 2. Track order on form submit ─────────────────────────────────────────
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $order_id > 0) {
+
+    // Case A: Logged-in user — match by order_id + user_id (no email needed)
     if ($user_id > 0) {
-        $stmt = $conn->prepare("SELECT o.*, u.name as user_name, u.email as user_email, u.phone as user_phone FROM orders o JOIN users u ON o.user_id = u.id WHERE o.id = ? AND o.user_id = ?");
+        $stmt = $conn->prepare(
+            "SELECT id, shipping_name, shipping_email, shipping_phone,
+                    shipping_address, shipping_city, shipping_state, shipping_zip,
+                    total_amount, status, payment_status, payment_method,
+                    order_number, created_at
+             FROM orders
+             WHERE id = ? AND user_id = ?
+             LIMIT 1"
+        );
         $stmt->bind_param("ii", $order_id, $user_id);
         $stmt->execute();
         $res = $stmt->get_result();
         if ($res->num_rows > 0) {
             $order = $res->fetch_assoc();
+        } else {
+            $error = 'No order found with this Order ID in your account.';
         }
     }
-    
-    // If not loaded yet (or not logged in), perform email/phone verification lookup
-    if (!$order) {
-        if (empty($billing_email) && empty($billing_phone)) {
-            $error = 'Please enter your Billing Email or Phone Number for verification.';
+
+    // Case B: Guest / not found — verify by email
+    if (!$order && $user_id === 0) {
+        if (empty($billing_email)) {
+            $error = 'Please enter the Email Address used during checkout.';
         } else {
-            $stmt = $conn->prepare("SELECT o.*, u.name as user_name, u.email as user_email, u.phone as user_phone FROM orders o JOIN users u ON o.user_id = u.id WHERE o.id = ?");
+            $stmt = $conn->prepare(
+                "SELECT id, shipping_name, shipping_email, shipping_phone,
+                        shipping_address, shipping_city, shipping_state, shipping_zip,
+                        total_amount, status, payment_status, payment_method,
+                        order_number, created_at
+                 FROM orders
+                 WHERE id = ?
+                 LIMIT 1"
+            );
             $stmt->bind_param("i", $order_id);
             $stmt->execute();
             $res = $stmt->get_result();
-            
             if ($res->num_rows > 0) {
                 $candidate = $res->fetch_assoc();
-                
-                $verify_email = strtolower(trim($billing_email));
-                $verify_phone = preg_replace('/[^0-9]/', '', $billing_phone);
-                
-                $db_email = strtolower(trim($candidate['user_email']));
-                $db_phone = preg_replace('/[^0-9]/', '', $candidate['user_phone']);
-                
-                $email_match = !empty($verify_email) && ($db_email === $verify_email);
-                $phone_match = !empty($verify_phone) && ($db_phone === $verify_phone);
-                
-                if ($email_match || $phone_match) {
+                // Verify email matches
+                if (strtolower(trim($candidate['shipping_email'])) === $billing_email) {
                     $order = $candidate;
                 } else {
-                    $error = 'Verification failed. The Email or Phone Number provided does not match this Order ID.';
+                    $error = 'Email does not match this Order ID. Please check and try again.';
                 }
             } else {
-                $error = 'No order found with the provided Order ID.';
+                $error = 'No order found with Order ID #' . $order_id . '.';
             }
         }
     }
 
-    // Fetch live tracking if order is loaded and has a Shiprocket Shipment ID
-    if ($order && !empty($order['shiprocket_shipment_id'])) {
-        $tracking_info = getShiprocketTrackingInfo($order['shiprocket_shipment_id']);
+    // Fetch order items if order found
+    if ($order) {
+        $i_stmt = $conn->prepare(
+            "SELECT oi.quantity, oi.price, oi.variant,
+                    p.name AS prod_name, p.image AS prod_image
+             FROM order_items oi
+             JOIN products p ON oi.product_id = p.id
+             WHERE oi.order_id = ?"
+        );
+        $i_stmt->bind_param("i", $order['id']);
+        $i_stmt->execute();
+        $i_res = $i_stmt->get_result();
+        while ($row = $i_res->fetch_assoc()) {
+            $order_items[] = $row;
+        }
     }
 }
 ?>
 
 <style>
-    .track-container {
-        max-width: 800px;
-        margin: 60px auto 100px;
-        padding: 0 24px;
-    }
-    
-    .track-header {
-        text-align: center;
-        margin-bottom: 40px;
-    }
-    
-    .track-header h1 {
-        font-family: var(--font-primary);
-        font-size: 2.2rem;
-        font-weight: 700;
-        letter-spacing: 3px;
-        text-transform: uppercase;
-        color: #ffffff;
-        margin-bottom: 12px;
-    }
-    
-    .track-header p {
-        font-size: 0.85rem;
-        color: #a1a1aa;
-        text-transform: uppercase;
-        letter-spacing: 1.5px;
-        font-weight: 500;
-    }
-    
-    .track-card {
-        background: #ffffff;
-        border: 1.5px solid #1a1a1a;
-        border-radius: 4px;
-        padding: 30px;
-        margin-bottom: 30px;
-    }
-    
-    .track-form-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-    
-    .track-form-label {
-        display: block;
-        font-size: 0.75rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        color: #1a1a1a;
-        margin-bottom: 8px;
-    }
-    
-    .track-input {
-        width: 100%;
-        padding: 12px 16px;
-        border: 1.5px solid #d1d5db;
-        border-radius: 4px;
-        font-family: inherit;
-        font-size: 0.85rem;
-        outline: none;
-        transition: border-color 0.2s;
-    }
-    
-    .track-input:focus {
-        border-color: #1a1a1a;
-    }
-    
-    .track-btn {
-        background: #1a1a1a;
-        color: #ffffff;
-        border: 1.5px solid #1a1a1a;
-        border-radius: 4px;
-        width: 100%;
-        padding: 14px;
-        font-size: 0.8rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 1.5px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        margin-top: 10px;
-    }
-    
-    .track-btn:hover {
-        background: transparent;
-        color: #1a1a1a;
-    }
-    
-    .track-error {
-        background: #fef2f2;
-        border: 1px solid #fee2e2;
-        color: #b91c1c;
-        padding: 12px 16px;
-        border-radius: 4px;
-        font-size: 0.8rem;
-        margin-bottom: 24px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        text-align: center;
-    }
-    
-    /* Order Details Styling */
-    .order-status-badge {
-        display: inline-block;
-        padding: 4px 10px;
-        font-size: 0.65rem;
-        font-weight: 700;
-        border-radius: 3px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-    
-    .badge-pending { background: #fef3c7; color: #d97706; }
-    .badge-processing { background: #dbeafe; color: #2563eb; }
-    .badge-completed { background: #dcfce7; color: #16a34a; }
-    .badge-cancelled { background: #fee2e2; color: #dc2626; }
-    
-    .order-meta-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
-        border-bottom: 1.5px solid #1a1a1a;
-        padding-bottom: 20px;
-        margin-bottom: 24px;
-    }
-    
-    @media (max-width: 600px) {
-        .order-meta-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-    
-    .meta-item-title {
-        font-size: 0.65rem;
-        color: #666666;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        font-weight: 700;
-        margin-bottom: 4px;
-    }
-    
-    .meta-item-value {
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: #1a1a1a;
-    }
-    
-    /* Scans Timeline */
-    .timeline-wrapper {
-        margin-top: 20px;
-        border-left: 2px solid #1a1a1a;
-        padding-left: 20px;
-    }
-    
-    .timeline-event {
-        position: relative;
-        margin-bottom: 20px;
-    }
-    
-    .timeline-event::before {
-        content: '';
-        position: absolute;
-        left: -27px;
-        top: 2px;
-        width: 12px;
-        height: 12px;
-        background: #1a1a1a;
-        border-radius: 50%;
-        border: 2px solid #ffffff;
-    }
-    
-    .timeline-event.active::before {
-        background: #16a34a;
-    }
-    
-    .event-time {
-        font-size: 0.65rem;
-        font-weight: 700;
-        color: #666666;
-        text-transform: uppercase;
-    }
-    
-    .event-desc {
-        font-size: 0.8rem;
-        font-weight: 600;
-        color: #1a1a1a;
-        margin: 4px 0;
-    }
-    
-    .event-loc {
-        font-size: 0.7rem;
-        color: #555555;
-        font-style: italic;
-    }
-    
-    .recent-orders-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 15px;
-    }
-    
-    .recent-orders-table th, 
-    .recent-orders-table td {
-        padding: 12px;
-        text-align: left;
-        border-bottom: 1px solid #eaeaea;
-        font-size: 0.8rem;
-        color: #1a1a1a;
-    }
-    
-    .recent-orders-table th {
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        color: #666;
-        border-bottom: 1.5px solid #1a1a1a;
-    }
-    
-    .track-mini-btn {
-        background: #1a1a1a;
-        color: white;
-        border: none;
-        padding: 6px 12px;
-        font-size: 0.7rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        border-radius: 3px;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-block;
-    }
-    
-    .track-mini-btn:hover {
-        background: #444;
-    }
+/* ===== TRACK ORDER PAGE ===== */
+.track-page {
+    min-height: 100vh;
+    background: #f5f4f2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: calc(var(--header-height, 85px) + 30px) 16px 60px;
+    box-sizing: border-box;
+}
 
-    @media (max-width: 600px) {
-        .track-card {
-            padding: 20px 16px;
-        }
-        .track-container {
-            margin: 30px auto 80px;
-            padding: 0 16px;
-        }
-        .recent-orders-table th,
-        .recent-orders-table td {
-            padding: 10px 8px;
-            font-size: 0.75rem;
-            white-space: nowrap;
-        }
-        .recent-orders-table-wrapper {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            margin: 0 -16px;
-            padding: 0 16px;
-        }
-    }
+.track-card-wrap {
+    width: 100%;
+    max-width: 420px;
+}
+
+/* ── Main Search Card ── */
+.track-card {
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.08);
+    padding: 32px 28px 28px;
+    margin-bottom: 20px;
+}
+
+.track-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    text-align: center;
+    margin: 0 0 6px;
+}
+.track-subtitle {
+    font-size: 0.78rem;
+    color: #888;
+    text-align: center;
+    margin: 0 0 24px;
+}
+
+/* Input fields */
+.track-input-wrap {
+    position: relative;
+    margin-bottom: 12px;
+}
+.track-input-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #aaa;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    pointer-events: none;
+    line-height: 1;
+}
+.track-input {
+    width: 100%;
+    padding: 14px 14px 14px 42px;
+    border: 1.5px solid #e8e6e3;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 0.88rem;
+    color: #1a1a1a;
+    background: #fafaf9;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+}
+.track-input:focus {
+    border-color: #e8175d;
+    box-shadow: 0 0 0 3px rgba(232,23,93,0.08);
+    background: #fff;
+}
+.track-input::placeholder { color: #bbb; }
+
+/* Track button */
+.track-btn {
+    width: 100%;
+    padding: 15px;
+    background: #e8175d;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 0.92rem;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+    margin-top: 6px;
+    transition: background 0.2s, transform 0.15s;
+}
+.track-btn:hover  { background: #c91050; transform: translateY(-1px); }
+.track-btn:active { transform: translateY(0); }
+
+/* Error alert */
+.track-error {
+    background: #fff0f3;
+    border: 1.5px solid #e8175d;
+    color: #c91050;
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ── Recent Orders (logged-in) ── */
+.recent-title {
+    font-size: 0.7rem;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 12px;
+}
+.recent-chip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fff;
+    border-radius: 14px;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+.chip-id   { font-size: 0.88rem; font-weight: 700; color: #1a1a1a; }
+.chip-date { font-size: 0.72rem; color: #888; margin-top: 2px; }
+.chip-track {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #e8175d;
+    text-decoration: none;
+    background: #fff0f3;
+    padding: 6px 14px;
+    border-radius: 99px;
+    transition: background 0.2s;
+    white-space: nowrap;
+}
+.chip-track:hover { background: #ffd6e4; }
+
+/* Status pills */
+.status-pill {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 99px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+}
+.status-pending    { background:#fef3c7; color:#d97706; }
+.status-processing { background:#dbeafe; color:#2563eb; }
+.status-shipped    { background:#ede9fe; color:#7c3aed; }
+.status-completed,
+.status-delivered  { background:#dcfce7; color:#16a34a; }
+.status-cancelled,
+.status-failed     { background:#fee2e2; color:#dc2626; }
+
+/* ── Order Result Card ── */
+.result-card {
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.08);
+    padding: 24px;
+    margin-top: 16px;
+}
+.result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+    padding-bottom: 16px;
+    border-bottom: 1.5px solid #f0efed;
+}
+.result-order-label { font-size:0.7rem; color:#888; text-transform:uppercase; letter-spacing:0.5px; font-weight:600; display:block; }
+.result-order-num   { font-size:1.1rem; font-weight:700; color:#1a1a1a; }
+
+.result-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 20px;
+}
+.meta-label { font-size:0.68rem; color:#888; text-transform:uppercase; letter-spacing:0.4px; font-weight:600; margin-bottom:3px; }
+.meta-val   { font-size:0.84rem; font-weight:600; color:#1a1a1a; }
+
+/* Shipping address box */
+.ship-box {
+    background: #fafaf9;
+    border: 1.5px solid #f0efed;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 0.82rem;
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+/* Items */
+.item-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #f5f4f2;
+    gap: 10px;
+}
+.item-img  { width:44px; height:44px; object-fit:cover; border-radius:8px; border:1.5px solid #f0efed; flex-shrink:0; }
+.item-name { font-size:0.82rem; font-weight:600; color:#1a1a1a; }
+.item-variant { font-size:0.7rem; color:#888; margin-top:2px; }
+.item-price   { font-size:0.82rem; font-weight:700; color:#1a1a1a; white-space:nowrap; }
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 14px;
+    border-top: 1.5px solid #f0efed;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+.total-amt { font-size:1.05rem; color:#1a1a1a; }
+
+/* Order status progress */
+.progress-wrap { margin: 20px 0; }
+.progress-steps {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+}
+.progress-steps::before {
+    content: '';
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    right: 14px;
+    height: 2px;
+    background: #e8e6e3;
+    z-index: 0;
+}
+.progress-fill {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    height: 2px;
+    background: #e8175d;
+    z-index: 1;
+    transition: width 0.4s;
+}
+.step-dot-wrap { display:flex; flex-direction:column; align-items:center; gap:6px; z-index:2; }
+.step-dot {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: #e8e6e3;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.65rem; font-weight: 700; color: #aaa;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 2px #e8e6e3;
+}
+.step-dot.done  { background:#e8175d; color:#fff; box-shadow: 0 0 0 2px #e8175d; }
+.step-dot.active{ background:#fff; color:#e8175d; box-shadow: 0 0 0 2px #e8175d; }
+.step-label { font-size:0.6rem; color:#aaa; font-weight:600; text-align:center; max-width:55px; }
+.step-label.done, .step-label.active { color:#1a1a1a; }
+
+@media (max-width: 480px) {
+    .track-card { padding:24px 18px 20px; }
+    .result-meta { grid-template-columns:1fr; gap:10px; }
+    .step-label { font-size:0.55rem; max-width:44px; }
+}
 </style>
 
-<div class="container track-container">
-    <div class="track-header">
-        <h1>Track Your Order</h1>
-        <p>Real-time delivery status & shipping tracker</p>
-    </div>
-    
-    <?php if (!empty($error)): ?>
+<div class="track-page">
+<div class="track-card-wrap">
+
+    <!-- ── Main Search Card ─────────────────────────── -->
+    <div class="track-card">
+        <h1 class="track-title">Track Order</h1>
+        <p class="track-subtitle">Enter your Order ID &amp; Email to track</p>
+
+        <?php if (!empty($error)): ?>
         <div class="track-error">
+            <i data-lucide="alert-circle" style="width:16px;height:16px;flex-shrink:0;"></i>
             <?php echo htmlspecialchars($error); ?>
         </div>
-    <?php endif; ?>
+        <?php endif; ?>
 
-    <!-- Recent Orders (Only if logged in) -->
-    <?php if ($user_id > 0 && !empty($recent_orders)): ?>
-        <div class="track-card">
-            <h2 style="font-family: var(--font-primary); font-size: 1.1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 15px; color: #1a1a1a;">Your Recent Orders</h2>
-            <div class="recent-orders-table-wrapper" style="overflow-x: auto;">
-                <table class="recent-orders-table" style="min-width: 480px;">
-                    <thead>
-                        <tr>
-                            <th>Order ID</th>
-                            <th>Date</th>
-                            <th>Amount</th>
-                            <th>Status</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($recent_orders as $ro): ?>
-                            <tr>
-                                <td style="font-weight: 700;">#<?php echo $ro['id']; ?></td>
-                                <td><?php echo date('d M Y', strtotime($ro['created_at'])); ?></td>
-                                <td style="font-weight: 600;">₹<?php echo number_format($ro['total_amount']); ?></td>
-                                <td>
-                                    <span class="order-status-badge badge-<?php echo strtolower($ro['status']); ?>" style="padding: 2px 6px; font-size: 0.55rem;">
-                                        <?php echo htmlspecialchars($ro['status']); ?>
-                                    </span>
-                                </td>
-                                <td>
-                                    <a href="track_order.php?order_id=<?php echo $ro['id']; ?>" class="track-mini-btn">Track</a>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    <?php endif; ?>
-
-    <!-- Lookup Form -->
-    <div class="track-card">
-        <h2 style="font-family: var(--font-primary); font-size: 1.1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 20px; color: #1a1a1a;">Lookup Order</h2>
         <form method="POST" action="track_order.php">
-            <div class="track-form-grid">
-                <div>
-                    <label class="track-form-label">Order ID</label>
-                    <input type="number" name="order_id" required class="track-input" placeholder="e.g. 10042" value="<?php echo $order_id > 0 ? $order_id : ''; ?>">
-                </div>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <div>
-                        <label class="track-form-label">Billing Email</label>
-                        <input type="email" name="email" class="track-input" placeholder="name@domain.com" value="<?php echo htmlspecialchars($billing_email); ?>">
-                    </div>
-                    <div>
-                        <label class="track-form-label">Billing Phone</label>
-                        <input type="text" name="phone" class="track-input" placeholder="e.g. 9871234567" value="<?php echo htmlspecialchars($billing_phone); ?>">
-                    </div>
-                </div>
-                
-                <p style="font-size: 0.65rem; color: #666; text-transform: uppercase; letter-spacing: 0.5px; margin: 0; line-height: 1.4;">
-                    * If not logged in, please verify by entering the Email Address or Phone Number used during checkout to track the order.
-                </p>
-                
-                <button type="submit" class="track-btn">Track Shipment</button>
+            <!-- Order ID -->
+            <div class="track-input-wrap">
+                <span class="track-input-icon">#</span>
+                <input type="number" name="order_id" class="track-input"
+                       placeholder="Order ID (e.g. 4084)"
+                       value="<?php echo $order_id > 0 ? $order_id : ''; ?>"
+                       required>
             </div>
+
+            <!-- Email (not required if logged in) -->
+            <div class="track-input-wrap">
+                <span class="track-input-icon">
+                    <i data-lucide="mail" style="width:15px;height:15px;"></i>
+                </span>
+                <input type="email" name="email" class="track-input"
+                       placeholder="Email address used at checkout"
+                       value="<?php echo htmlspecialchars($billing_email); ?>"
+                       <?php echo $user_id > 0 ? '' : 'required'; ?>>
+            </div>
+
+            <?php if ($user_id > 0): ?>
+            <p style="font-size:0.72rem;color:#888;margin:0 0 12px;text-align:center;">
+                Logged in — only Order ID needed.
+            </p>
+            <?php endif; ?>
+
+            <button type="submit" class="track-btn">Track Order</button>
         </form>
     </div>
 
-    <!-- Display Results -->
-    <?php if ($order !== null): ?>
-        <div class="track-card" id="tracking-results">
-            <h2 style="font-family: var(--font-primary); font-size: 1.1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 1.5px solid #1a1a1a; padding-bottom: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
-                <span>Tracking Order #<?php echo $order['id']; ?></span>
-                <span class="order-status-badge badge-<?php echo strtolower($order['status']); ?>"><?php echo htmlspecialchars($order['status']); ?></span>
-            </h2>
-            
-            <div class="order-meta-grid">
-                <div>
-                    <div class="meta-item-title">Customer Name</div>
-                    <div class="meta-item-value"><?php echo htmlspecialchars($order['user_name']); ?></div>
-                </div>
-                <div>
-                    <div class="meta-item-title">Order Date</div>
-                    <div class="meta-item-value"><?php echo date('d M Y, h:i A', strtotime($order['created_at'])); ?></div>
-                </div>
-                <div>
-                    <div class="meta-item-title">Payment Method</div>
-                    <div class="meta-item-value" style="text-transform: uppercase;"><?php echo htmlspecialchars($order['payment_method']); ?></div>
-                </div>
-                <div>
-                    <div class="meta-item-title">Payment Status</div>
-                    <div class="meta-item-value" style="text-transform: uppercase;"><?php echo htmlspecialchars($order['payment_status']); ?></div>
+    <!-- ── Recent Orders (logged-in users) ───────────── -->
+    <?php if ($user_id > 0 && !empty($recent_orders) && !$order): ?>
+    <div style="margin-top:4px;">
+        <div class="recent-title">Your Recent Orders</div>
+        <?php foreach ($recent_orders as $ro): ?>
+        <div class="recent-chip">
+            <div>
+                <div class="chip-id">#<?php echo $ro['id']; ?></div>
+                <div class="chip-date">
+                    <?php echo date('d M Y', strtotime($ro['created_at'])); ?>
+                    · ₹<?php echo number_format($ro['total_amount']); ?>
                 </div>
             </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+                <span class="status-pill status-<?php echo strtolower($ro['status']); ?>">
+                    <?php echo htmlspecialchars($ro['status']); ?>
+                </span>
+                <a href="track_order.php" onclick="fillForm(<?php echo $ro['id']; ?>);return false;" class="chip-track">Track</a>
+            </div>
+        </div>
+        <?php endforeach; ?>
+    </div>
+    <script>
+    function fillForm(id) {
+        document.querySelector('input[name="order_id"]').value = id;
+        document.querySelector('form').submit();
+    }
+    </script>
+    <?php endif; ?>
 
-            <!-- Shipping Address -->
-            <div style="margin-bottom: 24px;">
-                <div class="meta-item-title">Shipping Destination</div>
-                <div class="meta-item-value" style="font-family: monospace; white-space: pre-line; line-height: 1.5; font-size: 0.8rem; background: #fafafa; padding: 12px; border-radius: 4px; border: 1.5px dashed #d1d5db; margin-top: 6px;">
-                    <?php echo htmlspecialchars($order['shipping_address']); ?>
+    <!-- ── Order Result ────────────────────────────── -->
+    <?php if ($order): ?>
+    <div class="result-card" id="tracking-results">
+
+        <!-- Header -->
+        <div class="result-header">
+            <div>
+                <span class="result-order-label">Order</span>
+                <span class="result-order-num">#<?php echo $order['id']; ?></span>
+            </div>
+            <span class="status-pill status-<?php echo strtolower($order['status']); ?>">
+                <?php echo htmlspecialchars(ucfirst($order['status'])); ?>
+            </span>
+        </div>
+
+        <!-- Progress bar -->
+        <?php
+        $steps = ['pending','processing','shipped','delivered'];
+        $cur   = strtolower($order['status']);
+        $cur_i = array_search($cur, $steps);
+        if ($cur_i === false) $cur_i = ($cur === 'completed') ? 3 : 0;
+        $fill_pct = $cur_i > 0 ? ($cur_i / (count($steps)-1)) * 100 : 0;
+        ?>
+        <div class="progress-wrap">
+            <div class="progress-steps">
+                <div class="progress-fill" style="width:<?php echo $fill_pct; ?>%;"></div>
+                <?php foreach ($steps as $si => $sl): 
+                    $dot_class = ($si < $cur_i) ? 'done' : (($si === $cur_i) ? 'active' : '');
+                    $lbl_class = ($si <= $cur_i) ? ($si < $cur_i ? 'done' : 'active') : '';
+                ?>
+                <div class="step-dot-wrap">
+                    <div class="step-dot <?php echo $dot_class; ?>">
+                        <?php if ($si < $cur_i): ?>✓<?php else: echo $si+1; endif; ?>
+                    </div>
+                    <div class="step-label <?php echo $lbl_class; ?>"><?php echo ucfirst($sl); ?></div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+
+        <!-- Meta info -->
+        <div class="result-meta">
+            <div>
+                <div class="meta-label">Customer</div>
+                <div class="meta-val"><?php echo htmlspecialchars($order['shipping_name']); ?></div>
+            </div>
+            <div>
+                <div class="meta-label">Order Date</div>
+                <div class="meta-val"><?php echo date('d M Y', strtotime($order['created_at'])); ?></div>
+            </div>
+            <div>
+                <div class="meta-label">Payment</div>
+                <div class="meta-val" style="text-transform:uppercase;">
+                    <?php echo htmlspecialchars($order['payment_method'] ?? 'N/A'); ?>
                 </div>
             </div>
-
-            <!-- Items -->
-            <div style="margin-bottom: 24px;">
-                <div class="meta-item-title">Line Items</div>
-                <div style="margin-top: 6px;">
-                    <?php 
-                    $items_stmt = $conn->prepare("SELECT oi.*, p.name as prod_name, p.image as prod_image FROM order_items oi JOIN products p ON oi.product_id = p.id WHERE oi.order_id = ?");
-                    $items_stmt->bind_param("i", $order['id']);
-                    $items_stmt->execute();
-                    $items = $items_stmt->get_result();
-                    
-                    while($item = $items->fetch_assoc()):
-                        $p_image = $item['prod_image'] ? BASE_URL . '/assets/' . htmlspecialchars($item['prod_image']) : '/assets/product_pants.png';
-                    ?>
-                        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #eaeaea; padding: 10px 0;">
-                            <div style="display: flex; align-items: center; gap: 12px;">
-                                <img src="<?php echo $p_image; ?>" style="width: 45px; height: 45px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd;">
-                                <div>
-                                    <div style="font-size: 0.8rem; font-weight: 600; color: #1a1a1a;"><?php echo htmlspecialchars($item['prod_name']); ?></div>
-                                    <?php if (!empty($item['variant'])): ?>
-                                        <div style="font-size: 0.65rem; color: #888; text-transform: uppercase; font-weight: 700; margin-top: 2px;">Model: <?php echo htmlspecialchars($item['variant']); ?></div>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-                            <div style="text-align: right; font-size: 0.8rem; font-weight: 700;">
-                                <?php echo $item['quantity']; ?> x ₹<?php echo number_format($item['price']); ?>
-                            </div>
-                        </div>
-                    <?php endwhile; ?>
-                </div>
-                
-                <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 15px; font-weight: 700; font-size: 0.9rem;">
-                    <span>Total Paid</span>
-                    <span style="font-size: 1rem; color: #1a1a1a;">₹<?php echo number_format($order['total_amount']); ?></span>
+            <div>
+                <div class="meta-label">Pay Status</div>
+                <div class="meta-val status-pill status-<?php echo strtolower($order['payment_status']); ?>" style="padding:3px 8px;">
+                    <?php echo htmlspecialchars(ucfirst($order['payment_status'] ?? 'N/A')); ?>
                 </div>
             </div>
+        </div>
 
-            <!-- Shiprocket Live Tracking -->
-            <?php if (!empty($order['shiprocket_shipment_id'])): ?>
-                <div style="border-top: 1.5px solid #1a1a1a; padding-top: 20px; margin-top: 20px;">
-                    <div class="meta-item-title">Delivery Status (Shiprocket Tracker)</div>
-                    
-                    <?php 
-                    $scans = [];
-                    $awb = '';
-                    $courier = '';
-                    $current_status = 'Pending Pickup';
-                    
-                    if ($tracking_info && isset($tracking_info['tracking_data']['shipment_track'][0])) {
-                        $track = $tracking_info['tracking_data']['shipment_track'][0];
-                        $awb = $track['awb_code'] ?? '';
-                        $courier = $track['courier_name'] ?? '';
-                        $current_status = $track['current_status'] ?? 'Shipped / Label Generated';
-                        $scans = $track['scans'] ?? [];
-                    }
-                    ?>
+        <!-- Shipping address -->
+        <?php if (!empty($order['shipping_address'])): ?>
+        <div class="meta-label" style="margin-bottom:6px;">Shipping To</div>
+        <div class="ship-box">
+            <?php echo nl2br(htmlspecialchars(
+                $order['shipping_name'] . "\n" .
+                $order['shipping_address'] . "\n" .
+                $order['shipping_city'] . ', ' . $order['shipping_state'] . ' - ' . $order['shipping_zip']
+            )); ?>
+        </div>
+        <?php endif; ?>
 
-                    <div style="background: #f9fafb; padding: 20px; border-radius: 4px; border: 1.5px solid #eaeaea; margin-top: 8px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
-                            <div>
-                                <span style="font-size: 0.65rem; font-weight: 700; text-transform: uppercase; color: #666; display: block;">Current Location status</span>
-                                <span style="font-size: 1.1rem; font-weight: 700; color: #16a34a; text-transform: uppercase;"><?php echo htmlspecialchars($current_status); ?></span>
-                            </div>
-                            <?php if (!empty($awb)): ?>
-                                <div style="text-align: right;">
-                                    <span style="font-size: 0.65rem; font-weight: 700; text-transform: uppercase; color: #666; display: block;">Tracking AWB (<?php echo htmlspecialchars($courier); ?>)</span>
-                                    <span style="font-size: 0.9rem; font-family: monospace; font-weight: 700; color: #1a1a1a;"><?php echo htmlspecialchars($awb); ?></span>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-
-                        <!-- Scans Timeline -->
-                        <?php if (!empty($scans)): ?>
-                            <div class="timeline-wrapper">
-                                <?php foreach ($scans as $idx => $scan): ?>
-                                    <div class="timeline-event <?php echo $idx === 0 ? 'active' : ''; ?>">
-                                        <div class="event-time"><?php echo date('d M Y, h:i A', strtotime($scan['date'])); ?></div>
-                                        <div class="event-desc"><?php echo htmlspecialchars($scan['activity']); ?></div>
-                                        <?php if (!empty($scan['location'])): ?>
-                                            <div class="event-loc">Location: <?php echo htmlspecialchars($scan['location']); ?></div>
-                                        <?php endif; ?>
-                                    </div>
-                                <?php endforeach; ?>
-                            </div>
-                        <?php else: ?>
-                            <div style="font-size: 0.8rem; color: #555555; display: flex; align-items: center; gap: 10px; margin-top: 10px;">
-                                <i data-lucide="info" style="width: 16px; height: 16px; color: #d97706;"></i>
-                                <span>The package has been synced with Shiprocket. Once the courier picks up the parcel, live scan details will appear here.</span>
-                            </div>
-                        <?php endif; ?>
-                        
-                        <?php if (!empty($awb)): ?>
-                            <a href="https://www.shiprocket.in/shipment-tracking/" target="_blank" class="track-btn" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin-top: 20px;">
-                                <i data-lucide="external-link" style="width: 14px; height: 14px;"></i> Track via Shiprocket Portal
-                            </a>
+        <!-- Items -->
+        <?php if (!empty($order_items)): ?>
+        <div class="meta-label" style="margin-bottom:10px;">Items Ordered</div>
+        <div>
+            <?php foreach ($order_items as $item):
+                $img = !empty($item['prod_image'])
+                    ? BASE_URL . '/assets/' . htmlspecialchars($item['prod_image'])
+                    : BASE_URL . '/assets/product_pants.png';
+            ?>
+            <div class="item-row">
+                <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
+                    <img src="<?php echo $img; ?>" class="item-img" alt="">
+                    <div style="min-width:0;">
+                        <div class="item-name"><?php echo htmlspecialchars($item['prod_name']); ?></div>
+                        <?php if (!empty($item['variant'])): ?>
+                        <div class="item-variant"><?php echo htmlspecialchars($item['variant']); ?></div>
                         <?php endif; ?>
                     </div>
                 </div>
-            <?php else: ?>
-                <div style="border-top: 1.5px solid #1a1a1a; padding-top: 20px; margin-top: 20px; display: flex; align-items: center; gap: 12px;">
-                    <i data-lucide="clock" style="color: #d97706; flex-shrink:0;"></i>
-                    <p style="font-size: 0.8rem; color: #555555; margin: 0; line-height: 1.5;">
-                        Your order is being processed at our headquarters and is awaiting carrier pickup. Once shipped, live tracking parameters will automatically activate here.
-                    </p>
+                <div class="item-price">
+                    <?php echo $item['quantity']; ?> × ₹<?php echo number_format($item['price']); ?>
                 </div>
-            <?php endif; ?>
+            </div>
+            <?php endforeach; ?>
         </div>
-        
-        <script>
-            // Auto scroll to results
-            document.addEventListener('DOMContentLoaded', () => {
-                const el = document.getElementById('tracking-results');
-                if (el) {
-                    el.scrollIntoView({ behavior: 'smooth' });
-                }
-            });
-        </script>
+        <div class="total-row">
+            <span>Total Paid</span>
+            <span class="total-amt">₹<?php echo number_format($order['total_amount']); ?></span>
+        </div>
+        <?php endif; ?>
+
+        <!-- Processing note if no shipment -->
+        <div style="display:flex;align-items:flex-start;gap:10px;margin-top:20px;padding-top:16px;border-top:1.5px solid #f0efed;">
+            <i data-lucide="clock" style="color:#e8175d;width:18px;height:18px;flex-shrink:0;margin-top:1px;"></i>
+            <p style="font-size:0.8rem;color:#888;margin:0;line-height:1.6;">
+                <?php if ($cur === 'shipped' || $cur === 'delivered'): ?>
+                Your order has been shipped. Contact support for live courier tracking details.
+                <?php else: ?>
+                Your order is being processed at our warehouse. You will be notified once it is shipped.
+                <?php endif; ?>
+            </p>
+        </div>
+
+    </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var el = document.getElementById('tracking-results');
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    </script>
     <?php endif; ?>
-</div>
+
+</div><!-- /.track-card-wrap -->
+</div><!-- /.track-page -->
 
 <?php require_once 'includes/footer.php'; ?>

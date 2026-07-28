@@ -93,7 +93,7 @@ $_SESSION['recently_viewed'] = array_slice($_SESSION['recently_viewed'], 0, 5);
             
             <!-- Right: Product Info -->
             <div class="product-info-panel">
-                <div class="product-vendor">JEVANI STORE</div>
+                <div class="product-vendor">NØRVA STORE</div>
                 <h1 class="product-detail-title"><?php echo htmlspecialchars($product['name']); ?></h1>
                 
                 <!-- Star Rating Block -->

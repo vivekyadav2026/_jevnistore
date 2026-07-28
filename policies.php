@@ -8,15 +8,27 @@
             <div style="color: var(--text-secondary); line-height: 1.8; font-size: 0.95rem; display: flex; flex-direction: column; gap: 2.5rem;">
                 <div>
                     <h3 style="font-size: 1rem; color: #fff; margin-bottom: 10px; font-weight: 600; text-transform: uppercase;">1. Shipping Policy</h3>
-                    <p>
-                        We offer free shipping across India. Orders are processed within 1-2 business days and delivered within 4-7 business days depending on your location. Tracking details will be shared via email and SMS.
+                    <p style="margin-bottom: 10px;">
+                        <strong>Order Processing & Dispatch Time:</strong><br>
+                        All orders are processed and delivered within 15-20 business days. During sale or high-demand periods, delivery time may be extended due to higher order volumes. Once your order is shipped, you will receive a confirmation email with tracking details.
+                    </p>
+                    <p style="margin-bottom: 10px;">
+                        <strong>Failed Delivery / Return to Sender:</strong><br>
+                        If the courier is unable to deliver the package due to the customer being unavailable, wrong address, or failure to collect, and the order is returned to us, the customer will be responsible for reshipping charges. Reshipping will only be initiated once the additional shipping fee is paid.
+                    </p>
+                    <p style="margin-bottom: 10px;">
+                        <strong>Reshipping Time:</strong><br>
+                        Please note that reshipping may take longer than the standard delivery period due to return handling, reprocessing, and re-dispatch scheduling.
+                    </p>
+                    <p style="font-style: italic; opacity: 0.8;">
+                        * We recommend double-checking your shipping details and ensuring availability during the expected delivery window to avoid delays.
                     </p>
                 </div>
 
                 <div>
                     <h3 style="font-size: 1rem; color: #fff; margin-bottom: 10px; font-weight: 600; text-transform: uppercase;">2. Privacy Policy</h3>
                     <p>
-                        Your privacy is extremely important to us at <strong>JEVANI ENTERPRISES</strong>. We only collect the necessary information required to process your order securely. Please read our complete <a href="privacy_policy.php" style="color: var(--text-primary); text-decoration: underline;">Privacy Policy here</a>.
+                        Your privacy is extremely important to us at <strong>NØRVA STORE</strong>. We only collect the necessary information required to process your order securely. Please read our complete <a href="privacy_policy.php" style="color: var(--text-primary); text-decoration: underline;">Privacy Policy here</a>.
                     </p>
                 </div>
 

@@ -10,8 +10,8 @@ requireAdmin();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Admin Panel | GENRAGE.</title>
-    <link rel="icon" type="image/png" href="<?php echo htmlspecialchars(getSetting('site_logo') ? BASE_URL . '/assets/' . getSetting('site_logo') : BASE_URL . '/assets/logo.png'); ?>">
+    <title>Admin Panel | Nørva Store</title>
+    <link rel="icon" type="image/png" href="<?php echo htmlspecialchars(getSetting('site_logo') ? BASE_URL . '/assets/' . getSetting('site_logo') : BASE_URL . '/assets/logo.png'); ?>?v=3">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/styles.css">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -433,7 +433,7 @@ requireAdmin();
             <?php 
             $site_logo = getSetting('site_logo') ?: 'logo.png'; 
             ?>
-            <img src="<?php echo BASE_URL; ?>/assets/<?php echo htmlspecialchars($site_logo); ?>" alt="Jevani Store Admin" style="height: 50px; width: auto;" onerror="this.src='<?php echo BASE_URL; ?>/assets/logo.png';">
+            <img src="<?php echo BASE_URL; ?>/assets/<?php echo htmlspecialchars($site_logo); ?>" alt="Nørva Store Admin" style="height: 50px; width: auto;" onerror="this.src='<?php echo BASE_URL; ?>/assets/logo.png';">
         </a>
         <nav class="admin-nav">
             <a href="index.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : ''; ?>"><i data-lucide="layout-dashboard"></i> Dashboard</a>

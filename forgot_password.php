@@ -114,9 +114,9 @@ unset($_SESSION['_dev_reset_link']);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Forgot Password | Jevani Store</title>
-    <meta name="description" content="Reset your Jevani Store account password.">
-    <link rel="icon" type="image/png" href="<?php echo htmlspecialchars(getSetting('site_logo') ? BASE_URL . '/assets/' . getSetting('site_logo') : BASE_URL . '/assets/logo.png'); ?>">
+    <title>Forgot Password | Nørva Store</title>
+    <meta name="description" content="Reset your Nørva Store account password.">
+    <link rel="icon" type="image/png" href="<?php echo htmlspecialchars(getSetting('site_logo') ? BASE_URL . '/assets/' . getSetting('site_logo') : BASE_URL . '/assets/logo.png'); ?>?v=3">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
@@ -524,7 +524,7 @@ unset($_SESSION['_dev_reset_link']);
     <!-- Left Panel -->
     <div class="auth-left">
         <a href="<?php echo BASE_URL; ?>/index.php" class="auth-logo">
-            <img src="<?php echo BASE_URL; ?>/assets/logo.png" alt="Jevani Store">
+            <img src="<?php echo BASE_URL; ?>/assets/logo.png" alt="Nørva Store">
         </a>
 
         <div class="auth-brand-content">
@@ -566,7 +566,7 @@ unset($_SESSION['_dev_reset_link']);
         <div class="auth-form-box">
             
             <a href="<?php echo BASE_URL; ?>/index.php" class="auth-mobile-logo">
-                <img src="<?php echo BASE_URL; ?>/assets/logo.png" alt="Jevani Store">
+                <img src="<?php echo BASE_URL; ?>/assets/logo.png" alt="Nørva Store">
             </a>
 
             <?php if ($step === 'request'): ?>

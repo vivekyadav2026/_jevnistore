@@ -1,9 +1,9 @@
     <!-- Footer CSS -->
     <style>
         .footer-premium {
-            background-color: #000;
-            color: #fff;
-            padding: 80px 40px 40px;
+            background-color: #111111;
+            color: #f3f4f6;
+            padding: 95px 40px 45px;
             font-family: 'Inter', sans-serif;
             border-top: 1px solid rgba(255, 255, 255, 0.05);
         }
@@ -11,68 +11,84 @@
             max-width: 1200px;
             margin: 0 auto;
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr;
-            gap: 40px;
-            margin-bottom: 60px;
+            grid-template-columns: 1.5fr 1fr 1fr 1.2fr;
+            gap: 50px;
+            margin-bottom: 70px;
         }
         .footer-brand p {
-            color: #a1a1aa;
-            font-size: 0.85rem;
-            line-height: 1.6;
+            color: #9ca3af;
+            font-size: 0.82rem;
+            line-height: 1.7;
             margin-top: 20px;
-            max-width: 300px;
+            max-width: 280px;
         }
         .footer-col-title {
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             letter-spacing: 2px;
             text-transform: uppercase;
-            font-weight: 600;
-            margin-bottom: 25px;
-            color: #fff;
+            font-weight: 700;
+            margin-bottom: 24px;
+            color: #ffffff;
+            position: relative;
         }
         .footer-links {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
         }
         .footer-links a {
-            color: #a1a1aa;
+            color: #9ca3af;
             text-decoration: none;
-            font-size: 0.85rem;
-            transition: color 0.3s ease;
+            font-size: 0.82rem;
+            transition: all 0.3s ease;
+            width: fit-content;
+            display: inline-block;
         }
         .footer-links a:hover {
-            color: #fff;
+            color: #ffffff;
+            transform: translateX(4px);
+        }
+        .footer-newsletter p {
+            color: #9ca3af;
+            font-size: 0.8rem;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+        .footer-newsletter form {
+            position: relative;
+            display: flex;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            align-items: center;
+            transition: border-color 0.3s;
+        }
+        .footer-newsletter form:focus-within {
+            border-bottom-color: #ffffff;
         }
         .footer-newsletter input {
             background: transparent;
             border: none;
-            border-bottom: 1px solid #444;
-            color: #fff;
+            color: #ffffff;
             padding: 10px 0;
             width: 100%;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             outline: none;
-            transition: border-color 0.3s;
-            margin-bottom: 15px;
+            letter-spacing: 0.5px;
         }
-        .footer-newsletter input:focus {
-            border-bottom-color: #fff;
+        .footer-newsletter input::placeholder {
+            color: #6b7280;
         }
         .footer-newsletter button {
-            background: #fff;
-            color: #000;
+            background: transparent;
             border: none;
-            padding: 10px 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            color: #9ca3af;
             cursor: pointer;
-            transition: background 0.3s;
+            padding: 0 5px;
+            display: flex;
+            align-items: center;
+            transition: color 0.3s;
         }
         .footer-newsletter button:hover {
-            background: #e4e4e7;
+            color: #ffffff;
         }
         .footer-bottom {
             max-width: 1200px;
@@ -80,40 +96,66 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-top: 30px;
-            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
         }
         .footer-social {
             display: flex;
-            gap: 20px;
+            gap: 12px;
         }
         .footer-social a {
-            color: #a1a1aa;
-            transition: color 0.3s ease;
+            color: #9ca3af;
+            background: rgba(255, 255, 255, 0.04);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
         .footer-social a:hover {
-            color: #fff;
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.15);
         }
         .footer-meta {
             display: flex;
             align-items: center;
-            gap: 20px;
-            font-size: 0.8rem;
-            color: #71717a;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            gap: 30px;
+            font-size: 0.78rem;
+            color: #9ca3af;
         }
         .footer-country {
             display: flex;
             align-items: center;
             gap: 8px;
-            color: #a1a1aa;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .footer-country:hover {
+            color: #ffffff;
+        }
+        .footer-trust-badges {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .footer-trust-badge {
+            opacity: 0.5;
+            transition: opacity 0.3s;
+        }
+        .footer-trust-badge:hover {
+            opacity: 0.8;
         }
         @media (max-width: 900px) {
             .footer-grid {
                 grid-template-columns: 1fr 1fr;
+                gap: 40px;
             }
-            .footer-brand {
+            .footer-brand, .footer-newsletter {
                 grid-column: span 2;
             }
         }
@@ -123,14 +165,14 @@
             }
             .footer-grid {
                 grid-template-columns: 1fr;
-                gap: 40px;
+                gap: 35px;
             }
-            .footer-brand {
+            .footer-brand, .footer-newsletter {
                 grid-column: span 1;
             }
             .footer-bottom {
                 flex-direction: column;
-                gap: 20px;
+                gap: 25px;
                 text-align: center;
             }
             .footer-meta {
@@ -144,89 +186,106 @@
     <footer class="footer-premium">
         <div class="footer-grid">
             
-            <!-- Column 1: Brand & Newsletter -->
+            <!-- Column 1: Brand Info -->
             <div class="footer-brand">
                 <a href="<?php echo BASE_URL; ?>/index.php" style="display: inline-block;">
                     <?php 
-                    $site_logo = getSetting('site_logo') ?: 'logo_gothic.png'; 
+                    $site_logo = getSetting('site_logo') ?: 'logo.png'; 
                     ?>
-                    <img src="<?php echo BASE_URL; ?>/assets/<?php echo htmlspecialchars($site_logo); ?>" alt="JEVANI" style="height: 70px; width: auto; object-fit: contain;">
+                    <img src="<?php echo BASE_URL; ?>/assets/<?php echo htmlspecialchars($site_logo); ?>" alt="NØRVA" style="height: 42px; width: auto; object-fit: contain;">
                 </a>
-                <p>Every stitch carries purpose. Jevani is a premium streetwear accessories brand redefining everyday carry for the modern urbanite. Proudly homegrown in India.</p>
+                <p>Every stitch carries purpose. Nørva Store is a dark luxury alternative streetwear brand redefining urban carry with punk hardware and Y2K silhouettes. Homegrown in India.</p>
                 
-                <div class="footer-newsletter" style="margin-top: 30px;">
-                    <div class="footer-col-title" style="margin-bottom: 15px;">Join The Inner Circle</div>
-                    <form onsubmit="event.preventDefault(); alert('Subscribed successfully!');">
-                        <input type="email" placeholder="ENTER YOUR EMAIL ADDRESS" required>
-                        <button type="submit">Subscribe</button>
-                    </form>
+                <!-- Social links moved here for better layout -->
+                <div class="footer-social" style="margin-top: 24px;">
+                    <a href="<?php echo htmlspecialchars(getSetting('social_instagram', '#')); ?>" target="_blank" aria-label="Instagram">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width: 18px; height: 18px;"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                    </a>
+                    <?php 
+                        $wa_number = getSetting('contact_whatsapp', ''); 
+                        $wa_clean = preg_replace('/[^0-9]/', '', $wa_number);
+                        $wa_link = $wa_clean ? 'https://wa.me/' . $wa_clean : '#';
+                    ?>
+                    <a href="<?php echo htmlspecialchars($wa_link); ?>" target="_blank" aria-label="WhatsApp">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width: 18px; height: 18px;"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                    </a>
+                    <a href="#" target="_blank" aria-label="TikTok">
+                        <svg viewBox="0 0 24 24" fill="currentColor" style="width: 16px; height: 16px;"><path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.401.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.951-7.252 4.168 0 7.41 2.967 7.41 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.354-.629-2.758-1.379l-.749 2.848c-.269 1.045-1.004 2.352-1.498 3.146 1.123.345 2.306.535 3.55.535 6.607 0 11.985-5.365 11.985-11.987C23.97 5.367 18.592 0 12.017 0z"/></svg>
+                    </a>
                 </div>
             </div>
 
-            <!-- Column 2: Shop -->
+            <!-- Column 2: Shop Menu -->
             <div>
                 <div class="footer-col-title">Shop</div>
                 <div class="footer-links">
                     <a href="<?php echo BASE_URL; ?>/shop.php">All Products</a>
-                    <a href="<?php echo BASE_URL; ?>/shop.php?category=totes">Signature Totes</a>
-                    <a href="<?php echo BASE_URL; ?>/shop.php?category=crossbody">Crossbody Bags</a>
-                    <a href="<?php echo BASE_URL; ?>/shop.php?category=accessories">Accessories</a>
-                    <a href="<?php echo BASE_URL; ?>/track_order.php">Track Order</a>
+                    <a href="<?php echo BASE_URL; ?>/shop.php?search=bag">Signature Bags</a>
+                    <a href="<?php echo BASE_URL; ?>/shop.php?search=accessories">Accessories</a>
+                    <a href="<?php echo BASE_URL; ?>/reviews.php">Customer Reviews</a>
                 </div>
             </div>
 
-            <!-- Column 3: Support -->
+            <!-- Column 3: Support & Policy -->
             <div>
-                <div class="footer-col-title">Support & Policy</div>
+                <div class="footer-col-title">Support & Policies</div>
                 <div class="footer-links">
-                    <a href="<?php echo BASE_URL; ?>/customer/index.php">Track My Order</a>
-                    <a href="<?php echo BASE_URL; ?>/exchange_policy.php">Returns & Exchanges</a>
-                    <a href="<?php echo BASE_URL; ?>/policies.php">Shipping Policy</a>
+                    <a href="<?php echo BASE_URL; ?>/track_order.php">Track Order</a>
+                    <a href="<?php echo BASE_URL; ?>/shipping_policy.php">Shipping Policy</a>
+                    <a href="<?php echo BASE_URL; ?>/refund_policy.php">Refund & Returns</a>
                     <a href="<?php echo BASE_URL; ?>/privacy_policy.php">Privacy Policy</a>
                     <a href="<?php echo BASE_URL; ?>/terms_of_service.php">Terms of Service</a>
                 </div>
             </div>
 
-            <!-- Column 4: Company -->
-            <div>
-                <div class="footer-col-title">Company</div>
-                <div class="footer-links">
-                    <a href="<?php echo BASE_URL; ?>/about.php">About Us</a>
-                    <a href="<?php echo BASE_URL; ?>/contact.php">Contact Us</a>
-                    <a href="<?php echo BASE_URL; ?>/reviews.php">Customer Reviews</a>
-                    <a href="<?php echo BASE_URL; ?>/partner_with_us.php">Partner With Us</a>
-                </div>
+            <!-- Column 4: Newsletter -->
+            <div class="footer-newsletter">
+                <div class="footer-col-title">Join The Club</div>
+                <p>Subscribe to receive updates, access to exclusive drops, and more.</p>
+                <form onsubmit="event.preventDefault(); showToast('Subscribed successfully!', 'success');">
+                    <input type="email" placeholder="ENTER YOUR EMAIL" required>
+                    <button type="submit" aria-label="Subscribe">
+                        <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+                    </button>
+                </form>
             </div>
 
         </div>
 
         <!-- Footer Bottom -->
         <div class="footer-bottom">
-            <!-- Social Icons -->
-            <div class="footer-social">
-                <a href="<?php echo htmlspecialchars(getSetting('social_instagram', '#')); ?>" target="_blank" aria-label="Instagram">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width: 20px; height: 20px;"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-                </a>
-                <?php 
-                    $wa_number = getSetting('contact_whatsapp', ''); 
-                    $wa_clean = preg_replace('/[^0-9]/', '', $wa_number);
-                    $wa_link = $wa_clean ? 'https://wa.me/' . $wa_clean : '#';
-                ?>
-                <a href="<?php echo htmlspecialchars($wa_link); ?>" target="_blank" aria-label="WhatsApp">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width: 20px; height: 20px;"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
-                </a>
-                <a href="#" target="_blank" aria-label="TikTok">
-                    <svg viewBox="0 0 24 24" fill="currentColor" style="width: 18px; height: 18px;"><path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.401.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.951-7.252 4.168 0 7.41 2.967 7.41 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.354-.629-2.758-1.379l-.749 2.848c-.269 1.045-1.004 2.352-1.498 3.146 1.123.345 2.306.535 3.55.535 6.607 0 11.985-5.365 11.985-11.987C23.97 5.367 18.592 0 12.017 0z"/></svg>
-                </a>
+            <div class="footer-trust-badges">
+                <!-- Inline SVG payment badges for razorpay, upi, visa, mastercard -->
+                <div class="footer-trust-badge" title="Visa">
+                    <svg width="36" height="22" viewBox="0 0 36 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="36" height="22" rx="4" fill="#1A1A1A"/>
+                        <path d="M14.5 7L12.5 15H10.5L8.5 7H10.5L11.5 12L12.5 7H14.5ZM20.5 7L18.5 15H16.5L17.5 7H19.5L18.5 12L19.5 15H20.5ZM26.5 7.5C26 7.2 25.5 7 24.8 7C23.2 7 22 8 22 9.5C22 11.5 24 11.5 24 12.5C24 13 23.5 13.2 23 13.2C22.2 13.2 21.8 13 21.5 12.8L21 14C21.5 14.2 22.2 14.5 23 14.5C24.8 14.5 26 13.5 26 12C26 10 24 10 24 9C24 8.5 24.5 8.2 25 8.2C25.5 8.2 26 8.4 26.2 8.5L26.5 7.5Z" fill="#9CA3AF"/>
+                    </svg>
+                </div>
+                <div class="footer-trust-badge" title="Mastercard">
+                    <svg width="36" height="22" viewBox="0 0 36 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="36" height="22" rx="4" fill="#1A1A1A"/>
+                        <circle cx="15.5" cy="11" r="5.5" fill="#9CA3AF" fill-opacity="0.6"/>
+                        <circle cx="20.5" cy="11" r="5.5" fill="#9CA3AF" fill-opacity="0.8"/>
+                    </svg>
+                </div>
+                <div class="footer-trust-badge" title="UPI Secure Payments">
+                    <svg width="36" height="22" viewBox="0 0 36 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="36" height="22" rx="4" fill="#1A1A1A"/>
+                        <rect x="7" y="6" width="22" height="10" rx="1.5" stroke="#9CA3AF" stroke-width="1.2"/>
+                        <path d="M12 9.5L14 12.5L16 9.5" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round"/>
+                        <path d="M19 9.5H23V11H21V12.5" stroke="#9CA3AF" stroke-width="1.2" stroke-linecap="round"/>
+                    </svg>
+                </div>
             </div>
             
             <div class="footer-meta">
                 <div class="footer-country">
                     <img src="https://flagcdn.com/w20/in.png" alt="India" style="height: 12px; border-radius: 2px;">
-                    INDIA (INR ₹) <i data-lucide="chevron-up" style="width: 14px; height: 14px;"></i>
+                    INDIA (INR ₹)
                 </div>
-                <div>
-                    &copy; <?php echo date('Y'); ?> JEVANI ENTERPRISES. ALL RIGHTS RESERVED.
+                <div style="font-size: 0.72rem; letter-spacing: 0.5px; opacity: 0.8;">
+                    &copy; <?php echo date('Y'); ?> NØRVA STORE. ALL RIGHTS RESERVED.
                 </div>
             </div>
         </div>
@@ -267,7 +326,7 @@
             $site_logo = getSetting('site_logo') ?: 'logo.png'; 
             ?>
             <div class="mobile-nav-header" style="display: flex; justify-content: space-between; align-items: center; padding: 24px 24px 10px 24px; border: none;">
-                <img src="<?php echo BASE_URL; ?>/assets/<?php echo htmlspecialchars($site_logo); ?>" alt="Jevani Store" style="height: 32px; width: auto;" onerror="this.src='<?php echo BASE_URL; ?>/assets/logoOD.png';">
+                <img src="<?php echo BASE_URL; ?>/assets/<?php echo htmlspecialchars($site_logo); ?>" alt="Nørva Store" style="height: 32px; width: auto;" onerror="this.src='<?php echo BASE_URL; ?>/assets/logoOD.png';">
                 <button class="mobile-nav-close" onclick="closeMobileNav()" style="background: none; border: none; cursor: pointer; display: flex; align-items: center; padding: 0;">
                     <i data-lucide="x" style="width: 24px; height: 24px; color: #1a1a1a;"></i>
                 </button>
@@ -575,7 +634,7 @@
                     <i data-lucide="arrow-left" style="width: 20px; height: 20px;"></i>
                 </button>
                 <div class="chk-logo">
-                    JEVANI
+                    NØRVA
                 </div>
                 <button id="chk-close-btn" style="background: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 5px;" title="Cancel & Return to Cart">
                     <i data-lucide="x" style="width: 20px; height: 20px; color: #000000;"></i>
@@ -602,7 +661,7 @@
                     </div>
                     <div class="chk-summary-row" style="margin-top: 10px;">
                         <div class="chk-saved-tag">
-                            <i data-lucide="sparkles" style="width: 12px; height: 12px; fill: rgba(21, 128, 61, 0.1);"></i>
+                            <i data-lucide="sparkles" style="width: 12px; height: 12px; fill: rgba(136, 19, 55, 0.1);"></i>
                             ₹<span id="chk-summary-savings"><?php echo number_format($f_mock_savings); ?></span> saved so far
                         </div>
                         <div class="value">
@@ -614,8 +673,8 @@
                 
                 <!-- Coupon Banner -->
                 <div class="chk-banner-green" style="display: none;">
-                    <i data-lucide="badge-percent" style="width: 18px; height: 18px; fill: rgba(22, 163, 74, 0.1);"></i>
-                    "JEVANI WELCOME" applied
+                    <i data-lucide="badge-percent" style="width: 18px; height: 18px; fill: rgba(136, 19, 55, 0.1);"></i>
+                    "NØRVA WELCOME" applied
                 </div>
                                <!-- Login Container (Step 1: Email + Password) -->
                 <div id="chk-step-login">
@@ -623,6 +682,26 @@
                         <div class="chk-banner-gold">
                             Login to Redeem Gift Card / Partner Offers
                         </div>
+
+                        <!-- Google Continue Button -->
+                        <div style="padding: 12px 14px 0 14px;">
+                            <a href="<?php echo BASE_URL; ?>/google_login.php" style="display:flex; align-items:center; justify-content:center; gap:10px; padding:11px; border:1.5px solid #1a1a1a; border-radius:10px; background:#ffffff; color:#1a1a1a; font-weight:700; text-decoration:none; font-size:0.88rem; box-shadow: 0 2px 6px rgba(0,0,0,0.04); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.01)'" onmouseout="this.style.transform='scale(1)'">
+                                <svg width="18" height="18" viewBox="0 0 24 24">
+                                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                                </svg>
+                                <span>Continue with Google</span>
+                            </a>
+
+                            <div style="display:flex; align-items:center; gap:10px; margin: 12px 0 4px 0; color:#94a3b8; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:1px;">
+                                <div style="flex:1; height:1px; background:#cbd5e1;"></div>
+                                <span>OR</span>
+                                <div style="flex:1; height:1px; background:#cbd5e1;"></div>
+                            </div>
+                        </div>
+
                         <div class="chk-login-header">
                             <i data-lucide="mail" style="width: 16px; height: 16px;"></i>
                             Sign in to continue
@@ -776,7 +855,7 @@
                 
                 <!-- Trust Badges -->
                 <div class="chk-trust-badges">
-                    <span class="chk-trust-title">Powering secure checkout experiences for JEVANI</span>
+                    <span class="chk-trust-title">Powering secure checkout experiences for NØRVA</span>
                     <div class="chk-badge-grid">
                         <span class="chk-badge-item">PCI DSS Certified</span>
                         <span class="chk-badge-item">100% Secured Payments</span>
@@ -786,7 +865,7 @@
                 
                 <!-- Footer Text -->
                 <div class="chk-footer-text">
-                    By proceeding, I agree to Jevani's <a href="#">Privacy Policy</a> and <a href="#">T&C</a>
+                    By proceeding, I agree to Nørva's <a href="#">Privacy Policy</a> and <a href="#">T&C</a>
                 </div>
             </div>
         </div>
@@ -1197,7 +1276,7 @@
                                 "key": resData.razorpay_key,
                                 "amount": resData.amount,
                                 "currency": "INR",
-                                "name": "JEVANI STORE",
+                                "name": "NØRVA STORE",
                                 "description": "Order #" + resData.order_id,
                                 "order_id": resData.razorpay_order_id,
                                 "handler": function (response) {

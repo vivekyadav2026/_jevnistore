@@ -135,6 +135,17 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 $cnt_res = $conn->query("SELECT COUNT(*) as cnt FROM products");
 $total_products_count = $cnt_res ? $cnt_res->fetch_assoc()['cnt'] : 0;
 
+$page_title_text = "Collection";
+if ($selected_category !== null) {
+    $cat_title_stmt = $conn->prepare("SELECT name FROM categories WHERE id = ?");
+    $cat_title_stmt->bind_param("i", $selected_category);
+    $cat_title_stmt->execute();
+    $cat_title_res = $cat_title_stmt->get_result();
+    if ($cat_title_row = $cat_title_res->fetch_assoc()) {
+        $page_title_text = $cat_title_row['name'];
+    }
+}
+
 require_once 'includes/header.php';
 ?>
 
@@ -177,23 +188,216 @@ input:checked + .switch-slider:before {
     max-height: 500px;
     opacity: 1;
 }
+
+/* Fix double line issue on filter headers */
+body:has(.shop-page-container) .filter-group-header,
+.filter-group-header {
+    border-bottom: none !important;
+    padding-bottom: 4px !important;
+}
+.filter-group-divider {
+    height: 1px !important;
+    background: rgba(0, 0, 0, 0.08) !important;
+    margin: 8px 0 12px 0 !important;
+    border: none !important;
+}
+
+/* Black Header Icons for Shop Page */
+.header #mobile-menu-btn,
+.header .header-search-icon,
+.header .header-user-icon,
+.header .header-cart-icon,
+.header .icon-btn,
+.header .menu-toggle,
+.header #mobile-menu-btn *,
+.header .header-search-icon *,
+.header .header-user-icon *,
+.header .header-cart-icon *,
+.header .icon-btn *,
+.header .cart-count {
+    color: #1a1a1a !important;
+    stroke: #1a1a1a !important;
+}
+
+/* View Toggle Switcher & Header Bar */
+.shop-editorial-bg {
+    padding-top: 100px !important;
+}
+@media (max-width: 1024px) {
+    .shop-editorial-bg {
+        padding-top: 90px !important;
+    }
+}
+@media (max-width: 768px) {
+    .shop-editorial-bg {
+        padding-top: 80px !important;
+    }
+}
+
+.shop-toolbar-row {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 10px !important;
+    width: 100% !important;
+    margin: 0 0 24px 0 !important;
+    padding: 0 !important;
+}
+
+@media (min-width: 1025px) {
+    .shop-toolbar-row {
+        display: none !important;
+    }
+}
+
+.mobile-filter-btn {
+    flex: 1 !important;
+    min-width: 0 !important;
+    width: auto !important;
+    margin: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    background: #ffffff !important;
+    color: #1a1a1a !important;
+    border: 1.5px solid #1a1a1a !important;
+    padding: 0 16px !important;
+    height: 44px !important;
+    line-height: 1 !important;
+    box-sizing: border-box !important;
+    font-family: inherit !important;
+    font-weight: 700 !important;
+    font-size: 0.75rem !important;
+    letter-spacing: 1px !important;
+    text-transform: uppercase !important;
+    border-radius: 99px !important;
+    cursor: pointer !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04) !important;
+    white-space: nowrap !important;
+}
+
+.view-toggle-group {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    flex-shrink: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.view-toggle-btn {
+    width: 44px !important;
+    height: 44px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    border-radius: 50% !important;
+    border: 1.5px solid #e5e7eb !important;
+    background: #ffffff !important;
+    color: #374151 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+    flex-shrink: 0 !important;
+}
+.view-toggle-btn.active {
+    background: #e11d48 !important;
+    color: #ffffff !important;
+    border-color: #e11d48 !important;
+}
+.view-toggle-btn:hover:not(.active) {
+    border-color: #9ca3af;
+    background: #f9fafb;
+}
+
+@media (max-width: 480px) {
+    .mobile-filter-btn {
+        height: 40px !important;
+        font-size: 0.7rem !important;
+        padding: 0 10px !important;
+        margin: 0 !important;
+    }
+    .view-toggle-btn {
+        width: 40px !important;
+        height: 40px !important;
+        margin: 0 !important;
+    }
+}
+
+/* List View Layout */
+.shop-grid.view-list {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+}
+.shop-grid.view-list .product-card-min {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 20px !important;
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 12px !important;
+    padding: 14px !important;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.03) !important;
+}
+.shop-grid.view-list .product-card-min .product-img-box {
+    width: 120px !important;
+    height: 120px !important;
+    flex-shrink: 0 !important;
+    border-radius: 8px !important;
+    overflow: hidden !important;
+}
+.shop-grid.view-list .product-card-min .product-img-box img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+}
+.shop-grid.view-list .product-card-min .product-min-title {
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    margin-top: 0 !important;
+    margin-bottom: 6px !important;
+    text-align: left !important;
+}
+.shop-grid.view-list .product-card-min .product-min-price {
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    text-align: left !important;
+    color: #111827 !important;
+}
 </style>
 
 <div class="shop-page-container">
-    <!-- Styled Text Hero Banner -->
-    <div class="shop-hero-text-banner" style="background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%); padding: 60px 24px; text-align: center; border-bottom: 1.5px solid #222; margin-bottom: 10px;">
-        <h1 style="font-family: var(--font-primary); font-size: 2rem; font-weight: 700; letter-spacing: 5px; text-transform: uppercase; color: #ffffff; margin: 0 0 8px 0; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">THE COLLECTION</h1>
-        <p style="font-family: var(--font-secondary); font-size: 0.75rem; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; color: #888888; margin: 0;">Elevate Your Lifestyle. Curated Premium Accessories.</p>
-    </div>
-
     <!-- Main Editorial Shop Section -->
-    <section class="section shop-editorial-bg" style="padding-top: 3rem; padding-bottom: 8rem; background: var(--bg-primary);">
+    <section class="section shop-editorial-bg" style="padding-bottom: 8rem; background: var(--bg-primary);">
         <div class="container">
-            <!-- Mobile Filter Toggle -->
-            <div class="shop-header-row hide-desktop" style="margin-bottom: 30px; display: flex; justify-content: center; align-items: center; width: 100%;">
-                <button class="mobile-filter-btn" onclick="toggleMobileFilter()" style="display: inline-flex !important; align-items: center; justify-content: center; gap: 10px; background: #ffffff !important; color: #1a1a1a !important; border: 1.5px solid #1a1a1a !important; padding: 10px 32px !important; font-family: inherit; font-weight: 700; font-size: 0.8rem !important; letter-spacing: 1.5px; text-transform: uppercase; border-radius: 99px !important; cursor: pointer; width: auto !important; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
-                    <i data-lucide="sliders-horizontal" style="width: 16px; height: 16px; stroke-width: 2.5;"></i> Sort & Filter
-                </button>
+            <!-- Breadcrumbs & Collection Header Bar -->
+            <div class="shop-header-top-section" style="margin-bottom: 24px;">
+                <div class="shop-breadcrumbs" style="font-size: 0.85rem; color: #6b7280; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                    <a href="index.php" style="color: #4b5563; text-decoration: none;">Home</a>
+                    <span style="font-size: 0.75rem; color: #9ca3af;">›</span>
+                    <span style="color: #111827; font-weight: 500;"><?php echo htmlspecialchars($page_title_text); ?></span>
+                </div>
+                <h1 style="font-size: 2.25rem; font-weight: 700; color: #111827; margin: 0 0 20px 0; font-family: var(--font-primary, sans-serif); letter-spacing: -0.5px;"><?php echo htmlspecialchars($page_title_text); ?></h1>
+                
+                <div class="shop-toolbar-row">
+                    <button class="mobile-filter-btn" onclick="toggleMobileFilter()">
+                        <i data-lucide="sliders-horizontal" style="width: 16px; height: 16px; stroke-width: 2.5;"></i> SORT & FILTER
+                    </button>
+
+                    <div class="view-toggle-group">
+                        <button type="button" class="view-toggle-btn grid-btn active" onclick="setShopView('grid')" title="Grid View">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+                        </button>
+                        <button type="button" class="view-toggle-btn list-btn" onclick="setShopView('list')" title="List View">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+                        </button>
+                    </div>
+                </div>
             </div>
             
             <div class="filter-drawer-overlay" id="mobile-filter-overlay" onclick="toggleMobileFilter()"></div>
@@ -573,9 +777,33 @@ input:checked + .switch-slider:before {
         }, 300);
     }
 
-    // Initialize track highlight on load
+    function setShopView(view) {
+        const grid = document.getElementById('all-apparel');
+        const gridBtn = document.querySelector('.view-toggle-btn.grid-btn');
+        const listBtn = document.querySelector('.view-toggle-btn.list-btn');
+        
+        if (!grid) return;
+        
+        if (view === 'list') {
+            grid.classList.add('view-list');
+            if (listBtn) listBtn.classList.add('active');
+            if (gridBtn) gridBtn.classList.remove('active');
+            localStorage.setItem('shop_view_pref', 'list');
+        } else {
+            grid.classList.remove('view-list');
+            if (gridBtn) gridBtn.classList.add('active');
+            if (listBtn) listBtn.classList.remove('active');
+            localStorage.setItem('shop_view_pref', 'grid');
+        }
+    }
+
+    // Initialize track highlight and view state on load
     window.addEventListener('DOMContentLoaded', () => {
         updateTrackHighlight();
+        const savedView = localStorage.getItem('shop_view_pref');
+        if (savedView === 'list') {
+            setShopView('list');
+        }
     });
     </script>
 </div>

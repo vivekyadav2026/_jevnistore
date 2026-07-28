@@ -436,24 +436,7 @@ html { scroll-behavior: smooth; }
 
     /* Dashboard */
     .dashboard-layout { grid-template-columns: 1fr; gap: 0; }
-    .dashboard-nav {
-        position: static;
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 0;
-        border-bottom: 1px solid rgba(255,255,255,0.08);
-        margin-bottom: 30px;
-        padding-bottom: 0;
-    }
-    .dashboard-nav a {
-        padding: 12px 16px;
-        border-bottom: 2px solid transparent;
-        font-size: 0.8rem;
-    }
-    .dashboard-nav a:hover, .dashboard-nav a.active {
-        border-bottom-color: #fff;
-        border-right: none;
-    }
+    /* Legacy dashboard nav replaced by account-nav-list */
 
     /* Admin */
     .admin-menu-toggle { display: flex !important; }
@@ -1118,4 +1101,71 @@ html { scroll-behavior: smooth; }
     }
 }
 
+/* ── Customer Account Pages Responsive Overrides ── */
+@media (max-width: 1024px) {
+    .account-grid-layout {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+    }
+    .account-panel-card,
+    .wishlist-panel-card,
+    .track-card {
+        padding: 20px 16px !important;
+        border-radius: 14px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+}
 
+@media (max-width: 768px) {
+    .account-nav-list {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 6px !important;
+        padding: 6px !important;
+        border-radius: 12px !important;
+        border: 1.5px solid #1a1a1a !important;
+        background: #ffffff !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
+        margin-bottom: 16px !important;
+        width: 100% !important;
+    }
+    .account-nav-link {
+        width: 100% !important;
+        justify-content: center !important;
+        padding: 10px 4px !important;
+        font-size: 0.66rem !important;
+        border: none !important;
+        border-radius: 8px !important;
+        background: transparent !important;
+        text-align: center !important;
+        letter-spacing: 0.5px !important;
+        gap: 6px !important;
+    }
+    .stat-cards-row {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 10px !important;
+        width: 100% !important;
+    }
+    .stat-card-item {
+        padding: 14px 12px !important;
+        gap: 10px !important;
+        border-radius: 12px !important;
+    }
+    .stat-number-val {
+        font-size: 1.5rem !important;
+    }
+    .stat-icon-wrapper {
+        width: 38px !important;
+        height: 38px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .stat-cards-row {
+        grid-template-columns: 1fr !important;
+    }
+    .account-title {
+        font-size: 1.5rem !important;
+    }
+}

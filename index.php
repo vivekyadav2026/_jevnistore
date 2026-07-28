@@ -199,7 +199,8 @@
         margin-top: 40px;
     }
     .info-box {
-        border: 1.5px solid #1a1a1a;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        border-radius: 12px;
         padding: 20px;
         background: transparent;
         position: relative;
@@ -250,7 +251,9 @@
         margin-top: 20px;
     }
     .detail-card {
-        border: 1px solid #1a1a1a;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        border-radius: 10px;
+        overflow: hidden;
         position: relative;
     }
     .detail-card img {
@@ -479,7 +482,7 @@
     <picture style="width: 100%;">
         <source media="(max-width: 768px)" srcset="<?php echo BASE_URL; ?>/assets/hero_mobile.jpg">
         <source media="(min-width: 769px)" srcset="<?php echo BASE_URL; ?>/assets/hero_banner_model.png">
-        <img src="<?php echo BASE_URL; ?>/assets/hero_banner_model.png" alt="JEVANI Campaign" style="width: 100%; height: auto; object-fit: cover;">
+        <img src="<?php echo BASE_URL; ?>/assets/hero_banner_model.png" alt="NØRVA Campaign" style="width: 100%; height: auto; object-fit: cover;">
     </picture>
 </section>
 
@@ -700,7 +703,7 @@
 
         <!-- 2. Instagram Handle & Link -->
         <div class="mobile-instagram-header">
-            <a href="https://instagram.com" target="_blank" class="instagram-handle">@jevanistore</a>
+            <a href="https://instagram.com/norvastorex" target="_blank" class="instagram-handle">@norvastorex</a>
             <a href="https://instagram.com" target="_blank" class="instagram-view-link">VIEW OUR INSTAGRAM</a>
         </div>
 
@@ -902,7 +905,7 @@
     </div> -->
     
     <div class="ragers-content">
-        <h2 class="ragers-title">Let JEVANI speak for itself</h2>
+        <h2 class="ragers-title">Let NØRVA speak for itself</h2>
         
         <div class="ragers-stars">★★★★★</div>
         <div class="ragers-count">

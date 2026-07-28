@@ -50,9 +50,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $mail->Port       = 587; // TCP port to connect to
 
                 // Recipients
-                $mail->setFrom('noreply@jevanistore.com', 'Jevani Store Waitlist');
+                $mail->setFrom('noreply@norva.store', 'Nørva Store Waitlist');
                 // The admin email where you want to receive these notifications
-                $mail->addAddress('admin@jevanistore.com', 'Admin');
+                $mail->addAddress('norvastorex@gmail.com', 'Admin');
 
                 // Content
                 $mail->isHTML(true);

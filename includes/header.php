@@ -7,9 +7,9 @@ require_once __DIR__ . '/functions.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title><?php echo htmlspecialchars(getSetting('site_title', 'Jevani Store | Modern Edgy Clothing')); ?></title>
+    <title><?php echo htmlspecialchars(getSetting('site_title', 'Nørva   | Modern Edgy Clothing')); ?></title>
     <meta name="description" content="<?php echo htmlspecialchars(getSetting('site_description', 'Shop the latest streetwear. Baggy pants, hoodies, and cyberpunk fashion.')); ?>">
-    <link rel="icon" type="image/png" href="<?php echo htmlspecialchars(getSetting('site_logo') ? BASE_URL . '/assets/' . getSetting('site_logo') : BASE_URL . '/assets/logo.png'); ?>">
+    <link rel="icon" type="image/png" href="<?php echo htmlspecialchars(getSetting('site_logo') ? BASE_URL . '/assets/' . getSetting('site_logo') : BASE_URL . '/assets/logo.png'); ?>?v=3">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/styles.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/responsive.css?v=<?php echo time(); ?>">
     <!-- Google Fonts -->
@@ -187,7 +187,11 @@ require_once __DIR__ . '/functions.php';
         });
     </script>
 </head>
-<body>
+<?php
+$current_page = basename($_SERVER['PHP_SELF']);
+$body_class = ($current_page === 'index.php') ? 'homepage-body' : 'subpage-body';
+?>
+<body class="<?php echo $body_class; ?>">
 
     <!-- Toast Container -->
     <div id="toast-container"></div>
@@ -302,7 +306,7 @@ require_once __DIR__ . '/functions.php';
                     <?php 
                     $site_logo = getSetting('site_logo') ?: 'logo.png'; 
                     ?>
-                    <img src="<?php echo BASE_URL; ?>/assets/<?php echo htmlspecialchars($site_logo); ?>" alt="Jevani Store" style="height: 60px; width: auto;" onerror="this.src='<?php echo BASE_URL; ?>/assets/logoOD.png';">
+                    <img src="<?php echo BASE_URL; ?>/assets/<?php echo htmlspecialchars($site_logo); ?>" alt="Nørva Store" style="height: 40px; width: auto;" onerror="this.src='<?php echo BASE_URL; ?>/assets/logoOD.png';">
                 </a>
             </div>
             

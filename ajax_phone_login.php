@@ -57,7 +57,7 @@ if ($res->num_rows > 0) {
     // New user - Auto-register and log them in
     $name = 'Guest Customer';
     // Create a unique placeholder email based on phone number to satisfy the DB constraint
-    $email = 'guest_' . $phone . '@jevani.com';
+    $email = 'guest_' . $phone . '@norva.store';
     $role = 'customer';
     
     // Hash a random password for security
