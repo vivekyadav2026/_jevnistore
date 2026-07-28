@@ -3277,7 +3277,7 @@ h1, h2, h3, h4, h5, h6 { font-weight: 500; letter-spacing: -0.01em; }
     border-radius: 16px;
     box-shadow: 0 12px 35px rgba(0, 0, 0, 0.1);
     border: 1px solid rgba(0, 0, 0, 0.05);
-    aspect-ratio: 4/5;
+    aspect-ratio: 1/1;
 }
 .main-image-container img {
     width: 100%;
@@ -4526,7 +4526,7 @@ body:has(.shop-page-container) .slider-handle::-moz-range-thumb {
     border-radius: 16px;
     box-shadow: 0 12px 35px rgba(0, 0, 0, 0.1);
     border: 1px solid rgba(0, 0, 0, 0.05);
-    aspect-ratio: 4/5;
+    aspect-ratio: 1/1;
 }
 .main-image-container img {
     width: 100%;
