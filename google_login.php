@@ -5,8 +5,8 @@ require_once __DIR__ . '/includes/functions.php';
 // =========================================================================
 // GOOGLE OAUTH CREDENTIALS CONFIGURATION (FROM WEB CLIENT 2 SCREENSHOT)
 // =========================================================================
-$client_id     = trim(getSetting('google_client_id', ''));
-$client_secret = trim(getSetting('google_client_secret', ''));
+$client_id     = getGoogleClientId();
+$client_secret = getGoogleClientSecret();
 $redirect_uri  = BASE_URL . '/google_login.php';
 
 // Ensure database settings table has these updated credentials

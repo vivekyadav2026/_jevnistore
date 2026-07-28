@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
-$google_client_id = getSetting('google_client_id', '') ?: '640331052906-q6k3o731j8r19gt1ekp5062t2o955itn.apps.googleusercontent.com';
+$google_client_id = getGoogleClientId();
 ?>
 <!DOCTYPE html>
 <html lang="en">

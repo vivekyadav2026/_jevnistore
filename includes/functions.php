@@ -48,6 +48,14 @@ function requireAdmin() {
     }
 }
 
+function getGoogleClientId() {
+    return trim(getSetting('google_client_id', '')) ?: '';
+}
+
+function getGoogleClientSecret() {
+    return trim(getSetting('google_client_secret', ''));
+}
+
 function getCartCount() {
     $count = 0;
     if (isset($_SESSION['cart'])) {
