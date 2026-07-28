@@ -3268,9 +3268,8 @@ h1, h2, h3, h4, h5, h6 { font-weight: 500; letter-spacing: -0.01em; }
     max-width: 460px;
 }
 .main-image-container {
-    max-width: 100%;
-    width: fit-content;
-    margin: 0 auto;
+    width: 100%;
+    max-width: 460px;
     background: transparent;
     overflow: hidden;
     cursor: zoom-in;
@@ -3280,9 +3279,7 @@ h1, h2, h3, h4, h5, h6 { font-weight: 500; letter-spacing: -0.01em; }
     border: 1px solid rgba(0, 0, 0, 0.05);
 }
 .main-image-container img {
-    max-width: 100%;
-    max-height: 420px;
-    width: auto;
+    width: 100%;
     height: auto;
     object-fit: contain;
     display: block;
@@ -4520,9 +4517,8 @@ body:has(.shop-page-container) .slider-handle::-moz-range-thumb {
 }
 
 .main-image-container {
-    max-width: 100%;
-    width: fit-content;
-    margin: 0 auto;
+    width: 100%;
+    max-width: 460px;
     background: transparent;
     overflow: hidden;
     cursor: zoom-in;
@@ -4532,9 +4528,7 @@ body:has(.shop-page-container) .slider-handle::-moz-range-thumb {
     border: 1px solid rgba(0, 0, 0, 0.05);
 }
 .main-image-container img {
-    max-width: 100%;
-    max-height: 420px;
-    width: auto;
+    width: 100%;
     height: auto;
     object-fit: contain;
     display: block;
