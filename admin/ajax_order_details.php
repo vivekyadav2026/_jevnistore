@@ -74,6 +74,13 @@ $items = $item_stmt->get_result();
                 </p>
             </div>
         </div>
+        
+        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #222;">
+            <button id="btn-check-shipping-<?php echo $order_id; ?>" onclick="checkEstimatedShipping(<?php echo $order_id; ?>)" style="background: var(--bg-card); color: var(--text-primary); border: 1px solid #475569; padding: 6px 12px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; gap: 5px;">
+                <i data-lucide="calculator" style="width: 14px; height: 14px;"></i> Estimate Shipping Cost
+            </button>
+            <div id="shipping-result-<?php echo $order_id; ?>" style="margin-top: 10px; font-size: 0.85rem;"></div>
+        </div>
     </div>
 
     <h4 style="margin: 0 0 15px 0; color: var(--accent); font-size: 0.9rem; letter-spacing: 1px; text-transform: uppercase;">Line Items</h4>
@@ -125,4 +132,44 @@ $items = $item_stmt->get_result();
             </tr>
         </tbody>
     </table>
+    
+    <script>
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+    
+    function checkEstimatedShipping(orderId) {
+        const btn = document.getElementById('btn-check-shipping-' + orderId);
+        const resDiv = document.getElementById('shipping-result-' + orderId);
+        
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
+        resDiv.innerHTML = '';
+        
+        fetch('ajax_check_shipping.php?order_id=' + orderId)
+            .then(response => response.json())
+            .then(data => {
+                btn.disabled = false;
+                btn.innerHTML = '<i data-lucide="calculator" style="width: 14px; height: 14px;"></i> Estimate Shipping Cost';
+                if (typeof lucide !== 'undefined') { lucide.createIcons(); }
+                
+                if (data.status === 'success') {
+                    resDiv.innerHTML = `<div style="background: rgba(16, 185, 129, 0.1); border-left: 3px solid #10b981; padding: 10px; color: #10b981; border-radius: 4px;">
+                        <strong>Estimated Cost:</strong> ₹${data.rate}<br>
+                        <strong>Courier:</strong> ${data.courier_name}<br>
+                        <span style="font-size: 0.75rem; color: #888;">(Weight: ${data.weight}kg | Pincode: ${data.pickup_pincode} &rarr; ${data.delivery_pincode})</span>
+                    </div>`;
+                } else {
+                    resDiv.innerHTML = `<div style="background: rgba(239, 68, 68, 0.1); border-left: 3px solid #ef4444; padding: 10px; color: #ef4444; border-radius: 4px;">
+                        ${data.message}
+                    </div>`;
+                }
+            })
+            .catch(err => {
+                btn.disabled = false;
+                btn.innerHTML = 'Estimate Shipping Cost';
+                resDiv.innerHTML = `<span style="color: red;">Error checking shipping cost.</span>`;
+            });
+    }
+    </script>
 </div>

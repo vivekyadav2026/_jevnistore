@@ -70,7 +70,7 @@ $result = $stmt->get_result();
 if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
     if ($result->num_rows > 0) {
         while ($product = $result->fetch_assoc()) {
-            $image = $product['image'] ? BASE_URL . '/assets/' . htmlspecialchars($product['image']) : BASE_URL . '/assets/bag_shoulder.png';
+            $image = $product['image'] ? BASE_URL . '/assets/' . htmlspecialchars($product['image']) : BASE_URL . '/assets/bags/acc_2.jpeg';
             $hover_image = !empty($product['image2']) ? BASE_URL . '/assets/' . htmlspecialchars($product['image2']) : '';
             
             $discount_pct = 0;
@@ -542,7 +542,7 @@ body:has(.shop-page-container) .filter-group-header,
                         <?php
                         if ($result->num_rows > 0) {
                             while ($product = $result->fetch_assoc()) {
-                                $image = $product['image'] ? BASE_URL . '/assets/' . htmlspecialchars($product['image']) : BASE_URL . '/assets/bag_shoulder.png';
+                                $image = $product['image'] ? BASE_URL . '/assets/' . htmlspecialchars($product['image']) : BASE_URL . '/assets/bags/acc_2.jpeg';
                                 $hover_image = !empty($product['image2']) ? BASE_URL . '/assets/' . htmlspecialchars($product['image2']) : '';
                                 
                                 $discount_pct = 0;
@@ -612,16 +612,23 @@ body:has(.shop-page-container) .filter-group-header,
     <section class="marquee-section">
         <div class="marquee-title">AS FEATURED IN</div>
         <div class="marquee-track">
-            <span class="marquee-logo">VOGUE</span>
-            <span class="marquee-logo">HYPEBEAST</span>
-            <span class="marquee-logo">GQ</span>
-            <span class="marquee-logo">HIGHSNOBIETY</span>
-            <span class="marquee-logo">COMPLEX</span>
-            <span class="marquee-logo">VOGUE</span>
-            <span class="marquee-logo">HYPEBEAST</span>
-            <span class="marquee-logo">GQ</span>
-            <span class="marquee-logo">HIGHSNOBIETY</span>
-            <span class="marquee-logo">COMPLEX</span>
+            <span class="marquee-logo">Nørva Store</span>
+            <span class="marquee-logo">Nørva Store</span>
+            <span class="marquee-logo">Nørva Store</span>
+            <span class="marquee-logo">Nørva Store</span>
+            <span class="marquee-logo">Nørva Store</span>
+            <span class="marquee-logo">Nørva Store</span>
+            <span class="marquee-logo">Nørva Store</span>
+        </div>
+    </section>
+
+    <script>
+    let filterTimeout;
+
+    function toggleMobileFilter() {
+        const drawer = document.getElementById('shop-filter-drawer');
+        const overlay = document.getElementById('mobile-filter-overlay');
+        drawer.classList.toggle('open');
         </div>
     </section>
 

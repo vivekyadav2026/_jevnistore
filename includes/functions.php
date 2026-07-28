@@ -268,14 +268,29 @@ function pushOrderToShiprocket($order_id) {
         return ['status' => 'error', 'message' => 'Order not found in database.'];
     }
 
-    // Get order items (including variant column)
-    $item_stmt = $conn->prepare("SELECT oi.*, p.name as prod_name FROM order_items oi JOIN products p ON oi.product_id = p.id WHERE oi.order_id = ?");
+    // Get order items (including variant column and dimensions)
+    $item_stmt = $conn->prepare("SELECT oi.*, p.name as prod_name, p.weight, p.length, p.width, p.height FROM order_items oi JOIN products p ON oi.product_id = p.id WHERE oi.order_id = ?");
     $item_stmt->bind_param("i", $order_id);
     $item_stmt->execute();
     $items_res = $item_stmt->get_result();
     
     $order_items = [];
+    $total_weight = 0;
+    $max_length = 0;
+    $max_width = 0;
+    $max_height = 0;
+    
     while ($item = $items_res->fetch_assoc()) {
+        $wgt = (float)$item['weight'] > 0 ? (float)$item['weight'] : (float)getSetting('shiprocket_default_weight', '0.5');
+        $total_weight += $wgt * (int)$item['quantity'];
+        
+        $l = (int)$item['length'] > 0 ? (int)$item['length'] : (int)getSetting('shiprocket_default_length', '10');
+        $w = (int)$item['width'] > 0 ? (int)$item['width'] : (int)getSetting('shiprocket_default_width', '10');
+        $h = (int)$item['height'] > 0 ? (int)$item['height'] : (int)getSetting('shiprocket_default_height', '10');
+        
+        if ($l > $max_length) $max_length = $l;
+        if ($w > $max_width) $max_width = $w;
+        if ($h > $max_height) $max_height = $h;
         $variant_suffix = !empty($item['variant']) ? ' (' . $item['variant'] . ')' : '';
         $sku_suffix = !empty($item['variant']) ? '_' . strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', $item['variant']), 0, 8)) : '';
         
@@ -345,10 +360,10 @@ function pushOrderToShiprocket($order_id) {
         'order_items' => $order_items,
         'payment_method' => $payment_method,
         'sub_total' => (float)$order['total_amount'],
-        'length' => (int)getSetting('shiprocket_default_length', '10'),
-        'width' => (int)getSetting('shiprocket_default_width', '10'),
-        'height' => (int)getSetting('shiprocket_default_height', '10'),
-        'weight' => (float)getSetting('shiprocket_default_weight', '0.5')
+        'length' => $max_length ?: (int)getSetting('shiprocket_default_length', '10'),
+        'width' => $max_width ?: (int)getSetting('shiprocket_default_width', '10'),
+        'height' => $max_height ?: (int)getSetting('shiprocket_default_height', '10'),
+        'weight' => $total_weight > 0 ? $total_weight : (float)getSetting('shiprocket_default_weight', '0.5')
     ];
 
     $ch = curl_init('https://apiv2.shiprocket.in/v2/authorized/orders/create/adhoc');

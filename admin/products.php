@@ -20,6 +20,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_product'])) {
     $compare_at_price = !empty($_POST['compare_at_price']) ? (float)$_POST['compare_at_price'] : null;
     $description = $_POST['description'] ?? '';
     $stock = $_POST['stock'] ?? 0;
+    $weight = isset($_POST['weight']) ? (float)$_POST['weight'] : 0.5;
+    $length = isset($_POST['length']) ? (int)$_POST['length'] : 10;
+    $width = isset($_POST['width']) ? (int)$_POST['width'] : 10;
+    $height = isset($_POST['height']) ? (int)$_POST['height'] : 10;
     $is_waitlist = isset($_POST['is_waitlist']) ? 1 : 0;
     
     // Handle primary image upload
@@ -40,8 +44,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_product'])) {
     $variant_name = $_POST['variant_name'] ?? '';
     $variants_list = $_POST['variants_list'] ?? '';
 
-    $stmt = $conn->prepare("INSERT INTO products (category_id, name, description, price, compare_at_price, stock, is_waitlist, image, image2, has_variants, variant_name, variants_list) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("issddiisssis", $category_id, $name, $description, $price, $compare_at_price, $stock, $is_waitlist, $image, $image2, $has_variants, $variant_name, $variants_list);
+    $stmt = $conn->prepare("INSERT INTO products (category_id, name, description, price, compare_at_price, stock, weight, length, width, height, is_waitlist, image, image2, has_variants, variant_name, variants_list) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("issddidiiiiissis", $category_id, $name, $description, $price, $compare_at_price, $stock, $weight, $length, $width, $height, $is_waitlist, $image, $image2, $has_variants, $variant_name, $variants_list);
     $stmt->execute();
     $product_id = $conn->insert_id;
 
@@ -82,6 +86,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['edit_product'])) {
     $compare_at_price = !empty($_POST['compare_at_price']) ? (float)$_POST['compare_at_price'] : null;
     $description = $_POST['description'] ?? '';
     $stock = $_POST['stock'] ?? 0;
+    $weight = isset($_POST['weight']) ? (float)$_POST['weight'] : 0.5;
+    $length = isset($_POST['length']) ? (int)$_POST['length'] : 10;
+    $width = isset($_POST['width']) ? (int)$_POST['width'] : 10;
+    $height = isset($_POST['height']) ? (int)$_POST['height'] : 10;
     $is_waitlist = isset($_POST['is_waitlist']) ? 1 : 0;
     
     // Get existing product images
@@ -115,8 +123,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['edit_product'])) {
     $variant_name = $_POST['variant_name'] ?? '';
     $variants_list = $_POST['variants_list'] ?? '';
 
-    $stmt = $conn->prepare("UPDATE products SET category_id = ?, name = ?, description = ?, price = ?, compare_at_price = ?, stock = ?, is_waitlist = ?, image = ?, image2 = ?, has_variants = ?, variant_name = ?, variants_list = ? WHERE id = ?");
-    $stmt->bind_param("issddiisssisi", $category_id, $name, $description, $price, $compare_at_price, $stock, $is_waitlist, $image, $image2, $has_variants, $variant_name, $variants_list, $product_id);
+    $stmt = $conn->prepare("UPDATE products SET category_id = ?, name = ?, description = ?, price = ?, compare_at_price = ?, stock = ?, weight = ?, length = ?, width = ?, height = ?, is_waitlist = ?, image = ?, image2 = ?, has_variants = ?, variant_name = ?, variants_list = ? WHERE id = ?");
+    $stmt->bind_param("issddidiiiiissisi", $category_id, $name, $description, $price, $compare_at_price, $stock, $weight, $length, $width, $height, $is_waitlist, $image, $image2, $has_variants, $variant_name, $variants_list, $product_id);
     $stmt->execute();
     
     // Handle multiple new gallery images
@@ -199,6 +207,24 @@ if (isset($_GET['delete_gallery_image_id'])) {
             <input type="number" step="0.01" name="price" class="form-control" placeholder="Price (INR)" required>
             <input type="number" step="0.01" name="compare_at_price" class="form-control" placeholder="Compare-At Price (Original Price, optional)">
             <input type="number" name="stock" class="form-control" placeholder="Stock Quantity" required>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 15px;">
+                <div>
+                    <label style="display:block; margin-bottom:5px; font-size:12px; color:#cbd5e1;">Weight (kg)</label>
+                    <input type="number" step="0.001" name="weight" class="form-control" placeholder="0.5" value="0.5" required>
+                </div>
+                <div>
+                    <label style="display:block; margin-bottom:5px; font-size:12px; color:#cbd5e1;">Length (cm)</label>
+                    <input type="number" name="length" class="form-control" placeholder="10" value="10" required>
+                </div>
+                <div>
+                    <label style="display:block; margin-bottom:5px; font-size:12px; color:#cbd5e1;">Width (cm)</label>
+                    <input type="number" name="width" class="form-control" placeholder="10" value="10" required>
+                </div>
+                <div>
+                    <label style="display:block; margin-bottom:5px; font-size:12px; color:#cbd5e1;">Height (cm)</label>
+                    <input type="number" name="height" class="form-control" placeholder="10" value="10" required>
+                </div>
+            </div>
             <div style="margin-top: 15px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
                 <input type="checkbox" name="is_waitlist" id="add-is-waitlist" value="1">
                 <label for="add-is-waitlist" style="font-size: 13px; color: #cbd5e1; cursor: pointer;">Waitlist Only (Product is in manufacturing / coming soon)</label>
@@ -288,6 +314,25 @@ if (isset($_GET['delete_gallery_image_id'])) {
             <div style="margin-bottom: 15px;">
                 <label style="display:block; margin-bottom:5px; font-size:13px; color:#cbd5e1; font-weight: 600;">Stock</label>
                 <input type="number" name="stock" id="edit-stock" class="form-control" required>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px;">
+                <div>
+                    <label style="display:block; margin-bottom:5px; font-size:12px; color:#cbd5e1;">Weight (kg)</label>
+                    <input type="number" step="0.001" name="weight" id="edit-weight" class="form-control" required>
+                </div>
+                <div>
+                    <label style="display:block; margin-bottom:5px; font-size:12px; color:#cbd5e1;">Length (cm)</label>
+                    <input type="number" name="length" id="edit-length" class="form-control" required>
+                </div>
+                <div>
+                    <label style="display:block; margin-bottom:5px; font-size:12px; color:#cbd5e1;">Width (cm)</label>
+                    <input type="number" name="width" id="edit-width" class="form-control" required>
+                </div>
+                <div>
+                    <label style="display:block; margin-bottom:5px; font-size:12px; color:#cbd5e1;">Height (cm)</label>
+                    <input type="number" name="height" id="edit-height" class="form-control" required>
+                </div>
             </div>
             
             <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
@@ -645,6 +690,10 @@ function openEditModal(product, gallery) {
     document.getElementById('edit-price').value = product.price;
     document.getElementById('edit-compare-at-price').value = product.compare_at_price || '';
     document.getElementById('edit-stock').value = product.stock;
+    document.getElementById('edit-weight').value = product.weight || 0.5;
+    document.getElementById('edit-length').value = product.length || 10;
+    document.getElementById('edit-width').value = product.width || 10;
+    document.getElementById('edit-height').value = product.height || 10;
     document.getElementById('edit-is-waitlist').checked = product.is_waitlist == 1;
     document.getElementById('edit-has-variants').checked = product.has_variants == 1;
     document.getElementById('edit-variant-name').value = product.variant_name || '';

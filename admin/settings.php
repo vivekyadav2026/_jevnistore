@@ -122,6 +122,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['save_settings'])) {
                 <input type="url" name="settings[social_twitter]" class="form-control" value="<?php echo htmlspecialchars(getSetting('social_twitter')); ?>" style="margin-bottom:0;">
             </div>
             <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px; font-size:12px; color:#888; text-transform: uppercase; letter-spacing: 0.5px;">TikTok URL</label>
+                <input type="url" name="settings[social_tiktok]" class="form-control" value="<?php echo htmlspecialchars(getSetting('social_tiktok')); ?>" style="margin-bottom:0;">
+            </div>
+            <div style="margin-bottom: 15px;">
                 <label style="display:block; margin-bottom:5px; font-size:12px; color:#888; text-transform: uppercase; letter-spacing: 0.5px;">Contact Email</label>
                 <input type="email" name="settings[contact_email]" class="form-control" value="<?php echo htmlspecialchars(getSetting('contact_email')); ?>" style="margin-bottom:0;">
             </div>
@@ -248,8 +252,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['save_settings'])) {
                 <input type="password" name="settings[shiprocket_password]" class="form-control" value="<?php echo htmlspecialchars(getSetting('shiprocket_password')); ?>" placeholder="Password" style="margin-bottom:0;">
             </div>
             <div style="margin-bottom: 15px;">
-                <label style="display:block; margin-bottom:5px; font-size:12px; color:#888; text-transform: uppercase; letter-spacing: 0.5px;">Pickup Location Name</label>
+                <label style="display:block; margin-bottom:5px; font-size:12px; color:#888; text-transform: uppercase; letter-spacing: 0.5px; margin-top:15px;">Shiprocket Pickup Location ID</label>
                 <input type="text" name="settings[shiprocket_pickup_location]" class="form-control" value="<?php echo htmlspecialchars(getSetting('shiprocket_pickup_location', 'Primary')); ?>" style="margin-bottom:0;">
+                
+                <label style="display:block; margin-bottom:5px; font-size:12px; color:#888; text-transform: uppercase; letter-spacing: 0.5px; margin-top:15px;">Shiprocket Pickup Pincode (For Estimate)</label>
+                <input type="text" name="settings[shiprocket_pickup_pincode]" class="form-control" value="<?php echo htmlspecialchars(getSetting('shiprocket_pickup_pincode', '')); ?>" placeholder="e.g. 110001" style="margin-bottom:0;">
             </div>
             <div style="margin-bottom: 15px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
                 <div>

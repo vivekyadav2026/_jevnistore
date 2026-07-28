@@ -374,7 +374,7 @@ $is_logged_in = isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0;
                             <div class="wishlist-products-grid" id="wishlist-grid">
                                 <?php
                                 while ($product = $result->fetch_assoc()) {
-                                    $image = $product['image'] ? BASE_URL . '/assets/' . htmlspecialchars($product['image']) : BASE_URL . '/assets/bag_shoulder.png';
+                                    $image = $product['image'] ? BASE_URL . '/assets/' . htmlspecialchars($product['image']) : BASE_URL . '/assets/bags/acc_2.jpeg';
                                     ?>
                                     <div class="product-card-min" id="wishlist-item-<?php echo $product['id']; ?>">
                                         <div class="product-img-box">

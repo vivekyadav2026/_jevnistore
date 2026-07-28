@@ -27,8 +27,18 @@ CREATE TABLE IF NOT EXISTS products (
     name VARCHAR(255) NOT NULL,
     description TEXT,
     price DECIMAL(10,2) NOT NULL,
+    compare_at_price DECIMAL(10,2) NULL,
     image VARCHAR(255),
+    image2 VARCHAR(255) NULL,
     stock INT DEFAULT 0,
+    weight DECIMAL(10,3) DEFAULT 0.5,
+    length INT DEFAULT 10,
+    width INT DEFAULT 10,
+    height INT DEFAULT 10,
+    is_waitlist TINYINT(1) DEFAULT 0,
+    has_variants TINYINT(1) DEFAULT 0,
+    variant_name VARCHAR(255) NULL,
+    variants_list TEXT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL
 );

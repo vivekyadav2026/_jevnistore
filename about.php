@@ -297,10 +297,10 @@
         <!-- Showcase Grid -->
         <div class="showcase-grid">
             <div class="showcase-item-card">
-                <img src="<?php echo BASE_URL; ?>/assets/bag_mini.png" alt="Nørva Mini Bag" class="showcase-img">
+                <img src="<?php echo BASE_URL; ?>/assets/6a609d9ac3fd1_1as.png" alt="Nørva Mini Bag" class="showcase-img">
             </div>
             <div class="showcase-item-card">
-                <img src="<?php echo BASE_URL; ?>/assets/bag_shoulder.png" alt="Nørva Shoulder Bag" class="showcase-img">
+                <img src="<?php echo BASE_URL; ?>/assets/6a61214f56ac5_H7a493d0c699c4dfea39d97875cbc3df7h.avif" alt="Nørva Shoulder Bag" class="showcase-img">
             </div>
         </div>
 

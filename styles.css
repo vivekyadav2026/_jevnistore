@@ -2740,6 +2740,12 @@ h1, h2, h3, h4, h5, h6 { font-weight: 500; letter-spacing: -0.01em; }
     font-family: 'Inter', sans-serif;
 }
 
+@media (max-width: 768px) {
+    body:has(.product-detail-container) .chat-widget-container {
+        bottom: calc(110px + env(safe-area-inset-bottom, 0px));
+    }
+}
+
 .chat-fab {
     width: 60px;
     height: 60px;

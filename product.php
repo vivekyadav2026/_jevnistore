@@ -15,7 +15,7 @@ if ($result->num_rows === 0) {
 }
 
 $product = $result->fetch_assoc();
-$image = $product['image'] ? BASE_URL . '/assets/' . htmlspecialchars($product['image']) : BASE_URL . '/assets/bag_shoulder.png';
+$image = $product['image'] ? BASE_URL . '/assets/' . htmlspecialchars($product['image']) : BASE_URL . '/assets/bags/acc_2.jpeg';
 
 // Recently Viewed Session Tracking
 if (session_status() === PHP_SESSION_NONE) {
@@ -35,11 +35,13 @@ $_SESSION['recently_viewed'] = array_slice($_SESSION['recently_viewed'], 0, 5);
     <div class="container product-detail-container" style="max-width: 1600px; margin-bottom: 3rem;">
         
         <!-- Responsive Breadcrumbs -->
+        <!--
         <div class="breadcrumb">
             <a href="<?php echo BASE_URL; ?>">Home</a> / 
             <a href="<?php echo BASE_URL; ?>/shop.php">Shop</a> / 
             <span class="breadcrumb-current"><?php echo htmlspecialchars($product['name']); ?></span>
         </div>
+        -->
 
         <div class="product-split-layout">
             <?php
@@ -65,7 +67,7 @@ $_SESSION['recently_viewed'] = array_slice($_SESSION['recently_viewed'], 0, 5);
             }
             // Fallback if no images are set
             if(empty($images)) {
-                $images[] = BASE_URL . '/assets/bag_shoulder.png';
+                $images[] = BASE_URL . '/assets/bags/acc_2.jpeg';
             }
             ?>
             
@@ -440,7 +442,7 @@ $_SESSION['recently_viewed'] = array_slice($_SESSION['recently_viewed'], 0, 5);
                 }
                 
                 foreach ($related_products as $rel_product) {
-                    $image = $rel_product['image'] ? BASE_URL . '/assets/' . htmlspecialchars($rel_product['image']) : BASE_URL . '/assets/bag_shoulder.png';
+                    $image = $rel_product['image'] ? BASE_URL . '/assets/' . htmlspecialchars($rel_product['image']) : BASE_URL . '/assets/bags/acc_2.jpeg';
                     ?>
                     <div class="product-card-min">
                         <div class="product-img-box">
@@ -494,7 +496,7 @@ $_SESSION['recently_viewed'] = array_slice($_SESSION['recently_viewed'], 0, 5);
                 $rv_stmt->execute();
                 $rv_res = $rv_stmt->get_result();
                 while ($rv_product = $rv_res->fetch_assoc()):
-                    $image = $rv_product['image'] ? BASE_URL . '/assets/' . htmlspecialchars($rv_product['image']) : BASE_URL . '/assets/bag_shoulder.png';
+                    $image = $rv_product['image'] ? BASE_URL . '/assets/' . htmlspecialchars($rv_product['image']) : BASE_URL . '/assets/bags/acc_2.jpeg';
                     ?>
                     <div class="product-card-min">
                         <div class="product-img-box">

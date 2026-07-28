@@ -519,7 +519,7 @@
         $na_stmt->execute();
         $na_result = $na_stmt->get_result();
         while ($product = $na_result->fetch_assoc()) {
-            $image = $product['image'] ? BASE_URL . '/assets/' . htmlspecialchars($product['image']) : BASE_URL . '/assets/bag_shoulder.png';
+            $image = $product['image'] ? BASE_URL . '/assets/' . htmlspecialchars($product['image']) : BASE_URL . '/assets/bags/acc_2.jpeg';
             ?>
             <div class="product-card-min" style="position: relative;">
                 <div class="product-img-box" style="position: relative;">
@@ -592,7 +592,7 @@
             </div>
 
             <div class="info-center-bag">
-                <img src="<?php echo BASE_URL; ?>/assets/bag_shoulder.png" alt="The Icon Bag" class="info-bag-img">
+                <img src="<?php echo BASE_URL; ?>/assets/bags/acc_2.jpeg" alt="The Icon Bag" class="info-bag-img">
                 <div class="info-measurements">
                     <span>← 42CM →</span>
                     <span>↑ 28CM ↓</span>
@@ -711,10 +711,10 @@
         <div class="mobile-image-slider-section">
             <div class="image-slider-wrapper">
                 <div class="image-slide-item">
-                    <img src="<?php echo BASE_URL; ?>/assets/campaign_lifestyle.jpg" alt="Lifestyle" onerror="this.src='<?php echo BASE_URL; ?>/assets/bag_mini.png';">
+                    <img src="<?php echo BASE_URL; ?>/assets/campaign_lifestyle.jpg" alt="Lifestyle" onerror="this.src='<?php echo BASE_URL; ?>/assets/6a609d9ac3fd1_1as.png';">
                 </div>
                 <div class="image-slide-item">
-                    <img src="<?php echo BASE_URL; ?>/assets/bags/acc_2.jpeg" alt="Hardware detail" onerror="this.src='<?php echo BASE_URL; ?>/assets/bag_shoulder.png';">
+                    <img src="<?php echo BASE_URL; ?>/assets/bags/acc_2.jpeg" alt="Hardware detail" onerror="this.src='<?php echo BASE_URL; ?>/assets/bags/acc_2.jpeg';">
                 </div>
                 <div class="image-slide-item">
                     <img src="<?php echo BASE_URL; ?>/assets/isolated_bag.png" alt="Isolated bag">
