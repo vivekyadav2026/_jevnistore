@@ -467,13 +467,15 @@
             height: 80vh;
         }
         .products-grid { grid-template-columns: repeat(2, 1fr); }
-        .lookbook-images { display: flex; align-items: center; justify-content: flex-start; gap: 10px; width: 100%; margin: 0 auto 25px auto; }
+        .lookbook-section { padding: 15px 16px 20px 16px; }
+        .lookbook-images { display: flex; align-items: center; justify-content: flex-start; gap: 10px; width: 100%; margin: 0 auto 15px auto; }
         .lookbook-main-img { width: 65%; margin-bottom: 0px; }
         .lookbook-sub-img { width: 35%; margin-bottom: 0px; position: static; }
         .lookbook-text-area { width: 100%; margin: 0; text-align: left; }
-        .lookbook-title { margin: 0 0 15px 0; display: inline-block; width: max-content; }
+        .lookbook-title { margin: 0 0 10px 0; display: inline-block; width: max-content; }
         .lookbook-desc { text-align: left; }
-        .lookbook-divider { margin-left: 0; margin-right: 0; }
+        .lookbook-divider { margin: 15px 0 10px 0; }
+        .ragers-content { padding: 30px 16px; }
     }
 </style>
 
@@ -665,7 +667,7 @@
     </div>
     
     <!-- Mobile View (Video & Instagram Sliders) -->
-    <div class="info-mobile-only" style="background: var(--bg-tan); padding-bottom: 40px;">
+    <div class="info-mobile-only" style="background: var(--bg-tan); padding-bottom: 10px;">
         
         <!-- 1. Video Slider Section -->
         <div class="mobile-video-slider-section">
@@ -711,22 +713,34 @@
         <div class="mobile-image-slider-section">
             <div class="image-slider-wrapper">
                 <div class="image-slide-item">
-                    <img src="<?php echo BASE_URL; ?>/assets/campaign_lifestyle.jpg" alt="Lifestyle" onerror="this.src='<?php echo BASE_URL; ?>/assets/6a609d9ac3fd1_1as.png';">
+                    <img src="<?php echo BASE_URL; ?>/assets/bags/WhatsApp Image 2026-07-28 at 3.19.33 PM.jpeg" alt="Bag 1">
                 </div>
                 <div class="image-slide-item">
-                    <img src="<?php echo BASE_URL; ?>/assets/bags/acc_2.jpeg" alt="Hardware detail" onerror="this.src='<?php echo BASE_URL; ?>/assets/bags/acc_2.jpeg';">
+                    <img src="<?php echo BASE_URL; ?>/assets/bags/WhatsApp Image 2026-07-28 at 3.19.33 PM (1).jpeg" alt="Bag 2">
                 </div>
                 <div class="image-slide-item">
-                    <img src="<?php echo BASE_URL; ?>/assets/isolated_bag.png" alt="Isolated bag">
+                    <img src="<?php echo BASE_URL; ?>/assets/bags/WhatsApp Image 2026-07-28 at 3.19.34 PM.jpeg" alt="Bag 3">
                 </div>
                 <div class="image-slide-item">
-                    <img src="<?php echo BASE_URL; ?>/assets/lookbook_edit_2.png" alt="Lookbook model" onerror="this.src='<?php echo BASE_URL; ?>/assets/bag_tote.png';">
+                    <img src="<?php echo BASE_URL; ?>/assets/bags/WhatsApp Image 2026-07-28 at 3.19.35 PM.jpeg" alt="Bag 4">
                 </div>
                 <div class="image-slide-item">
-                    <img src="<?php echo BASE_URL; ?>/assets/streetwear_bag.png" alt="Streetwear bag">
+                    <img src="<?php echo BASE_URL; ?>/assets/bags/WhatsApp Image 2026-07-28 at 3.19.35 PM (1).jpeg" alt="Bag 5">
                 </div>
                 <div class="image-slide-item">
-                    <img src="<?php echo BASE_URL; ?>/assets/craft_workshop.jpg" alt="Workshop details" onerror="this.src='<?php echo BASE_URL; ?>/assets/bag_crossbody.png';">
+                    <img src="<?php echo BASE_URL; ?>/assets/bags/WhatsApp Image 2026-07-28 at 3.19.36 PM.jpeg" alt="Bag 6">
+                </div>
+                <div class="image-slide-item">
+                    <img src="<?php echo BASE_URL; ?>/assets/bags/WhatsApp Image 2026-07-28 at 3.19.36 PM (1).jpeg" alt="Bag 7">
+                </div>
+                <div class="image-slide-item">
+                    <img src="<?php echo BASE_URL; ?>/assets/bags/WhatsApp Image 2026-07-28 at 3.19.36 PM (2).jpeg" alt="Bag 8">
+                </div>
+                <div class="image-slide-item">
+                    <img src="<?php echo BASE_URL; ?>/assets/bags/WhatsApp Image 2026-07-28 at 3.19.37 PM.jpeg" alt="Bag 9">
+                </div>
+                <div class="image-slide-item">
+                    <img src="<?php echo BASE_URL; ?>/assets/bags/WhatsApp Image 2026-07-28 at 3.19.57 PM.jpeg" alt="Bag 10">
                 </div>
             </div>
         </div>

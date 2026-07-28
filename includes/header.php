@@ -153,6 +153,13 @@ require_once __DIR__ . '/functions.php';
         .toast-warning .toast-icon { color: #f59e0b; }
         .toast-warning .toast-title { color: #f59e0b; }
         .toast-warning .toast-progress { background: #f59e0b; }
+
+        /* Hide logo on mobile */
+        @media (max-width: 768px) {
+            .logo-wrapper {
+                display: none !important;
+            }
+        }
     </style>
     <!-- Disable Inspect Element & Mobile Zoom Gestures -->
     <script>

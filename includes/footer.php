@@ -13,7 +13,7 @@
             display: grid;
             grid-template-columns: 1.5fr 1fr 1fr 1.2fr;
             gap: 50px;
-            margin-bottom: 70px;
+            margin-bottom: 30px;
         }
         .footer-brand p {
             color: #9ca3af;
@@ -96,7 +96,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-top: 40px;
+            padding-top: 20px;
             border-top: 1px solid rgba(255, 255, 255, 0.08);
         }
         .footer-social {
@@ -166,11 +166,12 @@
         }
         @media (max-width: 600px) {
             .footer-premium {
-                padding: 60px 20px 30px;
+                padding: 40px 20px 25px;
             }
             .footer-grid {
                 grid-template-columns: 1fr;
-                gap: 35px;
+                gap: 24px;
+                margin-bottom: 20px;
             }
             .footer-brand, .footer-newsletter {
                 grid-column: span 1;

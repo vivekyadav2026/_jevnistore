@@ -231,6 +231,7 @@ body:has(.shop-page-container) .filter-group-header,
 @media (max-width: 768px) {
     .shop-editorial-bg {
         padding-top: 80px !important;
+        padding-bottom: 2rem !important;
     }
 }
 
@@ -373,7 +374,7 @@ body:has(.shop-page-container) .filter-group-header,
 
 <div class="shop-page-container">
     <!-- Main Editorial Shop Section -->
-    <section class="section shop-editorial-bg" style="padding-bottom: 8rem; background: var(--bg-primary);">
+    <section class="section shop-editorial-bg" style="padding-bottom: 3rem; background: var(--bg-primary);">
         <div class="container">
             <!-- Breadcrumbs & Collection Header Bar -->
             <div class="shop-header-top-section" style="margin-bottom: 24px;">
@@ -610,7 +611,6 @@ body:has(.shop-page-container) .filter-group-header,
 
     <!-- Marquee Section -->
     <section class="marquee-section">
-        <div class="marquee-title">AS FEATURED IN</div>
         <div class="marquee-track">
             <span class="marquee-logo">Nørva Store</span>
             <span class="marquee-logo">Nørva Store</span>
