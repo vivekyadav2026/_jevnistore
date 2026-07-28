@@ -359,6 +359,12 @@ $google_client_id = getGoogleClientId();
         lucide.createIcons();
 
         function handleGoogleCredentialResponse(response) {
+            // Show instant loading state so user knows redirect is happening
+            const btnStack = document.querySelector('.auth-btn-stack');
+            if (btnStack) {
+                btnStack.innerHTML = '<div style="display:flex; align-items:center; justify-content:center; gap:10px; padding:12px; background:#f4f4f5; border-radius:12px; font-weight:600; font-size:0.88rem; color:#1a1a1a;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Creating account... Please wait...</div>';
+            }
+
             const data = new FormData();
             data.append('credential', response.credential);
 
@@ -369,15 +375,18 @@ $google_client_id = getGoogleClientId();
             .then(res => res.json())
             .then(resData => {
                 if (resData.status === 'success') {
-                    window.location.href = resData.redirect;
+                    window.location.replace(resData.redirect);
                 } else {
                     alert('Google login failed: ' + (resData.message || 'Error'));
+                    window.location.reload();
                 }
             })
             .catch(err => {
                 console.error('Google Auth Network error:', err);
+                window.location.reload();
             });
         }
     </script>
+    <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
 </body>
 </html>
