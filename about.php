@@ -294,10 +294,11 @@
 
         </div>
 
+
         <!-- Showcase Grid -->
         <div class="showcase-grid">
             <div class="showcase-item-card">
-                <img src="<?php echo BASE_URL; ?>/assets/6a609d9ac3fd1_1as.png" alt="Nørva Mini Bag" class="showcase-img">
+                <img src="<?php echo BASE_URL; ?>/assets/6a61214f54bd3_H0588898196e74c75972f4e6f1f45f67e0-removebg-preview.png" alt="Nørva Mini Bag" class="showcase-img">
             </div>
             <div class="showcase-item-card">
                 <img src="<?php echo BASE_URL; ?>/assets/6a61214f56ac5_H7a493d0c699c4dfea39d97875cbc3df7h.avif" alt="Nørva Shoulder Bag" class="showcase-img">

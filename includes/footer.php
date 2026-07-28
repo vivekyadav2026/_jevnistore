@@ -11,7 +11,7 @@
             max-width: 1200px;
             margin: 0 auto;
             display: grid;
-            grid-template-columns: 1.5fr 1fr 1fr 1.2fr;
+            grid-template-columns: 1.5fr 1.2fr 1.3fr;
             gap: 50px;
             margin-bottom: 30px;
         }
@@ -224,7 +224,8 @@
                 </div>
             </div>
 
-            <!-- Column 2: Shop Menu -->
+            <!-- Column 2: Shop Menu (Commented Out) -->
+            <!--
             <div>
                 <div class="footer-col-title">Shop</div>
                 <div class="footer-links">
@@ -234,6 +235,7 @@
                     <a href="<?php echo BASE_URL; ?>/reviews.php">Customer Reviews</a>
                 </div>
             </div>
+            -->
 
             <!-- Column 3: Support & Policy -->
             <div>
@@ -247,16 +249,15 @@
                 </div>
             </div>
 
-            <!-- Column 4: Newsletter -->
-            <div class="footer-newsletter">
-                <div class="footer-col-title">Join The Club</div>
-                <p>Subscribe to receive updates, access to exclusive drops, and more.</p>
-                <form onsubmit="event.preventDefault(); showToast('Subscribed successfully!', 'success');">
-                    <input type="email" placeholder="ENTER YOUR EMAIL" required>
-                    <button type="submit" aria-label="Subscribe">
-                        <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
-                    </button>
-                </form>
+            <!-- Column 4: Company Links -->
+            <div>
+                <div class="footer-col-title">Company</div>
+                <div class="footer-links">
+                    <a href="<?php echo BASE_URL; ?>/about.php">About Us</a>
+                    <a href="<?php echo BASE_URL; ?>/contact.php">Contact Us</a>
+                    <a href="<?php echo BASE_URL; ?>/reviews.php">Customer Reviews</a>
+                    <a href="<?php echo BASE_URL; ?>/wishlist.php">My Wishlist</a>
+                </div>
             </div>
 
         </div>

@@ -107,6 +107,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $order_id > 0) {
 ?>
 
 <style>
+/* Make header icons black on track order page */
+#main-header .icon-btn,
+#main-header .menu-toggle {
+    color: #000000 !important;
+}
+
 /* ===== TRACK ORDER PAGE ===== */
 .track-page {
     min-height: 100vh;

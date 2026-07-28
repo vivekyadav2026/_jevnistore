@@ -30,7 +30,7 @@ if (isset($_GET['token']) && isset($_GET['email'])) {
 }
 
 // ── HANDLE: Password Reset Submit ─────────────────────────────────────
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] === 'reset_password') {
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['reset_action']) && $_POST['reset_action'] === 'reset_password') {
     $token    = $_POST['token'] ?? '';
     $email    = $_POST['email'] ?? '';
     $password = $_POST['new_password'] ?? '';
@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
 }
 
 // ── HANDLE: Send Reset Email Request ──────────────────────────────────
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] === 'request_reset') {
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['reset_action']) && $_POST['reset_action'] === 'request_reset') {
     $email = trim($_POST['email'] ?? '');
 
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -594,7 +594,7 @@ unset($_SESSION['_dev_reset_link']);
             <?php endif; ?>
 
             <form method="POST" action="" id="forgot-form">
-                <input type="hidden" name="action" value="request_reset">
+                <input type="hidden" name="reset_action" value="request_reset">
                 <div class="form-field">
                     <label for="email">Email Address</label>
                     <div class="input-wrapper">
@@ -666,7 +666,7 @@ unset($_SESSION['_dev_reset_link']);
             <?php endif; ?>
 
             <form method="POST" action="" id="reset-form">
-                <input type="hidden" name="action" value="reset_password">
+                <input type="hidden" name="reset_action" value="reset_password">
                 <input type="hidden" name="token" value="<?php echo htmlspecialchars($_GET['token'] ?? ''); ?>">
                 <input type="hidden" name="email" value="<?php echo htmlspecialchars($_GET['email'] ?? ''); ?>">
 

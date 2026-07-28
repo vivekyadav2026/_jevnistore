@@ -629,16 +629,6 @@ body:has(.shop-page-container) .filter-group-header,
         const drawer = document.getElementById('shop-filter-drawer');
         const overlay = document.getElementById('mobile-filter-overlay');
         drawer.classList.toggle('open');
-        </div>
-    </section>
-
-    <script>
-    let filterTimeout;
-
-    function toggleMobileFilter() {
-        const drawer = document.getElementById('shop-filter-drawer');
-        const overlay = document.getElementById('mobile-filter-overlay');
-        drawer.classList.toggle('open');
         overlay.classList.toggle('open');
     }
 

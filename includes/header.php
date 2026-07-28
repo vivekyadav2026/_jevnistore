@@ -321,7 +321,7 @@ $body_class = ($current_page === 'index.php') ? 'homepage-body' : 'subpage-body'
                 <!-- Hide nav links for the minimalist header, moved to hamburger -->
             </nav>
             
-            <div class="header-icons" style="justify-self: end; display: flex; gap: 1rem; align-items: center;">
+            <div class="header-icons" style="justify-self: end; display: flex; gap: 0.5rem; align-items: center;">
                 <button class="icon-btn header-search-icon" aria-label="Search" onclick="document.getElementById('header-search-bar').classList.toggle('active'); document.getElementById('search-input').focus();" style="color: var(--text-primary); background: transparent; border: none; cursor: pointer;">
                     <i data-lucide="search" style="width: 20px; height: 20px;"></i>
                 </button>
