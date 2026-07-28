@@ -708,7 +708,7 @@
         </div>
 
         <!-- 3. Small Image Slider Section -->
-        <div class="mobile-image-slider-section">
+        <!-- <div class="mobile-image-slider-section">
             <div class="image-slider-wrapper">
                 <div class="image-slide-item">
                     <img src="<?php echo BASE_URL; ?>/assets/campaign_lifestyle.jpg" alt="Lifestyle" onerror="this.src='<?php echo BASE_URL; ?>/assets/6a609d9ac3fd1_1as.png';">
@@ -729,7 +729,7 @@
                     <img src="<?php echo BASE_URL; ?>/assets/craft_workshop.jpg" alt="Workshop details" onerror="this.src='<?php echo BASE_URL; ?>/assets/bag_crossbody.png';">
                 </div>
             </div>
-        </div>
+        </div> -->
 
     </div>
 
