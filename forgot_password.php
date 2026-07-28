@@ -476,6 +476,7 @@ unset($_SESSION['_dev_reset_link']);
             height: 64px;
             width: auto;
             object-fit: contain;
+            filter: brightness(0.1) !important;
         }
 
         @media (max-width: 900px) {

@@ -128,6 +128,7 @@ $google_client_id = getSetting('google_client_id', '') ?: '640331052906-q6k3o731
             height: 40px;
             width: auto;
             object-fit: contain;
+            filter: brightness(0.1) !important;
         }
 
         .auth-title {
