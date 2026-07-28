@@ -154,9 +154,9 @@ require_once __DIR__ . '/functions.php';
         .toast-warning .toast-title { color: #f59e0b; }
         .toast-warning .toast-progress { background: #f59e0b; }
 
-        /* Hide logo on mobile */
+        /* Hide logo on mobile - only on homepage */
         @media (max-width: 768px) {
-            .logo-wrapper {
+            .homepage-body .logo-wrapper {
                 display: none !important;
             }
         }
