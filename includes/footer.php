@@ -335,7 +335,7 @@
             $site_logo = getSetting('site_logo') ?: 'logo.png'; 
             ?>
             <div class="mobile-nav-header" style="display: flex; justify-content: space-between; align-items: center; padding: 24px 24px 10px 24px; border: none;">
-                <img src="<?php echo BASE_URL; ?>/assets/<?php echo htmlspecialchars($site_logo); ?>" alt="Nørva Store" style="height: 32px; width: auto;" onerror="this.src='<?php echo BASE_URL; ?>/assets/logoOD.png';">
+                <img src="<?php echo BASE_URL; ?>/assets/<?php echo htmlspecialchars($site_logo); ?>" alt="Nørva Store" style="height: 32px; width: auto; filter: brightness(0);" onerror="this.src='<?php echo BASE_URL; ?>/assets/logoOD.png';">
                 <button class="mobile-nav-close" onclick="closeMobileNav()" style="background: none; border: none; cursor: pointer; display: flex; align-items: center; padding: 0;">
                     <i data-lucide="x" style="width: 24px; height: 24px; color: #1a1a1a;"></i>
                 </button>
