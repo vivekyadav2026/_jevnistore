@@ -38,12 +38,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $order_id > 0) {
     // Case A: Logged-in user — match by order_id + user_id (no email needed)
     if ($user_id > 0) {
         $stmt = $conn->prepare(
-            "SELECT id, shipping_name, shipping_email, shipping_phone,
-                    shipping_address, shipping_city, shipping_state, shipping_zip,
-                    total_amount, status, payment_status, payment_method,
-                    order_number, created_at
-             FROM orders
-             WHERE id = ? AND user_id = ?
+            "SELECT o.id, o.shipping_address, o.total_amount, o.status, o.payment_status, o.payment_method, o.created_at,
+                    u.name as shipping_name, u.email as shipping_email, u.phone as shipping_phone
+             FROM orders o
+             JOIN users u ON o.user_id = u.id
+             WHERE o.id = ? AND o.user_id = ?
              LIMIT 1"
         );
         $stmt->bind_param("ii", $order_id, $user_id);
@@ -56,18 +55,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $order_id > 0) {
         }
     }
 
-    // Case B: Guest / not found — verify by email
+    // Case B: Guest — verify by email
     if (!$order && $user_id === 0) {
         if (empty($billing_email)) {
             $error = 'Please enter the Email Address used during checkout.';
         } else {
             $stmt = $conn->prepare(
-                "SELECT id, shipping_name, shipping_email, shipping_phone,
-                        shipping_address, shipping_city, shipping_state, shipping_zip,
-                        total_amount, status, payment_status, payment_method,
-                        order_number, created_at
-                 FROM orders
-                 WHERE id = ?
+                "SELECT o.id, o.shipping_address, o.total_amount, o.status, o.payment_status, o.payment_method, o.created_at,
+                        u.name as shipping_name, u.email as shipping_email, u.phone as shipping_phone
+                 FROM orders o
+                 JOIN users u ON o.user_id = u.id
+                 WHERE o.id = ?
                  LIMIT 1"
             );
             $stmt->bind_param("i", $order_id);
@@ -537,8 +535,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $order_id > 0) {
         <div class="ship-box">
             <?php echo nl2br(htmlspecialchars(
                 $order['shipping_name'] . "\n" .
-                $order['shipping_address'] . "\n" .
-                $order['shipping_city'] . ', ' . $order['shipping_state'] . ' - ' . $order['shipping_zip']
+                $order['shipping_address']
             )); ?>
         </div>
         <?php endif; ?>
