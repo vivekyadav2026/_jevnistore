@@ -404,7 +404,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $order_id > 0) {
         </div>
         <?php endif; ?>
 
-        <form method="POST" action="track_order.php">
+        <form method="POST" action="track_order.php" id="order-tracking-form">
             <!-- Order ID -->
             <div class="track-input-wrap">
                 <span class="track-input-icon">#</span>
@@ -459,8 +459,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $order_id > 0) {
     </div>
     <script>
     function fillForm(id) {
-        document.querySelector('input[name="order_id"]').value = id;
-        document.querySelector('form').submit();
+        const trackingForm = document.getElementById('order-tracking-form');
+        if (trackingForm) {
+            trackingForm.querySelector('input[name="order_id"]').value = id;
+            trackingForm.submit();
+        }
     }
     </script>
     <?php endif; ?>
