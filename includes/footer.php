@@ -1294,8 +1294,15 @@
                                         chkCity.value = cityVal;
                                     }
                                     
+                                    // State assignment with smart fallbacks
                                     if (addr.state) {
                                         chkState.value = addr.state;
+                                    } else if (addr.postcode && addr.postcode.replace(/[^0-9]/g, '').startsWith('11')) {
+                                        chkState.value = 'Delhi';
+                                    } else if (cityVal) {
+                                        chkState.value = cityVal;
+                                    } else {
+                                        chkState.value = '';
                                     }
                                     
                                     const roadVal = addr.road || addr.suburb || addr.neighbourhood || '';
@@ -1310,6 +1317,11 @@
                                     } else {
                                         chkFlat.value = 'House / Flat';
                                     }
+                                    
+                                    // Explicitly dispatch input events so browser/validation registers updates
+                                    [chkPincode, chkCity, chkState, chkFlat, chkArea].forEach(el => {
+                                        el.dispatchEvent(new Event('input', { bubbles: true }));
+                                    });
                                     
                                     // Trigger address form validation to enable continue button
                                     validateAddressForm();
