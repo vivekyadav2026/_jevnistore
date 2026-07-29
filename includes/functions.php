@@ -370,7 +370,7 @@ function pushOrderToShiprocket($order_id) {
         'payment_method' => $payment_method,
         'sub_total' => (float)$order['total_amount'],
         'length' => $max_length ?: (int)getSetting('shiprocket_default_length', '10'),
-        'width' => $max_width ?: (int)getSetting('shiprocket_default_width', '10'),
+        'breadth' => $max_width ?: (int)getSetting('shiprocket_default_width', '10'),
         'height' => $max_height ?: (int)getSetting('shiprocket_default_height', '10'),
         'weight' => $total_weight > 0 ? $total_weight : (float)getSetting('shiprocket_default_weight', '0.5')
     ];
