@@ -364,7 +364,7 @@ function pushOrderToShiprocket($order_id) {
         'billing_state' => $state,
         'billing_country' => 'India',
         'billing_email' => $order['user_email'],
-        'billing_phone' => $order['user_phone'] ?: '9999999999',
+        'billing_phone' => preg_replace('/[^0-9]/', '', $order['user_phone']) ? substr(preg_replace('/[^0-9]/', '', $order['user_phone']), -10) : '9999999999',
         'shipping_is_billing' => true,
         'order_items' => $order_items,
         'payment_method' => $payment_method,
