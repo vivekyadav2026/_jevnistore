@@ -769,19 +769,22 @@
                         align-items: center;
                         justify-content: center;
                         gap: 8px;
-                        background: #f3f4f6;
-                        color: #1f2937;
-                        border: 1.5px solid #d1d5db;
+                        background: #ffffff;
+                        color: #1a1a1a;
+                        border: 1.5px solid #1a1a1a;
                         border-radius: 10px;
-                        padding: 10px 16px;
+                        padding: 12px 16px;
                         width: 100%;
-                        font-size: 0.85rem;
+                        font-size: 0.82rem;
                         font-weight: 700;
                         cursor: pointer;
                         margin-bottom: 15px;
                         transition: all 0.2s ease;
-                    " onmouseover="this.style.background='#e5e7eb'; this.style.borderColor='#9ca3af';" onmouseout="this.style.background='#f3f4f6'; this.style.borderColor='#d1d5db';">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: #ef4444;"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
+                        font-family: inherit;
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                    " onmouseover="this.style.background='#1a1a1a'; this.style.color='#ffffff'; this.querySelector('svg').style.color='#ffffff';" onmouseout="this.style.background='#ffffff'; this.style.color='#1a1a1a'; this.querySelector('svg').style.color='#e60067';">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: #e60067; transition: color 0.2s;"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
                         Detect My Location
                     </button>
                     
