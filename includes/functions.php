@@ -375,7 +375,7 @@ function pushOrderToShiprocket($order_id) {
         'weight' => $total_weight > 0 ? $total_weight : (float)getSetting('shiprocket_default_weight', '0.5')
     ];
 
-    $ch = curl_init('https://apiv2.shiprocket.in/v2/authorized/orders/create/adhoc');
+    $ch = curl_init('https://apiv2.shiprocket.in/v1/external/orders/create/adhoc');
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
