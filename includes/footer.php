@@ -764,6 +764,27 @@
                 <div id="chk-step-address" style="display: none;">
                     <div class="chk-section-title">Add Delivery Address</div>
                     
+                    <button type="button" id="chk-detect-location-btn" style="
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 8px;
+                        background: #f3f4f6;
+                        color: #1f2937;
+                        border: 1.5px solid #d1d5db;
+                        border-radius: 10px;
+                        padding: 10px 16px;
+                        width: 100%;
+                        font-size: 0.85rem;
+                        font-weight: 700;
+                        cursor: pointer;
+                        margin-bottom: 15px;
+                        transition: all 0.2s ease;
+                    " onmouseover="this.style.background='#e5e7eb'; this.style.borderColor='#9ca3af';" onmouseout="this.style.background='#f3f4f6'; this.style.borderColor='#d1d5db';">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: #ef4444;"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
+                        Detect My Location
+                    </button>
+                    
                     <div class="chk-input-box">
                         <label>Pincode *</label>
                         <input type="text" id="chk-pincode" placeholder="Enter Pincode" maxlength="6" inputmode="numeric" pattern="[0-9]*">
@@ -1232,6 +1253,90 @@
             [chkPincode, chkCity, chkState, chkFlat, chkArea, chkNameInput, chkEmailInput].forEach(i => {
                 i.addEventListener('input', validateAddressForm);
             });
+
+            // Location detection logic
+            const detectLocBtn = document.getElementById('chk-detect-location-btn');
+            if (detectLocBtn) {
+                detectLocBtn.addEventListener('click', function() {
+                    if (!navigator.geolocation) {
+                        alert('Geolocation is not supported by your browser.');
+                        return;
+                    }
+                    
+                    const originalHTML = detectLocBtn.innerHTML;
+                    detectLocBtn.innerHTML = `
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="animate-spin" style="margin-right: 5px; display: inline-block; vertical-align: middle;"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                        Detecting Location...
+                    `;
+                    detectLocBtn.disabled = true;
+                    
+                    navigator.geolocation.getCurrentPosition(function(position) {
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
+                        
+                        // Call free OpenStreetMap Nominatim API for reverse geocoding
+                        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&addressdetails=1`)
+                            .then(response => response.json())
+                            .then(data => {
+                                detectLocBtn.innerHTML = originalHTML;
+                                detectLocBtn.disabled = false;
+                                
+                                if (data && data.address) {
+                                    const addr = data.address;
+                                    
+                                    // Populate inputs
+                                    if (addr.postcode) {
+                                        chkPincode.value = addr.postcode.replace(/[^0-9]/g, '').substring(0, 6);
+                                    }
+                                    
+                                    const cityVal = addr.city || addr.town || addr.village || addr.municipality || addr.county || '';
+                                    if (cityVal) {
+                                        chkCity.value = cityVal;
+                                    }
+                                    
+                                    if (addr.state) {
+                                        chkState.value = addr.state;
+                                    }
+                                    
+                                    const roadVal = addr.road || addr.suburb || addr.neighbourhood || '';
+                                    if (roadVal) {
+                                        chkArea.value = roadVal;
+                                    }
+                                    
+                                    // Generate fallback flat/house number details
+                                    const nameVal = addr.house_number || addr.building || addr.amenity || '';
+                                    if (nameVal) {
+                                        chkFlat.value = nameVal;
+                                    } else {
+                                        chkFlat.value = 'House / Flat';
+                                    }
+                                    
+                                    // Trigger address form validation to enable continue button
+                                    validateAddressForm();
+                                } else {
+                                    alert('Could not resolve your address. Please enter it manually.');
+                                }
+                            })
+                            .catch(err => {
+                                detectLocBtn.innerHTML = originalHTML;
+                                detectLocBtn.disabled = false;
+                                alert('Error detecting location. Please enter your address manually.');
+                            });
+                    }, function(error) {
+                        detectLocBtn.innerHTML = originalHTML;
+                        detectLocBtn.disabled = false;
+                        let errMsg = 'Could not get your position. Please check your browser location permissions.';
+                        if (error.code === error.PERMISSION_DENIED) {
+                            errMsg = 'Location permission was denied. Please enable it in your browser settings to use this feature.';
+                        }
+                        alert(errMsg);
+                    }, {
+                        enableHighAccuracy: true,
+                        timeout: 8000,
+                        maximumAge: 0
+                    });
+                });
+            }
 
             chkPincode.addEventListener('input', function(e) {
                 let val = e.target.value.replace(/[^0-9]/g, '');
