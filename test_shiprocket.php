@@ -23,7 +23,7 @@ $payload = [
     'password' => $password
 ];
 
-$ch = curl_init('https://apiv2.shiprocket.in/v2/authorized/auth/login');
+$ch = curl_init('https://apiv2.shiprocket.in/v1/external/auth/login');
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
