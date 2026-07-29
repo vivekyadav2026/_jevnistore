@@ -90,7 +90,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['reset_action']) && $_P
             $upd->bind_param("sss", $token, $expires, $email);
             $upd->execute();
 
-            $reset_link = BASE_URL . '/forgot_password.php?token=' . $token . '&email=' . urlencode($email);
+            $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
+            $host = $_SERVER['HTTP_HOST'];
+            $reset_link = $protocol . $host . BASE_URL . '/forgot_password.php?token=' . $token . '&email=' . urlencode($email);
 
             // Send actual email using SMTP settings
             $email_subject = "Password Reset Link | " . getSetting('site_title', 'Nørva Store');
