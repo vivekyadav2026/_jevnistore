@@ -5,7 +5,7 @@ require_once 'includes/header.php';
 <style>
     /* Styling overrides specifically for cart.php to match product grid layout */
     .cart-page-wrapper {
-        padding: 40px 24px 80px;
+        padding: 120px 24px 80px;
     }
     
     .cart-header-section {
@@ -294,7 +294,7 @@ require_once 'includes/header.php';
     
     @media (max-width: 768px) {
         .cart-page-wrapper {
-            padding: 24px 16px 60px;
+            padding: 100px 16px 60px;
         }
         .cart-grid-container .new-arrivals-grid {
             grid-template-columns: repeat(2, 1fr) !important;
