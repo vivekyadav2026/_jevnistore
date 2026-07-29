@@ -489,18 +489,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $order_id > 0) {
         $cur   = strtolower($order['status']);
         $cur_i = array_search($cur, $steps);
         if ($cur_i === false) $cur_i = ($cur === 'completed') ? 3 : 0;
+        $is_fully_done = ($cur === 'completed' || $cur === 'delivered');
         $fill_pct = $cur_i > 0 ? ($cur_i / (count($steps)-1)) * 100 : 0;
         ?>
         <div class="progress-wrap">
             <div class="progress-steps">
                 <div class="progress-fill" style="width:<?php echo $fill_pct; ?>%;"></div>
                 <?php foreach ($steps as $si => $sl): 
-                    $dot_class = ($si < $cur_i) ? 'done' : (($si === $cur_i) ? 'active' : '');
-                    $lbl_class = ($si <= $cur_i) ? ($si < $cur_i ? 'done' : 'active') : '';
+                    $dot_class = ($si < $cur_i || ($si === $cur_i && $is_fully_done)) ? 'done' : (($si === $cur_i) ? 'active' : '');
+                    $lbl_class = ($si < $cur_i || ($si === $cur_i && $is_fully_done)) ? 'done' : (($si === $cur_i) ? 'active' : '');
                 ?>
                 <div class="step-dot-wrap">
                     <div class="step-dot <?php echo $dot_class; ?>">
-                        <?php if ($si < $cur_i): ?>✓<?php else: echo $si+1; endif; ?>
+                        <?php if ($si < $cur_i || ($si === $cur_i && $is_fully_done)): ?>✓<?php else: echo $si+1; endif; ?>
                     </div>
                     <div class="step-label <?php echo $lbl_class; ?>"><?php echo ucfirst($sl); ?></div>
                 </div>
