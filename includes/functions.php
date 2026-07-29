@@ -242,6 +242,7 @@ function getShiprocketToken() {
         'password' => $password
     ]));
     curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
     
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -382,6 +383,7 @@ function pushOrderToShiprocket($order_id) {
         'Content-Type: application/json',
         'Authorization: Bearer ' . $token
     ]);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -429,6 +431,7 @@ function getShiprocketTrackingInfo($shipment_id) {
     curl_setopt_array($curl, [
         CURLOPT_URL => "https://apiv2.shiprocket.in/v1/external/courier/track/shipment/" . (int)$shipment_id,
         CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_SSL_VERIFYPEER => false,
         CURLOPT_HTTPHEADER => [
             "Content-Type: application/json",
             "Authorization: Bearer " . $token
