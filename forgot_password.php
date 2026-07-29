@@ -92,11 +92,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['reset_action']) && $_P
 
             $reset_link = BASE_URL . '/forgot_password.php?token=' . $token . '&email=' . urlencode($email);
 
-            // In production: send $reset_link by email via PHPMailer / mail()
-            // For now: display the link on the page for testing
+            // Send actual email using SMTP settings
+            $email_subject = "Password Reset Link | " . getSetting('site_title', 'Nørva Store');
+            $email_body = "
+                <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;'>
+                    <h2 style='color: #1a1a1a;'>Password Reset Request</h2>
+                    <p>Hello,</p>
+                    <p>We received a request to reset your password for your <strong>" . getSetting('site_title', 'Nørva Store') . "</strong> account.</p>
+                    <p>Please click the button below to choose a new password. This link will expire in 1 hour:</p>
+                    <p style='text-align: center; margin: 30px 0;'>
+                        <a href='" . $reset_link . "' style='background-color: #1a1a1a; color: white; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-block;'>Reset Password</a>
+                    </p>
+                    <p style='font-size: 12px; color: #666;'>If you didn't request a password reset, you can safely ignore this email.</p>
+                </div>
+            ";
+            
+            sendEmail($email, $email_subject, $email_body);
+
             $success = true;
             $step = 'sent';
-            // Store link so we can display it in dev mode
             $_SESSION['_dev_reset_link'] = $reset_link;
         } else {
             // Don't reveal that the email doesn't exist – show the same success message

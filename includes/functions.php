@@ -447,4 +447,64 @@ function getShiprocketTrackingInfo($shipment_id) {
     
     return null;
 }
+
+/**
+ * Send an Email via SMTP using PHPMailer.
+ */
+function sendEmail($to, $subject, $body) {
+    $host = getSetting('smtp_host', 'smtp.gmail.com');
+    $port = (int)getSetting('smtp_port', '465');
+    $encryption = getSetting('smtp_encryption', 'ssl');
+    $username = getSetting('smtp_username');
+    $password = getSetting('smtp_password');
+
+    if (empty($username) || empty($password)) {
+        return false;
+    }
+
+    require_once dirname(__DIR__) . '/vendor/autoload.php';
+    
+    $mail = new PHPMailer\PHPMailer\PHPMailer(true);
+
+    try {
+        $mail->isSMTP();
+        $mail->Host       = $host;
+        $mail->SMTPAuth   = true;
+        $mail->Username   = $username;
+        $mail->Password   = $password;
+        
+        if ($encryption === 'ssl') {
+            $mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;
+        } elseif ($encryption === 'tls') {
+            $mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
+        } else {
+            $mail->SMTPAutoTLS = false;
+            $mail->SMTPAuth = false;
+        }
+        
+        $mail->Port       = $port;
+
+        // SSL options to prevent local verification errors
+        $mail->SMTPOptions = array(
+            'ssl' => array(
+                'verify_peer' => false,
+                'verify_peer_name' => false,
+                'allow_self_signed' => true
+            )
+        );
+
+        $mail->setFrom($username, getSetting('site_title', 'Nørva Store'));
+        $mail->addAddress($to);
+
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $mail->Body    = $body;
+
+        $mail->send();
+        return true;
+    } catch (Exception $e) {
+        error_log("PHPMailer error: " . $mail->ErrorInfo);
+        return false;
+    }
+}
 ?>

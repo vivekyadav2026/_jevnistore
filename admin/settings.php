@@ -289,6 +289,38 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['save_settings'])) {
             </div>
         </div>
         
+        <!-- SMTP / Email Configuration Card -->
+        <div style="background: var(--bg-secondary); padding: 25px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); color: white;">
+            <h4 style="margin-top: 0; text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem; border-bottom: 1px solid #222; padding-bottom: 10px; margin-bottom: 20px; color: var(--accent);">
+                Email & SMTP Settings (Gmail/Custom)
+            </h4>
+            <p style="font-size: 0.8rem; color: #cbd5e1; margin-bottom: 15px;">Configure SMTP details for sending forgot password recovery links:</p>
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px; font-size:12px; color:#888; text-transform: uppercase; letter-spacing: 0.5px;">SMTP Host</label>
+                <input type="text" name="settings[smtp_host]" class="form-control" value="<?php echo htmlspecialchars(getSetting('smtp_host', 'smtp.gmail.com')); ?>" placeholder="e.g. smtp.gmail.com" style="margin-bottom:0;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px; font-size:12px; color:#888; text-transform: uppercase; letter-spacing: 0.5px;">SMTP Port</label>
+                <input type="text" name="settings[smtp_port]" class="form-control" value="<?php echo htmlspecialchars(getSetting('smtp_port', '465')); ?>" placeholder="e.g. 465 or 587" style="margin-bottom:0;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px; font-size:12px; color:#888; text-transform: uppercase; letter-spacing: 0.5px;">Encryption</label>
+                <select name="settings[smtp_encryption]" class="form-control" style="margin-bottom:0; background:#1a1a1a; color:white; border:1px solid #333; padding:8px; width:100%; border-radius:4px;">
+                    <option value="ssl" <?php echo getSetting('smtp_encryption', 'ssl') === 'ssl' ? 'selected' : ''; ?>>SSL (Port 465)</option>
+                    <option value="tls" <?php echo getSetting('smtp_encryption') === 'tls' ? 'selected' : ''; ?>>TLS (Port 587)</option>
+                    <option value="none" <?php echo getSetting('smtp_encryption') === 'none' ? 'selected' : ''; ?>>None</option>
+                </select>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px; font-size:12px; color:#888; text-transform: uppercase; letter-spacing: 0.5px;">SMTP Username (Gmail Address)</label>
+                <input type="email" name="settings[smtp_username]" class="form-control" value="<?php echo htmlspecialchars(getSetting('smtp_username')); ?>" placeholder="e.g. yourname@gmail.com" style="margin-bottom:0;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px; font-size:12px; color:#888; text-transform: uppercase; letter-spacing: 0.5px;">SMTP Password (Gmail App Password)</label>
+                <input type="password" name="settings[smtp_password]" class="form-control" value="<?php echo htmlspecialchars(getSetting('smtp_password')); ?>" placeholder="16-character App Password" style="margin-bottom:0;">
+            </div>
+        </div>
+        
     </div>
 
     <button type="submit" name="save_settings" class="btn" style="padding: 15px 40px; font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 600; cursor: pointer; display: block; margin-top: 20px;">
