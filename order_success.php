@@ -15,8 +15,8 @@ if (!$order_exists) {
 }
 ?>
 
-<div class="container" style="text-align: center; padding: 150px 0; max-width: 600px;">
-    <div style="color: var(--accent); margin-bottom: 2rem;">
+<div class="container order-success-container" style="text-align: center; padding: 150px 0; max-width: 600px;">
+    <div style="color: #16a34a; margin-bottom: 2rem;">
         <i data-lucide="check" style="width: 64px; height: 64px;"></i>
     </div>
     <h1 class="section-title" style="font-size: 2.5rem; margin-bottom: 1rem;">ORDER SECURED</h1>

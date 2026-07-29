@@ -3645,14 +3645,15 @@ body.subpage-body #main-header .menu-toggle {
     }
 }
 
-/* Light Tan Theme Override for Product Detail, Cart, Checkout, Shop, Wishlist, Lookbook, and About pages */
+/* Light Tan Theme Override for Product Detail, Cart, Checkout, Shop, Wishlist, Lookbook, About, and Order Success pages */
 body:has(.product-detail-container),
 body:has(.cart-page-container),
 body:has(.checkout-page-container),
 body:has(.shop-page-container),
 body:has(.wishlist-page-container),
 body:has(.lookbook-page-container),
-body:has(.about-page-container) {
+body:has(.about-page-container),
+body:has(.order-success-container) {
     background-color: #d6d3d1 !important;
     color: #1a1a1a !important;
     font-family: var(--font-primary) !important;
@@ -3672,7 +3673,8 @@ body:has(.checkout-page-container) .btn,
 body:has(.shop-page-container) .btn,
 body:has(.wishlist-page-container) .btn,
 body:has(.lookbook-page-container) .btn,
-body:has(.about-page-container) .btn {
+body:has(.about-page-container) .btn,
+body:has(.order-success-container) .btn {
     background-color: #1a1a1a !important;
     color: #ffffff !important;
     border: 1px solid #1a1a1a !important;
@@ -3684,7 +3686,8 @@ body:has(.checkout-page-container) .btn:hover,
 body:has(.shop-page-container) .btn:hover,
 body:has(.wishlist-page-container) .btn:hover,
 body:has(.lookbook-page-container) .btn:hover,
-body:has(.about-page-container) .btn:hover {
+body:has(.about-page-container) .btn:hover,
+body:has(.order-success-container) .btn:hover {
     background-color: #333333 !important;
     color: #ffffff !important;
     border-color: #333333 !important;
