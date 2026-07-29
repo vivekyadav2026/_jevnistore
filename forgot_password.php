@@ -639,12 +639,7 @@ unset($_SESSION['_dev_reset_link']);
                     The link will expire in <strong>1 hour</strong>. Check your spam folder if you don't see it.
                 </p>
 
-                <?php if ($dev_link): ?>
-                <div class="dev-link-box">
-                    <strong>🛠 Dev Mode — Reset Link (no email configured)</strong>
-                    <a href="<?php echo htmlspecialchars($dev_link); ?>"><?php echo htmlspecialchars($dev_link); ?></a>
-                </div>
-                <?php endif; ?>
+
 
                 <a href="<?php echo BASE_URL; ?>/login.php" class="auth-btn" style="text-decoration:none; display:inline-flex; width:auto; padding: 13px 32px; margin: 0 auto;">
                     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
