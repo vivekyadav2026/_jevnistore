@@ -45,8 +45,8 @@ if (hash_equals($generated_signature, $razorpay_signature)) {
             unset($_SESSION['pending_order_id']);
         }
 
-        // Auto-push order to Shiprocket
-        $shiprocket_res = pushOrderToShiprocket($order_id);
+        // Auto-push order to Shiprocket disabled per request (Only manual push from admin panel)
+        $shiprocket_res = ['status' => 'info', 'message' => 'Manual push required'];
 
         echo json_encode([
             'status' => 'success',

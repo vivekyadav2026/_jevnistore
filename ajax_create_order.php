@@ -160,13 +160,12 @@ if ($stmt->execute()) {
         
         echo json_encode(['status' => 'error', 'message' => $errMsg]);
         exit();
-        
     } else {
-        // COD Order - Clear Cart and Push to Shiprocket automatically
+        // COD Order - Clear Cart
         unset($_SESSION['cart']);
         
-        // Auto-push order to Shiprocket
-        $shiprocket_res = pushOrderToShiprocket($order_id);
+        // Auto-push order to Shiprocket disabled per request (Only manual push from admin panel)
+        $shiprocket_res = ['status' => 'info', 'message' => 'Manual push required'];
         
         echo json_encode([
             'status' => 'success',
