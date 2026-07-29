@@ -11,9 +11,20 @@ require_once 'includes/header.php';
 // Handle Settings Update
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['save_settings'])) {
     foreach ($_POST['settings'] as $key => $value) {
-        $stmt = $conn->prepare("UPDATE settings SET value = ? WHERE `key` = ?");
-        $stmt->bind_param("ss", $value, $key);
-        $stmt->execute();
+        $check = $conn->prepare("SELECT `key` FROM settings WHERE `key` = ?");
+        $check->bind_param("s", $key);
+        $check->execute();
+        $res = $check->get_result();
+        
+        if ($res->num_rows > 0) {
+            $stmt = $conn->prepare("UPDATE settings SET value = ? WHERE `key` = ?");
+            $stmt->bind_param("ss", $value, $key);
+            $stmt->execute();
+        } else {
+            $stmt = $conn->prepare("INSERT INTO settings (`key`, `value`) VALUES (?, ?)");
+            $stmt->bind_param("ss", $key, $value);
+            $stmt->execute();
+        }
     }
     
     // Handle Hero Image Upload
