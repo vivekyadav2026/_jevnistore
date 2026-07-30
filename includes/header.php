@@ -163,7 +163,6 @@ require_once __DIR__ . '/functions.php';
     </style>
     <!-- Disable Inspect Element & Mobile Zoom Gestures -->
     <script>
-        /*
         // Disable context menu (right click)
         document.addEventListener('contextmenu', e => e.preventDefault());
 
@@ -186,12 +185,43 @@ require_once __DIR__ . '/functions.php';
                 return false;
             }
         });
-        */
 
-        // Disable pinch zoom on iOS / Safari
+        // Disable pinch zoom on iOS / Safari / Chrome
         document.addEventListener('gesturestart', function(e) {
             e.preventDefault();
         });
+        document.addEventListener('gesturechange', function(e) {
+            e.preventDefault();
+        });
+        document.addEventListener('gestureend', function(e) {
+            e.preventDefault();
+        });
+
+        // Disable multi-touch touchstart/touchmove (pinch zoom)
+        document.addEventListener('touchstart', function(event) {
+            if (event.touches.length > 1) {
+                event.preventDefault();
+            }
+        }, { passive: false });
+
+        document.addEventListener('touchmove', function(event) {
+            if (event.scale !== undefined && event.scale !== 1) {
+                event.preventDefault();
+            }
+            if (event.touches.length > 1) {
+                event.preventDefault();
+            }
+        }, { passive: false });
+
+        // Disable double tap to zoom on mobile devices
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function(event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
     </script>
 </head>
 <?php
