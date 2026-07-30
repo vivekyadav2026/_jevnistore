@@ -704,9 +704,20 @@
         </div>
 
         <!-- 2. Instagram Handle & Link -->
+        <?php 
+            $instagram_url = getSetting('social_instagram', 'https://www.instagram.com/norvastorex/');
+            $instagram_handle = '@norvastorex';
+            $parsed_url = parse_url($instagram_url);
+            if (isset($parsed_url['path'])) {
+                $path_parts = array_filter(explode('/', $parsed_url['path']));
+                if (!empty($path_parts)) {
+                    $instagram_handle = '@' . end($path_parts);
+                }
+            }
+        ?>
         <div class="mobile-instagram-header" style="position: relative; z-index: 99; pointer-events: auto;">
-            <a href="https://www.instagram.com/norvastorex/" target="_blank" class="instagram-handle">@norvastorex</a>
-            <a href="https://www.instagram.com/norvastorex/" target="_blank" class="instagram-view-link">VIEW OUR INSTAGRAM</a>
+            <a href="<?php echo htmlspecialchars($instagram_url); ?>" target="_blank" class="instagram-handle"><?php echo htmlspecialchars($instagram_handle); ?></a>
+            <a href="<?php echo htmlspecialchars($instagram_url); ?>" target="_blank" class="instagram-view-link">VIEW OUR INSTAGRAM</a>
         </div>
 
         <!-- 3. Small Image Slider Section -->
