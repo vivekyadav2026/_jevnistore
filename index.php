@@ -927,13 +927,76 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
         </div>
         
-        <div class="ragers-stars" style="font-size: 1.2rem; margin-bottom: 15px;">★★★★★</div>
-        <div class="ragers-review-title">slay check passed with full marks</div>
-        <div class="ragers-review-text">
-            bindass hai yaar, fabric se pata chalta hai premium hai design looks even better in person than the product photos corduroy texture is so tactile and premium feeling will be a loyal customer from her...
+        <div class="ragers-slider-wrapper" style="position: relative; overflow: hidden; min-height: 220px; display: flex; align-items: center; justify-content: center; width: 100%;">
+            <div id="active-review-container" style="width: 100%; transition: opacity 0.35s ease, transform 0.35s ease; opacity: 1; transform: translateY(0);">
+                <div class="ragers-stars" style="font-size: 1.2rem; margin-bottom: 15px;">★★★★★</div>
+                <div class="ragers-review-title" id="rev-title">slay check passed with full marks</div>
+                <div class="ragers-review-text" id="rev-text">
+                    bindass hai yaar, fabric se pata chalta hai premium hai design looks even better in person than the product photos corduroy texture is so tactile and premium feeling will be a loyal customer from her...
+                </div>
+                <div class="ragers-author" id="rev-author">Lavanya Gupta</div>
+            </div>
         </div>
-        <div class="ragers-author">Lavanya Gupta</div>
         
+        <script>
+            const ragersReviews = [
+                {
+                    title: "slay check passed with full marks",
+                    text: "bindass hai yaar, fabric se pata chalta hai premium hai design looks even better in person than the product photos corduroy texture is so tactile and premium feeling will be a loyal customer from her...",
+                    author: "Lavanya Gupta"
+                },
+                {
+                    title: "Absolutely next level baggy fit",
+                    text: "I have been searching for proper oversized streetwear pants in India for months and this is it. The drape is perfect, heavy cotton, sits beautifully on sneakers. Ordering the grey one next!",
+                    author: "Rohan Sharma"
+                },
+                {
+                    title: "Best streetwear cop of 2026",
+                    text: "Hardware quality on the cargo straps is insane. Very heavy-duty punk aesthetic. Washed it 3 times now, color and texture are still like brand new. 10/10 would recommend.",
+                    author: "Arjun Malhotra"
+                },
+                {
+                    title: "Sensational fabric & drop",
+                    text: "Super cozy, heavyweight feel, and the silhouette is perfectly street. The details on the waistband and pocket lining are very premium. NORVA is doing it right.",
+                    author: "Sanya Sen"
+                },
+                {
+                    title: "Pure cyberpunk aesthetic",
+                    text: "The stitching is flawless. Looks like a high-end designer piece but at a fraction of the cost. Got so many compliments in college today. Delivery was super fast too!",
+                    author: "Kabir Mehta"
+                }
+            ];
+
+            let currentRevIndex = 0;
+            const revContainer = document.getElementById('active-review-container');
+            const revTitle = document.getElementById('rev-title');
+            const revText = document.getElementById('rev-text');
+            const revAuthor = document.getElementById('rev-author');
+
+            setInterval(() => {
+                if (!revContainer) return;
+                // Slide out
+                revContainer.style.opacity = '0';
+                revContainer.style.transform = 'translateY(-15px)';
+
+                setTimeout(() => {
+                    // Update content
+                    currentRevIndex = (currentRevIndex + 1) % ragersReviews.length;
+                    const nextRev = ragersReviews[currentRevIndex];
+                    
+                    revTitle.textContent = nextRev.title;
+                    revText.textContent = nextRev.text;
+                    revAuthor.textContent = nextRev.author;
+
+                    // Slide in from bottom
+                    revContainer.style.transform = 'translateY(15px)';
+                    void revContainer.offsetWidth; // Trigger reflow
+                    
+                    revContainer.style.opacity = '1';
+                    revContainer.style.transform = 'translateY(0)';
+                }, 350);
+            }, 2000); // 2000ms interval for comfortable viewing
+        </script>
     </div>
 </section>
 
