@@ -704,9 +704,9 @@
         </div>
 
         <!-- 2. Instagram Handle & Link -->
-        <div class="mobile-instagram-header">
-            <a href="https://instagram.com/norvastorex" target="_blank" class="instagram-handle">@norvastorex</a>
-            <a href="https://instagram.com" target="_blank" class="instagram-view-link">VIEW OUR INSTAGRAM</a>
+        <div class="mobile-instagram-header" style="position: relative; z-index: 99; pointer-events: auto;">
+            <a href="https://www.instagram.com/norvastorex/" target="_blank" class="instagram-handle">@norvastorex</a>
+            <a href="https://www.instagram.com/norvastorex/" target="_blank" class="instagram-view-link">VIEW OUR INSTAGRAM</a>
         </div>
 
         <!-- 3. Small Image Slider Section -->
@@ -716,7 +716,7 @@
                     <img src="<?php echo BASE_URL; ?>/assets/bags/WhatsApp Image 2026-07-28 at 3.19.33 PM.jpeg" alt="Bag 1">
                 </div>
                 <div class="image-slide-item">
-                    <img src="<?php echo BASE_URL; ?>/assets/bags/WhatsApp Image 2026-07-28 at 3.19.33 PM (1).jpeg" alt="Bag 2">
+                    <img src="<?php echo BASE_URL; ?>/assets/bags/WhatsApp Image 2026-07-28 at 3.21.14 PM.jpeg" alt="Bag 2">
                 </div>
                 <div class="image-slide-item">
                     <img src="<?php echo BASE_URL; ?>/assets/bags/WhatsApp Image 2026-07-28 at 3.19.34 PM.jpeg" alt="Bag 3">
