@@ -19,6 +19,20 @@ require_once __DIR__ . '/functions.php';
     <!-- Lucide Icons for minimal elegant icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
+        @media (min-width: 1025px) {
+            #desktop-blocker {
+                display: flex !important;
+            }
+            body {
+                overflow: hidden !important;
+                height: 100vh !important;
+            }
+        }
+        @media (max-width: 1024px) {
+            #desktop-blocker {
+                display: none !important;
+            }
+        }
         html, body {
             touch-action: pan-x pan-y;
         }
@@ -229,6 +243,28 @@ $current_page = basename($_SERVER['PHP_SELF']);
 $body_class = ($current_page === 'index.php') ? 'homepage-body' : 'subpage-body';
 ?>
 <body class="<?php echo $body_class; ?>">
+
+    <!-- Desktop Blocker Overlay -->
+    <div id="desktop-blocker" style="display: none; position: fixed; inset: 0; background: #000000; color: #ffffff; z-index: 9999999; flex-direction: column; align-items: center; justify-content: center; text-align: center; font-family: 'Inter', sans-serif; padding: 20px;">
+        <div style="max-width: 450px; background: #111111; padding: 40px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 20px 80px rgba(0,0,0,0.85); display: flex; flex-direction: column; align-items: center;">
+            <div style="font-family: 'Playfair Display', serif; font-size: 2.5rem; font-weight: 700; letter-spacing: 4px; margin-bottom: 24px; text-transform: uppercase;">NØRVA</div>
+            <div style="font-size: 0.7rem; font-weight: 700; color: #adff2f; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 32px; border: 1px solid #adff2f; padding: 6px 16px; border-radius: 99px;">Mobile Only Experience</div>
+            <p style="font-size: 0.8rem; color: #a1a1aa; line-height: 1.8; margin-bottom: 36px; text-transform: uppercase; letter-spacing: 0.5px;">
+                Our collection is exclusively optimized for mobile devices. Please scan the QR code below using your mobile phone to experience NØRVA.
+            </p>
+            <div style="background: #ffffff; padding: 16px; border-radius: 16px; display: inline-block; margin-bottom: 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.5);">
+                <?php 
+                    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+                    $current_url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+                    $qr_api = "https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=" . urlencode($current_url);
+                ?>
+                <img src="<?php echo $qr_api; ?>" alt="Scan to Visit on Mobile" style="width: 180px; height: 180px; display: block; border-radius: 8px;">
+            </div>
+            <div style="font-size: 0.6rem; color: #71717a; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;">
+                SCAN TO SHOP AT NØRVA
+            </div>
+        </div>
+    </div>
 
     <!-- Toast Container -->
     <div id="toast-container"></div>
