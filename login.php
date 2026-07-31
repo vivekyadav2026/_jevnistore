@@ -3,7 +3,11 @@ require_once 'includes/db.php';
 require_once 'includes/functions.php';
 
 if (isLoggedIn()) {
-    redirect(BASE_URL . '/index.php');
+    if (isAdmin()) {
+        redirect(BASE_URL . '/admin/index.php');
+    } else {
+        redirect(BASE_URL . '/index.php');
+    }
 }
 
 $error = '';
