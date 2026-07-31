@@ -19,6 +19,7 @@ require_once __DIR__ . '/functions.php';
     <!-- Lucide Icons for minimal elegant icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
+        <?php if (strpos($_SERVER['REQUEST_URI'], '/admin/') === false): ?>
         @media (min-width: 1025px) {
             #desktop-blocker {
                 display: flex !important;
@@ -33,6 +34,7 @@ require_once __DIR__ . '/functions.php';
                 display: none !important;
             }
         }
+        <?php endif; ?>
         html, body {
             touch-action: pan-x pan-y;
         }
@@ -244,6 +246,7 @@ $body_class = ($current_page === 'index.php') ? 'homepage-body' : 'subpage-body'
 ?>
 <body class="<?php echo $body_class; ?>">
 
+    <?php if (strpos($_SERVER['REQUEST_URI'], '/admin/') === false): ?>
     <!-- Desktop Blocker Overlay -->
     <div id="desktop-blocker" style="display: none; position: fixed; inset: 0; background: #000000; color: #ffffff; z-index: 9999999; flex-direction: column; align-items: center; justify-content: center; text-align: center; font-family: 'Inter', sans-serif; padding: 20px;">
         <div style="max-width: 450px; background: #111111; padding: 40px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 20px 80px rgba(0,0,0,0.85); display: flex; flex-direction: column; align-items: center;">
@@ -265,6 +268,7 @@ $body_class = ($current_page === 'index.php') ? 'homepage-body' : 'subpage-body'
             </div>
         </div>
     </div>
+    <?php endif; ?>
 
     <!-- Toast Container -->
     <div id="toast-container"></div>
