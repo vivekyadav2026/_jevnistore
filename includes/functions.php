@@ -44,7 +44,7 @@ function requireLogin() {
 
 function requireAdmin() {
     if (!isAdmin()) {
-        redirect(BASE_URL . '/index.php');
+        redirect(BASE_URL . '/login.php');
     }
 }
 
