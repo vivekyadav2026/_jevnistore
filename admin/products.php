@@ -103,20 +103,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['edit_product'])) {
     
     // Handle primary image update
     if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
-        $image = uniqid() . '_' . basename($_FILES['image']['name']);
-        compressAndSaveImage($_FILES['image']['tmp_name'], '../assets/' . $image);
-        
-        $conn->query("DELETE FROM product_images WHERE product_id = $product_id AND sort_order = 0");
-        $conn->query("INSERT INTO product_images (product_id, image_path, sort_order) VALUES ($product_id, '$image', 0)");
+        $new_image_name = uniqid() . '_' . basename($_FILES['image']['name']);
+        $dest = __DIR__ . '/../assets/' . $new_image_name;
+        $saved = compressAndSaveImage($_FILES['image']['tmp_name'], $dest);
+        if (!$saved) {
+            $saved = move_uploaded_file($_FILES['image']['tmp_name'], $dest);
+        }
+        if ($saved) {
+            $image = $new_image_name;
+            $conn->query("DELETE FROM product_images WHERE product_id = $product_id AND sort_order = 0");
+            $conn->query("INSERT INTO product_images (product_id, image_path, sort_order) VALUES ($product_id, '$image', 0)");
+        }
     }
 
     // Handle secondary image update
     if (isset($_FILES['image2']) && $_FILES['image2']['error'] == 0) {
-        $image2 = uniqid() . '_' . basename($_FILES['image2']['name']);
-        compressAndSaveImage($_FILES['image2']['tmp_name'], '../assets/' . $image2);
-        
-        $conn->query("DELETE FROM product_images WHERE product_id = $product_id AND sort_order = 1");
-        $conn->query("INSERT INTO product_images (product_id, image_path, sort_order) VALUES ($product_id, '$image2', 1)");
+        $new_image2_name = uniqid() . '_' . basename($_FILES['image2']['name']);
+        $dest2 = __DIR__ . '/../assets/' . $new_image2_name;
+        $saved2 = compressAndSaveImage($_FILES['image2']['tmp_name'], $dest2);
+        if (!$saved2) {
+            $saved2 = move_uploaded_file($_FILES['image2']['tmp_name'], $dest2);
+        }
+        if ($saved2) {
+            $image2 = $new_image2_name;
+            $conn->query("DELETE FROM product_images WHERE product_id = $product_id AND sort_order = 1");
+            $conn->query("INSERT INTO product_images (product_id, image_path, sort_order) VALUES ($product_id, '$image2', 1)");
+        }
     }
     
     $has_variants = isset($_POST['has_variants']) ? 1 : 0;
@@ -124,8 +136,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['edit_product'])) {
     $variants_list = $_POST['variants_list'] ?? '';
 
     $stmt = $conn->prepare("UPDATE products SET category_id = ?, name = ?, description = ?, price = ?, compare_at_price = ?, stock = ?, weight = ?, length = ?, width = ?, height = ?, is_waitlist = ?, image = ?, image2 = ?, has_variants = ?, variant_name = ?, variants_list = ? WHERE id = ?");
-    $stmt->bind_param("issddidiiiiissisi", $category_id, $name, $description, $price, $compare_at_price, $stock, $weight, $length, $width, $height, $is_waitlist, $image, $image2, $has_variants, $variant_name, $variants_list, $product_id);
-    $stmt->execute();
+    // Types: i=category_id, s=name, s=description, d=price, d=compare_at_price,
+    //        i=stock, d=weight, i=length, i=width, i=height, i=is_waitlist,
+    //        s=image, s=image2, i=has_variants, s=variant_name, s=variants_list, i=product_id  (17 total)
+    $stmt->bind_param("issddidiiiississi", $category_id, $name, $description, $price, $compare_at_price, $stock, $weight, $length, $width, $height, $is_waitlist, $image, $image2, $has_variants, $variant_name, $variants_list, $product_id);
+    if (!$stmt->execute()) {
+        setFlash('Error updating product: ' . $stmt->error, 'error');
+        redirect('products.php');
+    }
     
     // Handle multiple new gallery images
     if (isset($_FILES['gallery']) && !empty($_FILES['gallery']['name'][0])) {
