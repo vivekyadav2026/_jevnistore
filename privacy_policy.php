@@ -169,7 +169,7 @@
             </p>
 
             <p class="policy-text">
-                Your privacy is important to us. This Privacy Policy explains how we collect, use, store, and protect your personal information when you visit <strong>https://nørva.store</strong>, create an account, make a purchase, or otherwise interact with our website and services.
+                Your privacy is important to us. This Privacy Policy explains how we collect, use, store, and protect your personal information when you visit <strong>https://norvastore.in</strong>, create an account, make a purchase, or otherwise interact with our website and services.
             </p>
 
             <p class="policy-text">
@@ -388,7 +388,7 @@
                     <strong>Email:</strong> <a href="mailto:norvastorex@gmail.com" style="color: #e8175d; text-decoration: none; font-weight: 600;">norvastorex@gmail.com</a>
                 </p>
                 <p class="policy-text">
-                    <strong>Website:</strong> <a href="https://nørva.store" target="_blank" style="color: #e8175d; text-decoration: none; font-weight: 600;">https://nørva.store</a>
+                    <strong>Website:</strong> <a href="https://norvastore.in" target="_blank" style="color: #e8175d; text-decoration: none; font-weight: 600;">https://norvastore.in</a>
                 </p>
             </div>
 

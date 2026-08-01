@@ -342,7 +342,7 @@
                     <strong>Email:</strong> <a href="mailto:norvastorex@gmail.com" style="color: #e8175d; text-decoration: none; font-weight: 600;">norvastorex@gmail.com</a>
                 </p>
                 <p class="policy-text">
-                    <strong>Website:</strong> <a href="https://nørva.store" target="_blank" style="color: #e8175d; text-decoration: none; font-weight: 600;">https://nørva.store</a>
+                    <strong>Website:</strong> <a href="https://norvastore.in" target="_blank" style="color: #e8175d; text-decoration: none; font-weight: 600;">https://norvastore.in</a>
                 </p>
             </div>
 

@@ -159,7 +159,7 @@
             <h2 style="font-size: 1.15rem; font-weight: 700; color: #1a1a1a; margin-bottom: 12px;">Welcome to Nørva Store</h2>
 
             <p class="policy-text">
-                These Terms of Service ("Terms") govern your access to and use of <strong>https://nørva.store</strong> (the "Website"), including all products, features, services, content, and functionality provided by <strong>Nørva Store</strong> ("Nørva Store," "we," "our," or "us").
+                These Terms of Service ("Terms") govern your access to and use of <strong>https://norvastore.in</strong> (the "Website"), including all products, features, services, content, and functionality provided by <strong>Nørva Store</strong> ("Nørva Store," "we," "our," or "us").
             </p>
 
             <p class="policy-text">
@@ -439,7 +439,7 @@
                     <strong>Email:</strong> <a href="mailto:norvastorex@gmail.com" style="color: #e8175d; text-decoration: none; font-weight: 600;">norvastorex@gmail.com</a>
                 </p>
                 <p class="policy-text">
-                    <strong>Website:</strong> <a href="https://nørva.store" target="_blank" style="color: #e8175d; text-decoration: none; font-weight: 600;">https://nørva.store</a>
+                    <strong>Website:</strong> <a href="https://norvastore.in" target="_blank" style="color: #e8175d; text-decoration: none; font-weight: 600;">https://norvastore.in</a>
                 </p>
             </div>
 
